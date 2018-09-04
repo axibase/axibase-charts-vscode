@@ -94,8 +94,7 @@ export const suggestionMessage: (word: string, dictionary?: Iterable<string>) =>
  * @returns the wanted setting or undefined if not found
  */
 export const getSetting: (name: string) => Setting | undefined = (name: string): Setting | undefined => {
-    const clearedName: string = name.toLowerCase()
-        .replace(/[^a-z]/g, "");
+    const clearedName: string = Setting.clearSetting(name);
 
     return settingsMap.get(clearedName);
 };

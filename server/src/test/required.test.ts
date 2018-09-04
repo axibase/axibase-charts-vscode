@@ -164,6 +164,44 @@ endfor`,
   metric = cpu_busy`,
             [],
         ),
+        new Test(
+            "Do not raise error if both column-metric and column-value are null",
+            `list lpars = abc, cde, efg
+[widget]
+  type = table
+  column-metric = null
+  column-value = null
+  [series]
+    entity = @{lpar}`,
+            [],
+        ),
+        new Test(
+            "Raise error if column-metric is not null",
+            `list lpars = abc, cde, efg
+[widget]
+  type = table
+  column-metric = undefined
+  column-value = null
+  [series]
+    entity = @{lpar}`,
+            [createDiagnostic(
+                Range.create(5, "  [".length, 5, "  [".length + "series".length),
+                DiagnosticSeverity.Error, "metric is required",
+            )],
+        ),
+        new Test(
+            "Raise error if column-value is not specified",
+            `list lpars = abc, cde, efg
+[widget]
+  type = table
+  column-metric = null
+  [series]
+    entity = @{lpar}`,
+            [createDiagnostic(
+                Range.create(4, "  [".length, 4, "  [".length + "series".length),
+                DiagnosticSeverity.Error, "metric is required",
+            )],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });

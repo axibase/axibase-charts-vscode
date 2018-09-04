@@ -7,8 +7,8 @@ import {
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import {
-    addDisplayNames, countCsvColumns, createDiagnostic, deleteComments, getSetting, isAnyInArray,
-    isDate, isInMap, mapToArray, suggestionMessage,
+    addDisplayNames, countCsvColumns, createDiagnostic, deleteComments, getSetting,
+    isAnyInArray, isDate, isInMap, mapToArray, suggestionMessage,
 } from "./util";
 
 export class Validator {
@@ -29,6 +29,7 @@ export class Validator {
     private previousSettings: Setting[] = [];
     private requiredSettings: Array<Array<Setting | undefined>> = [];
     private readonly result: Diagnostic[] = [];
+    private settingValues: Map<string, string> = new Map<string, string>();
     private urlParameters: string[] | undefined;
     private readonly variables: Map<string, string[]> = new Map([
         ["freemarker", ["entity", "entities"]],
@@ -86,6 +87,18 @@ export class Validator {
                 this.addToSettingMap(this.currentSection.text, setting);
             }
         }
+    }
+
+    /**
+     * Adds new entry to settingValue map based on this.match
+     */
+    private addSettingValue(): void {
+        if (!this.match) {
+            throw new Error("Trying to add new entry to settingValue map based on undefined");
+        }
+        const name: string = Setting.clearSetting(this.match[2]);
+        const value: string = Setting.clearSetting(this.match[3]);
+        this.settingValues.set(name, value);
     }
 
     /**
@@ -367,6 +380,13 @@ export class Validator {
                         }
                         if (ifCounter !== elseCounter) { notFound.push(displayName); }
                     } else {
+                        if (displayName === "metric") {
+                            const columnMetric: string | undefined = this.settingValues.get("columnmetric");
+                            const columnValue: string | undefined = this.settingValues.get("columnvalue");
+                            if (columnMetric === "null" && columnValue === "null") {
+                                return;
+                            }
+                        }
                         notFound.push(displayName);
                     }
                 }
@@ -503,7 +523,7 @@ export class Validator {
         const regexp: RegExp = /{(.+?)}/g;
         this.match = regexp.exec(line);
         while (this.match) {
-            const cleared: string = this.match[1].replace(/[^a-z]/g, "");
+            const cleared: string = Setting.clearSetting(this.match[1]);
             this.urlParameters.push(cleared);
             this.match = regexp.exec(line);
         }
@@ -540,13 +560,13 @@ export class Validator {
 
     /**
      * Creates a diagnostic about unknown setting name or returns the setting
-     * @param name the setting name
      * @returns undefined if setting is unknown, setting otherwise
      */
-    private getSettingCheck(name: string): Setting | undefined {
+    private getSettingCheck(): Setting | undefined {
         if (!this.match) {
             return;
         }
+        const name: string = this.match[2];
         const setting: Setting | undefined = getSetting(name);
         if (!setting) {
             if (TextRange.KEYWORD_REGEXP.test(name)) {
@@ -801,8 +821,8 @@ export class Validator {
         const line: string = this.getCurrentLine();
         if (!this.currentSection || !/(?:tag|key)s?/.test(this.currentSection.text)) {
             // We are not in tags or keys section
-            const name: string = this.match[2];
-            const setting: Setting | undefined = this.getSettingCheck(name);
+            this.addSettingValue();
+            const setting: Setting | undefined = this.getSettingCheck();
             if (!setting) {
                 return;
             }
