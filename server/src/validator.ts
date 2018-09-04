@@ -559,6 +559,9 @@ export class Validator {
                     return undefined;
                 }
             }
+            if (name.startsWith("column")) {
+                return undefined;
+            }
             dictionary = addDisplayNames(dictionary);
             const message: string = suggestionMessage(name, dictionary);
             this.result.push(createDiagnostic(

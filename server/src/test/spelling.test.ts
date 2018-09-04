@@ -106,6 +106,14 @@ type = chart`,
                 DiagnosticSeverity.Error, errorMessage("ad", "id"),
             )],
         ),
+        new Test(
+            "Column setting",
+            `[widget]
+  type = table
+  column-metric = null
+  column-value = null`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
