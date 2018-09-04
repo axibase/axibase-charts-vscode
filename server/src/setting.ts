@@ -9,7 +9,7 @@ export class Setting {
     public static clearSetting: (str: string) => string = (str: string): string => str.toLowerCase()
         .replace(/[^a-z]/g, "")
     public readonly defaultValue?: string | number | boolean;
-    public readonly description?: string = "";
+    public readonly description: string = "";
     public readonly displayName: string = "";
     public readonly enum: string[] = [];
     public readonly example: string | number | boolean = "";
