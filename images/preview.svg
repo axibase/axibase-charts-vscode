@@ -1,0 +1,8 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+    <circle/>
+    <rect x="1" y="12" width="2" height="4"/>
+    <rect x="5" y="9.75" width="2" height="6.25"/>
+    <rect x="9" y="6" width="2" height="10"/>
+    <rect x="13" y="0" width="2" height="16"/>
+</svg>

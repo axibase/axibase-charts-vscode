@@ -71,7 +71,8 @@
             {
                 "command": "axibasecharts.showPortal",
                 "title": "Show preview",
-                "category": "Axibase Charts"
+                "category": "Axibase Charts",
+                "icon": "./images/preview.svg"
             },
             {
                 "command": "axibasecharts.changeUrl",
