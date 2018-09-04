@@ -1,5 +1,5 @@
-import { ClientRequest, IncomingMessage, OutgoingMessage, request as http, RequestOptions } from "http";
-import { request as https } from "https";
+import { ClientRequest, IncomingMessage, OutgoingMessage, request as http } from "http";
+import { request as https, RequestOptions } from "https";
 import { URL } from "url";
 import {
     Event, EventEmitter, TextDocument, TextDocumentContentProvider, TextEditor,
@@ -158,6 +158,7 @@ document.cookie = "${this.cookie}";
             path: "/login-processing",
             port: url.port,
             protocol: url.protocol,
+            rejectUnauthorized: false,
         };
         const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
             => ClientRequest = (url.protocol === "https:") ? https : http;

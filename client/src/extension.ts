@@ -115,21 +115,53 @@ export const deactivate: () => Thenable<void> = (): Thenable<void> => {
 
 const validateUrl: (url: string) => boolean = (url: string): boolean => urlRegex({ exact: true, strict: true })
     .test(url);
-
-const askUrl: () => Promise<string> = async (): Promise<string> => {
-    const url: string | undefined = await window.showInputBox({
-        ignoreFocusOut: true, placeHolder: "http(s)://atsd_host:port",
-        prompt: "Enter the target ATSD URL. Can be stored permanently in 'axibaseCharts.url' setting",
-    });
-    if (!url) {
-        return Promise.reject("URL is not specified");
+const validateAddress: (address: string) => string | undefined = (address: string): string | undefined => {
+    const regex: RegExp = urlRegex({ exact: true, strict: false });
+    if (!regex.test(address)) {
+        return "The address is invalid";
     }
 
+    return undefined;
+};
+
+const askUrl: () => Promise<string> = async (): Promise<string> => {
+    const protocol: string | undefined = await window.showQuickPick(["http", "https"], {
+        canPickMany: false, ignoreFocusOut: true, placeHolder: "Choose the protocol to connect to ATSD",
+    });
+    if (!protocol) {
+        return Promise.reject("Protocol is not specified");
+    }
+    const address: string | undefined = await window.showInputBox({
+        ignoreFocusOut: true, placeHolder: "localhost",
+        prompt: "Enter the target ATSD address. Can be stored permanently in 'axibaseCharts.url' setting",
+        validateInput: validateAddress,
+    });
+    if (!address) {
+        return Promise.reject("Address is not specified");
+    }
+    const port: string | undefined = await window.showInputBox({
+        ignoreFocusOut: true, placeHolder: "8443", prompt: "Enter the target ATSD port",
+        validateInput: isPort, value: "8443",
+    });
+    if (!port) {
+        return Promise.reject("Port is not specified");
+    }
+    const url: string = `${protocol}://${address}:${port}`;
+
     if (!validateUrl(url)) {
-        window.showErrorMessage("The specified URL is incorrect!");
+        window.showErrorMessage(`The specified URL: ${url} is incorrect!`);
 
         return askUrl();
     }
 
     return url;
+};
+
+const isPort: (str: string) => string | undefined = (str: string): string | undefined => {
+    const port: number = Number.parseInt(str, 10);
+    if (Number.isNaN(port) || port < 1 || port > 65535) {
+        return "Port must be an integer between 1 and 65535";
+    }
+
+    return undefined;
 };
