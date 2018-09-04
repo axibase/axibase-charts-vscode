@@ -49,8 +49,14 @@ export const settingsMap: Map<string, Setting> = createSettingsMap();
  */
 export const requiredSectionSettingsMap: Map<string, Array<Array<Setting | undefined>>> = new Map([
     ["series", [
-        [settingsMap.get("entity"), settingsMap.get("value"), settingsMap.get("entities")],
-        [settingsMap.get("metric"), settingsMap.get("value"), settingsMap.get("table"), settingsMap.get("attribute")],
+        [
+            settingsMap.get("entity"), settingsMap.get("value"),
+            settingsMap.get("entities"), settingsMap.get("entitygroup"),
+        ],
+        [
+            settingsMap.get("metric"), settingsMap.get("value"),
+            settingsMap.get("table"), settingsMap.get("attribute"),
+        ],
     ]],
     ["widget", [[settingsMap.get("type")],
     ]],

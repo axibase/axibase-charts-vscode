@@ -4794,11 +4794,6 @@
             "example": "1px"
         },
         {
-            "displayName": "palette",
-            "type": null,
-            "example": null
-        },
-        {
             "displayName": "palette-ticks",
             "section": "widget",
             "type": "boolean",
