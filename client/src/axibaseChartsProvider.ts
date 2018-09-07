@@ -47,12 +47,6 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
         if (this.password && this.username && !this.cookie) {
             try {
                 [this.withCredentials, this.cookie] = await this.performRequest(this.username, this.password);
-                if (new URL(this.withCredentials).pathname.includes("login")) {
-                    const errorMessage: string = "Credentials are incorrect";
-                    window.showErrorMessage(errorMessage);
-
-                    return Promise.reject(errorMessage);
-                }
             } catch (err) {
                 window.showErrorMessage(err);
 
@@ -60,6 +54,12 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
             } finally {
                 delete this.password;
                 delete this.username;
+            }
+            if (new URL(this.withCredentials).pathname.includes("login")) {
+                const errorMessage: string = "Credentials are incorrect";
+                window.showErrorMessage(errorMessage);
+
+                return Promise.reject(errorMessage);
             }
         }
         this.addUrl();
