@@ -39,7 +39,10 @@
                 "axibaseCharts.protocol": {
                     "type": "string",
                     "description": "What protocol should be used to show the preview.",
-                    "default": "http"
+                    "default": "http",
+                    "enum": [
+                        "http", "https"
+                    ]
                 },
                 "axibaseCharts.port": {
                     "type": "integer",
