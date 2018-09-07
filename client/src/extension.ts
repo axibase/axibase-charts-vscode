@@ -1,4 +1,7 @@
+import { ClientRequest, IncomingMessage, OutgoingMessage, request as http } from "http";
+import { request as https, RequestOptions } from "https";
 import { join } from "path";
+import { URL } from "url";
 // tslint:disable-next-line:no-require-imports
 import urlRegex = require("url-regex");
 import {
@@ -148,9 +151,57 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
                     `to ${address}:${port}. Exit VSCode to terminate the session.`,
             });
         } catch (err) {
-            return Promise.reject(err);
+            return Promise.reject(err as Error);
         }
     }
 
-    return { url, username, password };
+    let cookie: string | undefined;
+    if (password && username) {
+        try {
+            cookie = await performRequest(url, username, password);
+        } catch (err) {
+            const error: Error = err as Error;
+            window.showErrorMessage(error.toString());
+
+            return Promise.reject(error);
+        }
+    }
+
+    return { url, cookie };
 };
+const performRequest: (address: string, username: string, password: string) => Promise<string> =
+    async (address: string, username: string, password: string): Promise<string> => {
+        const url: URL = new URL(address);
+        const options: RequestOptions = {
+            headers: {
+                Authorization: `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
+            },
+            hostname: url.hostname,
+            method: "GET",
+            path: "/api/v1/ping",
+            port: url.port,
+            protocol: url.protocol,
+            rejectUnauthorized: false, // allows self-signed certificates
+            timeout: 500, // milliseconds (0.5 s)
+        };
+        const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
+            => ClientRequest = (url.protocol === "https:") ? https : http;
+
+        return new Promise<string>((resolve: (result: string) => void, reject: (err: Error) => void): void => {
+            const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
+                res.on("error", reject);
+                const expectedStatusCode: number = 200;
+                if (res.statusCode !== expectedStatusCode) {
+                    return reject(new Error(`Login failed with status code ${res.statusCode}`));
+                }
+                const setCookie: string[] | undefined = res.headers["set-cookie"];
+                if (!setCookie) {
+                    return reject(new Error("Cookie is empty"));
+                }
+                resolve(setCookie.join(";"));
+            });
+
+            outgoing.on("error", reject);
+            outgoing.end();
+        });
+    };

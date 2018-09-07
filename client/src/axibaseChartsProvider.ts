@@ -1,15 +1,11 @@
-import { ClientRequest, IncomingMessage, OutgoingMessage, request as http } from "http";
-import { request as https, RequestOptions } from "https";
-import { URL } from "url";
 import {
-    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri, window,
+    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri,
 } from "vscode";
 import { languageId } from "./extension";
 
 export interface IConnectionDetails {
-    password?: string;
+    cookie?: string;
     url: string;
-    username?: string;
 }
 
 export class AxibaseChartsProvider implements TextDocumentContentProvider {
@@ -30,33 +26,19 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
     private cookie: string | undefined;
     private innerDocument: TextDocument;
     private readonly onDidChangeEmitter: EventEmitter<Uri>;
-    private password: string | undefined;
     private text: string | undefined;
     private url: string;
-    private username: string | undefined;
-    private withCredentials: string | undefined;
 
     public constructor(details: IConnectionDetails, document: TextDocument) {
         this.onDidChangeEmitter = new EventEmitter<Uri>();
         this.innerDocument = document;
         this.url = details.url;
-        if (details.username && details.password) {
-            this.username = details.username;
-            this.password = details.password;
-        } else {
-            this.withCredentials = this.url;
-        }
+        this.cookie = details.cookie;
     }
 
     public changeSettings(details: IConnectionDetails): void {
-        delete this.cookie;
         this.url = details.url;
-        if (details.username && details.password) {
-            this.username = details.username;
-            this.password = details.password;
-        } else {
-            this.withCredentials = this.url;
-        }
+        this.cookie = details.cookie;
         this.update();
     }
 
@@ -68,24 +50,6 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
         this.clearUrl();
         this.replaceImports();
 
-        if (this.password && this.username && !this.cookie) {
-            try {
-                [this.withCredentials, this.cookie] = await this.performRequest(this.username, this.password);
-            } catch (err) {
-                window.showErrorMessage(err);
-
-                return Promise.reject(err);
-            } finally {
-                delete this.password;
-                delete this.username;
-            }
-            if (new URL(this.withCredentials).pathname.includes("login")) {
-                const errorMessage: string = "Credentials are incorrect";
-                window.showErrorMessage(errorMessage);
-
-                return Promise.reject(errorMessage);
-            }
-        }
         this.addUrl();
         const html: string = this.getHtml();
 
@@ -111,7 +75,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
             match = /^[ \t]*\[configuration\]/i.exec(this.text);
         }
         if (match) {
-            this.text = `${this.text.substr(0, match.index + match[0].length + 1)}  url = ${this.withCredentials}
+            this.text = `${this.text.substr(0, match.index + match[0].length + 1)}  url = ${this.url}
 ${this.text.substr(match.index + match[0].length + 1)}`;
         }
     }
@@ -168,53 +132,6 @@ document.cookie = "${this.cookie}";
 </body>
 
 </html>`;
-    }
-
-    private async performRequest(username: string, password: string): Promise<[string, string]> {
-        const url: URL = new URL(this.url);
-        const data: string = `login=true&atsd_user=${username}&atsd_pwd=${password}&commit=Login`;
-        const options: RequestOptions = {
-            headers: {
-                "Content-Length": data.length,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            hostname: url.hostname,
-            method: "POST",
-            path: "/login-processing",
-            port: url.port,
-            protocol: url.protocol,
-            rejectUnauthorized: false, // allows self-signed certificates
-            timeout: 500, // milliseconds (0.5 s)
-        };
-        const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
-            => ClientRequest = (url.protocol === "https:") ? https : http;
-
-        return new Promise<[string, string]>((
-            resolve: (value: [string, string]) => void, reject: (reason: Error) => void): void => {
-            const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
-                res.on("error", reject);
-                const expectedStatusCode: number = 302;
-                if (res.statusCode !== expectedStatusCode) {
-                    return reject(new Error(`HTTP response code: ${res.statusCode}`));
-                }
-                if (res.headers) {
-                    const location: string | undefined = res.headers.location;
-                    const setCookie: string[] | undefined = res.headers["set-cookie"];
-                    if (!setCookie) {
-                        return reject(new Error("Empty cookie"));
-                    }
-                    const cookie: string | undefined = setCookie.join(";");
-                    if (location && cookie) {
-                        return resolve([location, cookie]);
-                    }
-                }
-
-                return reject(new Error("Empty headers"));
-            });
-            outgoing.on("error", reject);
-            outgoing.write(data);
-            outgoing.end();
-        });
     }
 
     private replaceImports(): void {
