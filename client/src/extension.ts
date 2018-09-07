@@ -15,7 +15,6 @@ const configSection: string = "axibaseCharts";
 const errorMessage: string = "Configure connection properties in VSCode > Preferences > Settings. Open Settings," +
     " search settings for 'axibase', and enter the requested connection properties.";
 let client: LanguageClient;
-const tabSize: number = 2;
 
 export const activate: (context: ExtensionContext) => void = async (context: ExtensionContext): Promise<void> => {
 
@@ -55,12 +54,6 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
         }
     }));
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {
-        const textEditor: TextEditor | undefined = window.activeTextEditor;
-        if (textEditor) {
-            const editorConfig: WorkspaceConfiguration = workspace.getConfiguration("editor", textEditor.document.uri);
-            editorConfig.update("tabSize", tabSize);
-            editorConfig.update("insertSpaces", true);
-        }
         if (provider) {
             provider.update(Uri.parse(previewUri));
         }

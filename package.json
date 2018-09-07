@@ -22,43 +22,36 @@
             "title": "Default configuration",
             "properties": {
                 "axibaseCharts.validateFunctions": {
-                    "scope": "resource",
                     "type": "boolean",
                     "default": false,
                     "description": "Controls whether inline JS functions are validated or not."
                 },
                 "axibaseCharts.address": {
-                    "scope": "resource",
                     "type": "string",
                     "default": "localhost",
                     "description": "What URL should be used to show the preview."
                 },
                 "axibaseCharts.username": {
-                    "scope": "resource",
                     "type": "string",
                     "default": null,
                     "description": "What username should be used to show the preview. Empty if API is open for guests."
                 },
                 "axibaseCharts.protocol": {
-                    "scope": "resource",
                     "type": "string",
                     "description": "What protocol should be used to show the preview.",
-                    "default": "http",
-                    "anyOf": [
-                        "http", "https"
-                    ],
-                    "enumDescriptions": [
-                        "Without SSL", "With SSL. Self-signed certificate requires ----ignore-certificate-errors flag."
-                    ]
+                    "default": "http"
                 },
                 "axibaseCharts.port": {
-                    "scope": "resource",
                     "type": "integer",
                     "default": 8088,
-                    "minimum": 1,
-                    "maximum": 65535,
                     "description": "What port should be used to show the preview."
                 }
+            }
+        },
+        "configurationDefaults": {
+            "axibasecharts": {
+                "editor.tabSize": 2,
+                "editor.insertSpaces": true
             }
         },
         "languages": [
