@@ -1,5 +1,5 @@
 import {
-    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri,
+    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri, workspace,
 } from "vscode";
 import { languageId } from "./extension";
 
@@ -90,13 +90,21 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     }
 
     private getHtml(): string {
+        const theme: string | undefined = workspace.getConfiguration("workbench")
+            .get("colorTheme");
+        const applyDark: boolean = theme !== undefined && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme);
+
         return `<!DOCTYPE html>
 <html>
 
 <head>
 	<link rel="stylesheet" type="text/css"
 		href="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/css/smoothness/jquery-ui-1.9.1.custom.min.css">
-	<link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/charts.min.css">
+    <link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/charts.min.css">
+    ${applyDark ?
+                `<link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/themes/black/black.css">` :
+                ""
+            }
 	<style>
 	  .portalPage body {
 		padding: 0;
