@@ -182,7 +182,7 @@ const performRequest: (address: string, username: string, password: string) => P
             port: url.port,
             protocol: url.protocol,
             rejectUnauthorized: false, // allows self-signed certificates
-            timeout: 500, // milliseconds (0.5 s)
+            timeout: 3000, // milliseconds (3 s)
         };
         const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
             => ClientRequest = (url.protocol === "https:") ? https : http;
@@ -190,8 +190,7 @@ const performRequest: (address: string, username: string, password: string) => P
         return new Promise<string>((resolve: (result: string) => void, reject: (err: Error) => void): void => {
             const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
                 res.on("error", reject);
-                const expectedStatusCode: number = 200;
-                if (res.statusCode !== expectedStatusCode) {
+                if (res.statusCode !== 200) {
                     return reject(new Error(`Login failed with status code ${res.statusCode}`));
                 }
                 const setCookie: string[] | undefined = res.headers["set-cookie"];
