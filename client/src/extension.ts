@@ -2,8 +2,8 @@ import { join } from "path";
 // tslint:disable-next-line:no-require-imports
 import urlRegex = require("url-regex");
 import {
-    commands, ConfigurationChangeEvent, ExtensionContext, TextDocument, Uri, ViewColumn, window,
-    workspace, WorkspaceConfiguration,
+    commands, ConfigurationChangeEvent, Disposable, ExtensionContext, TextDocument, Uri, ViewColumn,
+    window, workspace, WorkspaceConfiguration,
 } from "vscode";
 import {
     ForkOptions, LanguageClient, LanguageClientOptions, ServerOptions, TransportKind,
@@ -12,6 +12,7 @@ import { AxibaseChartsProvider } from "./axibaseChartsProvider";
 
 const previewUri: string = "axibaseCharts://authority/axibaseCharts";
 const configSection: string = "axibaseCharts";
+const languageId: string = "axibasecharts";
 const errorMessage: string = "Configure connection properties in VSCode > Preferences > Settings. Open Settings," +
     " search settings for 'axibase', and enter the requested connection properties.";
 let client: LanguageClient;
@@ -33,7 +34,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
-        documentSelector: [{ language: "axibasecharts", scheme: "file" }],
+        documentSelector: [{ language: languageId, scheme: "file" }],
         outputChannelName: "Axibase Charts",
         synchronize: {
             // Notify the server about file changes to ".clientrc files contain in the workspace
@@ -42,7 +43,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     };
 
     // Create the language client and start the client.
-    client = new LanguageClient("axibaseCharts", "Axibase Charts", serverOptions, clientOptions);
+    client = new LanguageClient(languageId, "Axibase Charts", serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
     client.start();
@@ -54,31 +55,35 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
         }
     }));
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {
-        if (provider) {
+        if (window.activeTextEditor && window.activeTextEditor.document.languageId === languageId && provider) {
             provider.update(Uri.parse(previewUri));
         }
     }));
-    context.subscriptions.push(workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent): void => {
-        if (e.affectsConfiguration(configSection) && provider) {
-            provider = undefined;
-            commands.executeCommand("axibasecharts.showPortal");
-        }
-    }));
-    context.subscriptions.push(commands.registerCommand("axibasecharts.showPortal", async (): Promise<void> => {
+    let providerRegistration: Disposable | undefined;
+    context.subscriptions.push(commands.registerCommand(`${languageId}.showPortal`, async (): Promise<void> => {
         if (!provider) {
             try {
                 provider = await constructProvider();
             } catch (err) {
                 window.showErrorMessage(err);
 
-                return;
+                return Promise.reject();
             }
 
-            context.subscriptions.push(workspace.registerTextDocumentContentProvider("axibaseCharts", provider));
+            providerRegistration = workspace.registerTextDocumentContentProvider("axibaseCharts", provider);
+            context.subscriptions.push(providerRegistration);
             provider.update(Uri.parse(previewUri));
         }
 
         commands.executeCommand("vscode.previewHtml", previewUri, ViewColumn.Two, "Portal");
+    }));
+    context.subscriptions.push(workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent): void => {
+        if (e.affectsConfiguration(configSection) && providerRegistration && provider) {
+            context.subscriptions.splice(context.subscriptions.indexOf(providerRegistration), 1);
+            providerRegistration.dispose();
+            provider = undefined;
+            commands.executeCommand(`${languageId}.showPortal`);
+        }
     }));
 };
 

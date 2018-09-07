@@ -158,7 +158,8 @@ document.cookie = "${this.cookie}";
             path: "/login-processing",
             port: url.port,
             protocol: url.protocol,
-            rejectUnauthorized: false,
+            rejectUnauthorized: false, // allows self-signed certificates
+            timeout: 500, // milliseconds (0.5 s)
         };
         const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
             => ClientRequest = (url.protocol === "https:") ? https : http;
