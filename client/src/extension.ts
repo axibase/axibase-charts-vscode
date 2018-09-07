@@ -2,7 +2,7 @@ import { join } from "path";
 // tslint:disable-next-line:no-require-imports
 import urlRegex = require("url-regex");
 import {
-    commands, ConfigurationChangeEvent, ExtensionContext, TextDocument, TextEditor, Uri, ViewColumn, window,
+    commands, ConfigurationChangeEvent, ExtensionContext, TextDocument, Uri, ViewColumn, window,
     workspace, WorkspaceConfiguration,
 } from "vscode";
 import {

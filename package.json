@@ -49,7 +49,7 @@
             }
         },
         "configurationDefaults": {
-            "axibasecharts": {
+            "[axibasecharts]": {
                 "editor.tabSize": 2,
                 "editor.insertSpaces": true
             }
