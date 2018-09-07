@@ -5,6 +5,7 @@ import {
     Event, EventEmitter, TextDocument, TextDocumentContentProvider, TextEditor,
     Uri, window,
 } from "vscode";
+import { languageId } from "./extension";
 
 export class AxibaseChartsProvider implements TextDocumentContentProvider {
     private cookie: string | undefined;
@@ -36,7 +37,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
             return Promise.reject();
         }
         const document: TextDocument = editor.document;
-        if (document.languageId !== "axibasecharts") {
+        if (document.languageId !== languageId) {
             return Promise.reject();
         }
         this.text = deleteComments(document.getText());

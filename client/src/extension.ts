@@ -12,7 +12,7 @@ import { AxibaseChartsProvider } from "./axibaseChartsProvider";
 
 const previewUri: string = "axibaseCharts://authority/axibaseCharts";
 const configSection: string = "axibaseCharts";
-const languageId: string = "axibasecharts";
+export const languageId: string = "axibasecharts";
 const errorMessage: string = "Configure connection properties in VSCode > Preferences > Settings. Open Settings," +
     " search settings for 'axibase', and enter the requested connection properties.";
 let client: LanguageClient;
