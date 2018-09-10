@@ -1,7 +1,10 @@
+import { join } from "path";
 import {
     Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri, workspace,
 } from "vscode";
 import { languageId } from "./extension";
+
+const SCRIPTS_PATH: string = join(__dirname, "../../scripts/");
 
 export interface IConnectionDetails {
     cookie?: string;
@@ -9,7 +12,6 @@ export interface IConnectionDetails {
 }
 
 export class AxibaseChartsProvider implements TextDocumentContentProvider {
-
     public set document(document: TextDocument) {
         this.innerDocument = document;
         this.update();
@@ -98,20 +100,16 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 <html>
 
 <head>
-	<link rel="stylesheet" type="text/css"
-		href="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/css/smoothness/jquery-ui-1.9.1.custom.min.css">
-    <link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/charts.min.css">
-    ${applyDark ?
-                `<link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/themes/black/black.css">` :
-                ""
-            }
+	<link rel="stylesheet" type="text/css" href="${join(SCRIPTS_PATH, "jquery-ui-1.9.1.custom.min.css")}">
+    <link rel="stylesheet" type="text/css" href="${join(SCRIPTS_PATH, "charts.min.css")}">
+    ${applyDark ? `<link rel="stylesheet" type="text/css" href="${join(SCRIPTS_PATH, "black.css")}">` : ""}
 	<style>
 	  .portalPage body {
 		padding: 0;
 		background: var(--vscode-editor-background);
 	  }
 	</style>
-	<script type="text/javascript" src="${this.url}/web/js/portal/portal_init.js"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "portal_init.js")}"></script>
 	<script>
 		if (typeof initializePortal === "function") {
 			initializePortal(function (callback) {
@@ -122,19 +120,16 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 			});
 		}
 	</script>
-	<script type="text/javascript"
-		src="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/js/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript"
-			src="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/js/jquery-ui-1.9.0.custom.min.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/d3.min.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/highlight.pack.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/charts.min.js"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "jquery-1.8.2.min.js")}"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "jquery-ui-1.9.0.custom.min.js")}"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "d3.min.js")}"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "highlight.pack.js")}"></script>
+	<script type="text/javascript" src="${join(SCRIPTS_PATH, "charts.min.js")}"></script>
 </head>
 
 <body onload="onBodyLoad()">
-<script>
-document.cookie = '${this.cookie}';
-</script>
+    <script>
+    ${this.cookie}</script>
 	<div class="portalView"></div>
 	<div id="dialog"></div>
 </body>
