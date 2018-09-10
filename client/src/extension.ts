@@ -193,11 +193,15 @@ const performRequest: (address: string, username: string, password: string) => P
                 if (res.statusCode !== 200) {
                     return reject(new Error(`Login failed with status code ${res.statusCode}`));
                 }
-                const setCookie: string[] | undefined = res.headers["set-cookie"];
-                if (!setCookie) {
+                const cookies: string[] | undefined = res.headers["set-cookie"];
+                if (!cookies || cookies.length < 1) {
                     return reject(new Error("Cookie is empty"));
                 }
-                resolve(setCookie.join(";"));
+                let result: string = "";
+                for (const cookie of cookies) {
+                    result += `document.cookie = ${JSON.stringify(cookie)};\n`;
+                }
+                resolve(result);
             });
 
             outgoing.on("error", reject);

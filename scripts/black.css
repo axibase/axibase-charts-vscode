@@ -1,0 +1,247 @@
+.portalPage body {
+    background-color: black;
+    background-image: none;
+    color: white;
+}
+.widget {
+    background: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border:none;
+}
+.ui-dialog, .ui-dialog .ui-widget {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: black !important;
+}
+.ui-dialog .ui-dialog-content {
+    background-color: transparent !important;
+    color: white;
+}
+/******************************************************************************/
+
+[class^="axi-icon-"],
+[class*=" axi-icon-"] {
+    background-image: url(img/icons-white.png);
+}
+.widgetHeader {
+    color: #B6B6B6;
+    -moz-border-radius: 3px 3px 3px 3px;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+
+    background: #172024;
+}
+.ui-widget-header {
+    color: #B6B6B6;
+    -moz-border-radius: 3px 3px 3px 3px;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+
+    background: #172024;
+}
+.ui-dialog .widgetButton:hover,
+.ui-dialog .widgetButton.widgetControlHover{
+    background: black url(img/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x;
+    border: 1px solid rgb(153, 153, 153);
+    color: #444;
+}
+/******************************************************************************/
+
+svg text {
+    fill: white;
+}
+.axi-panel .axi-controls-item text {
+    fill: white;
+}
+
+.axi-chart-grid line:not([stroke]) {
+    stroke: #444;
+}
+/******************************************************************************/
+
+.axi-tooltip-default .axi-tooltip-inner {
+    background-color: #172024;
+    color: #B6B6B6;
+}
+.axi-scroller > :first-child {
+    background-color: #DCDCDC;
+}
+/******************************************************************************/
+
+.axi-treemap-series rect,
+.axi-calendarchart .axi-chart-series rect {
+    stroke: black;
+}
+
+.axi-treemap .axi-controls>rect,
+.axi-calendarchart .axi-controls>rect {
+    fill: rgb(0, 0, 0);
+}
+/******************************************************************************/
+
+.axi-donut-counter.axi-tooltip > .axi-tooltip-inner {
+    color: rgb(255, 255, 255);
+}
+/******************************************************************************/
+
+.widget.widget-text .axi-text-widget-item-circle {
+    background: #3f3e3e;
+}
+
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #999;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+::-webkit-scrollbar-corner {
+    background-color: black;
+}
+::-webkit-scrollbar-button {
+    width: 7px;
+    height: 7px;
+    background-image: url(img/small_white_arrows.png);
+}
+::-webkit-scrollbar-button:vertical:decrement {
+    background-position: -7px 0px;
+}
+::-webkit-scrollbar-button:horizontal:increment {
+    background-position: -14px 0px;
+}
+::-webkit-scrollbar-button:horizontal:decrement {
+    background-position: -21px 0px;
+}
+::-webkit-scrollbar-button:hover {
+    background-color: #444;
+}
+
+.axi-box-series-label-padding {
+    fill: #000;
+    fill-opacity: 0.6;
+}
+
+.axi-box-series-marker-metro {
+    fill: black;
+}
+.axi-graph-labels .axi-tooltip-inner {
+    color: white;
+}
+.axi-graph-node-circle,
+.axi-graph-node path,
+.axi-graph-node circle {
+    stroke: white;
+}
+.axi-graph-node .axi-graph-node-style,
+.axi-graph-node-highlight {
+    fill: black;
+}
+.axi-graph-node-highlight .axi-graph-node-style {
+    fill: white;
+}
+.axi-graph-link {
+    stroke: #ffdc7b;
+}
+.axi-graph-link :first-child {
+    opacity: .5;
+    filter: url(#axi-graph-glow-8);
+    filter: drop-shadow(0 0 3px #ffdc7b);
+}
+.axi-graph-arc {
+    fill: white;
+}
+
+.axi-table > * > tr > *{
+    border-color: #444;
+}
+/*.axi-table-header {*/
+/*border-right-color: #444;*/
+/*background: black;*/
+/*}*/
+.axi-table-thead {
+    background: black;
+}
+.axi-table-striped > .axi-table-row-odd,
+.axi-table-striped > tbody > tr:nth-child(even){
+    background-color: #172024;
+}
+
+/*
+
+Darkula color scheme from the JetBrains family of IDEs
+
+*/
+
+
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    background: transparent;
+}
+
+.hljs {
+    color: #bababa;
+}
+
+.hljs-strong,
+.hljs-emphasis {
+    color: #a8a8a2;
+}
+
+.hljs-bullet,
+.hljs-quote,
+.hljs-link,
+.hljs-number,
+.hljs-regexp,
+.hljs-literal {
+    color: #6896ba;
+}
+
+.hljs-code,
+.hljs-selector-class {
+    color: #a6e22e;
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-attribute,
+.hljs-name,
+.hljs-variable {
+    color: #cb7832;
+}
+
+.hljs-params {
+    color: #b9b9b9;
+}
+
+.hljs-string,
+.hljs-subst,
+.hljs-type,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-symbol,
+.hljs-selector-id,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-addition {
+    color: #e0c46c;
+}
+
+.hljs-comment,
+.hljs-deletion,
+.hljs-meta {
+    color: #7f7f7f;
+}
