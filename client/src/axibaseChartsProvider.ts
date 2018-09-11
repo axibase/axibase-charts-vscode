@@ -74,8 +74,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
             if (match === null) {
                 return;
             }
-            this.text =
-                `${this.text.substr(0, match.index - 1)}[configuration]\n  ${this.text.substr(match.index)}`;
+            this.text = `${this.text.substr(0, match.index - 1)}[configuration]\n  ${this.text.substr(match.index)}`;
             match = /^[ \t]*\[configuration\]/i.exec(this.text);
         }
         if (match) {
