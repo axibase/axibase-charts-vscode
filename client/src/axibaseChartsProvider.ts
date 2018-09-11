@@ -4,6 +4,7 @@ import {
 import { languageId } from "./extension";
 
 export interface IConnectionDetails {
+    atsd: boolean;
     cookie?: string;
     url: string;
 }
@@ -23,6 +24,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
     }
 
     public static readonly previewUri: Uri = Uri.parse("axibaseCharts://authority/axibaseCharts");
+    private atsd: boolean;
     private cookie: string | undefined;
     private innerDocument: TextDocument;
     private readonly onDidChangeEmitter: EventEmitter<Uri>;
@@ -34,11 +36,13 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
         this.innerDocument = document;
         this.url = details.url;
         this.cookie = details.cookie;
+        this.atsd = details.atsd;
     }
 
     public changeSettings(details: IConnectionDetails): void {
         this.url = details.url;
         this.cookie = details.cookie;
+        this.atsd = details.atsd;
         this.update();
     }
 
@@ -52,6 +56,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
 
         this.addUrl();
         const html: string = this.getHtml();
+        console.log(html);
 
         return html;
     }
@@ -93,6 +98,8 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         const theme: string | undefined = workspace.getConfiguration("workbench")
             .get("colorTheme");
         const applyDark: boolean = theme !== undefined && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme);
+        const jsPath: string =  `${this.url}/${this.atsd ? "web/js/portal" : "JavaScript/portal/JavaScript"}`;
+        const cssPath: string =  `${this.url}/${this.atsd ? "web/css/portal" : "JavaScript/portal/CSS"}`;
 
         return `<!DOCTYPE html>
 <html>
@@ -105,20 +112,17 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
             this.withCredentials = true;
         };
     </script>
-	<link rel="stylesheet" type="text/css"
-		href="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/css/smoothness/jquery-ui-1.9.1.custom.min.css">
-    <link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/charts.min.css">
-    ${applyDark ?
-                `<link rel="stylesheet" type="text/css" href="${this.url}/web/css/portal/themes/black/black.css">` :
-                ""
-            }
+    <link rel="stylesheet" type="text/css"
+        href="${jsPath}/jquery-ui-1.9.0.custom/css/smoothness/jquery-ui-1.9.1.custom.min.css">
+    <link rel="stylesheet" type="text/css" href="${cssPath}/charts.min.css">
+    ${applyDark ? `<link rel="stylesheet" type="text/css" href="${cssPath}/themes/black/black.css">` : ""}
 	<style>
 	  .portalPage body {
 		padding: 0;
 		background: var(--vscode-editor-background);
 	  }
 	</style>
-	<script type="text/javascript" src="${this.url}/web/js/portal/portal_init.js"></script>
+	<script type="text/javascript" src="${jsPath}/portal_init.js"></script>
 	<script>
 		if (typeof initializePortal === "function") {
 			initializePortal(function (callback) {
@@ -129,13 +133,11 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 			});
 		}
 	</script>
-	<script type="text/javascript"
-		src="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/js/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript"
-			src="${this.url}/web/js/portal/jquery-ui-1.9.0.custom/js/jquery-ui-1.9.0.custom.min.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/d3.min.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/highlight.pack.js"></script>
-	<script type="text/javascript" src="${this.url}/web/js/portal/charts.min.js"></script>
+	<script type="text/javascript" src="${jsPath}/jquery-ui-1.9.0.custom/js/jquery-1.8.2.min.js"></script>
+	<script type="text/javascript" src="${jsPath}/jquery-ui-1.9.0.custom/js/jquery-ui-1.9.0.custom.min.js"></script>
+	<script type="text/javascript" src="${jsPath}/d3.min.js"></script>
+	<script type="text/javascript" src="${jsPath}/highlight.pack.js"></script>
+	<script type="text/javascript" src="${jsPath}/charts.min.js"></script>
 </head>
 
 <body onload="onBodyLoad()">

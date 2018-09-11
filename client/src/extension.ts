@@ -156,9 +156,10 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
     }
 
     let cookie: string | undefined;
+    let atsd: boolean | undefined;
     if (password && username) {
         try {
-            cookie = await performRequest(url, username, password);
+            [cookie, atsd] = await performRequest(url, username, password);
         } catch (err) {
             const error: Error = err as Error;
             window.showErrorMessage(error.toString());
@@ -166,11 +167,12 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
             return Promise.reject(error);
         }
     }
+    atsd = atsd === undefined ? true : atsd;
 
-    return { url, cookie };
+    return { url, cookie, atsd };
 };
-const performRequest: (address: string, username: string, password: string) => Promise<string> =
-    async (address: string, username: string, password: string): Promise<string> => {
+const performRequest: (address: string, username: string, password: string) => Promise<[string, boolean]> =
+    async (address: string, username: string, password: string): Promise<[string, boolean]> => {
         const url: URL = new URL(address);
         const options: RequestOptions = {
             headers: {
@@ -187,20 +189,33 @@ const performRequest: (address: string, username: string, password: string) => P
         const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
             => ClientRequest = (url.protocol === "https:") ? https : http;
 
-        return new Promise<string>((resolve: (result: string) => void, reject: (err: Error) => void): void => {
-            const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
-                res.on("error", reject);
-                if (res.statusCode !== 200) {
-                    return reject(new Error(`Login failed with status code ${res.statusCode}`));
-                }
-                const setCookie: string[] | undefined = res.headers["set-cookie"];
-                if (!setCookie) {
-                    return reject(new Error("Cookie is empty"));
-                }
-                resolve(setCookie.join(";"));
-            });
+        return new Promise<[string, boolean]>(
+            (resolve: (result: [string, boolean]) => void, reject: (err: Error) => void): void => {
+                const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
+                    res.on("error", reject);
+                    if (res.statusCode !== 200) {
+                        return reject(new Error(`Login failed with status code ${res.statusCode}`));
+                    }
+                    const cookies: string[] | undefined = res.headers["set-cookie"];
+                    if (!cookies || cookies.length < 1) {
+                        return reject(new Error("Cookie is empty"));
+                    }
+                    let result: string = "";
+                    for (const cookie of cookies) {
+                        result += `document.cookie = '${cookie}';`;
+                    }
+                    const server: string | string[] | undefined = res.headers.server;
+                    let atsd: boolean;
+                    if (!server || Array.isArray(server)) {
+                        atsd = false;
+                    } else {
+                        const lowerCased: string = server.toLowerCase();
+                        atsd = lowerCased.includes("atsd") ? true : false;
+                    }
+                    resolve([result, atsd]);
+                });
 
-            outgoing.on("error", reject);
-            outgoing.end();
-        });
+                outgoing.on("error", reject);
+                outgoing.end();
+            });
     };
