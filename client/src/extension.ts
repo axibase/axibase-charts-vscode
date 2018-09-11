@@ -74,7 +74,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             try {
                 details = await constructConnection();
             } catch (err) {
-                window.showErrorMessage(err);
+                window.showErrorMessage((err as Error).toString());
 
                 return Promise.resolve();
             }
@@ -96,7 +96,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
                     try {
                         details = await constructConnection();
                     } catch (err) {
-                        window.showErrorMessage(err);
+                        window.showErrorMessage((err as Error).toString());
 
                         return Promise.resolve();
                     }
@@ -160,10 +160,7 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
         try {
             cookie = await performRequest(url, username, password);
         } catch (err) {
-            const error: Error = err as Error;
-            window.showErrorMessage(error.toString());
-
-            return Promise.reject(error);
+            return Promise.reject(err as Error);
         }
     }
 
