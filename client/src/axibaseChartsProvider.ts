@@ -56,7 +56,6 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
 
         this.addUrl();
         const html: string = this.getHtml();
-        console.log(html);
 
         return html;
     }
