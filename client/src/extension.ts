@@ -12,6 +12,7 @@ import {
     ForkOptions, LanguageClient, LanguageClientOptions, ServerOptions, TransportKind,
 } from "vscode-languageclient";
 import { AxibaseChartsProvider, IConnectionDetails } from "./axibaseChartsProvider";
+import { userAgent } from "./util";
 
 const configSection: string = "axibaseCharts";
 export const languageId: string = "axibasecharts";
@@ -199,7 +200,7 @@ const performRequest: (address: string, username: string, password: string) => P
         const options: RequestOptions = {
             headers: {
                 "Authorization": `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
-                "user-agent": "axibase-charts-vscode",
+                "user-agent": userAgent,
             },
             hostname: url.hostname,
             method: "GET",
