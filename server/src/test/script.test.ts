@@ -55,36 +55,32 @@ endscrpt`,
             [],
         ),
         new Test(
-            "Correct multi-line script = ",
-            `script = if
-
-		(!config.isDialog)
-			c = widget
-endscript`,
+            "Correct one-line script = and a setting after",
+            `[widget]
+script = if (!config.isDialog) c = widget
+type = chart`,
             [],
         ),
         new Test(
-            "Unfinished one-line script = ",
-            "script = ",
-            [createDiagnostic(
-                Range.create(Position.create(0, 0), Position.create(0, "script".length)),
-                DiagnosticSeverity.Error, errorMessage,
-            )],
+            "Correct multi-line script = ",
+            `script = if
+script =		(!config.isDialog)
+script =			c = widget`,
+            [],
         ),
         new Test(
             "Correct empty one-line script = ",
-            `script =
-endscript`,
+            "script = ",
             [],
         ),
         new Test(
-            "Incorrect multi-line script = ",
-            `script = if
-
-		(!config.isDialog)
-			c = widget
+            "Correct one-line script = with endscript ",
+            `script = if (!config.isDialog) c = widget
 endscript`,
-            [],
+            [createDiagnostic(
+                Range.create(1, 0, 1, "endscript".length),
+                DiagnosticSeverity.Error, "endscript has no matching script",
+            )],
         ),
     ];
 
