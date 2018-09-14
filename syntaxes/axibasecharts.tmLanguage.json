@@ -84,7 +84,7 @@
 				},
 				{
 					"name": "keyword.control.axibase.charts",
-					"match": "^[ \t]*(import|csv|endcsv|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
+					"match": "^[ \t]*(script|endscript|import|csv|endcsv|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
 				}
 			]
 		}
