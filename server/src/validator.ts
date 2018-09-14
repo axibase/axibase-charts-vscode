@@ -738,23 +738,15 @@ export class Validator {
         if (!this.foundKeyword) {
             throw new Error(`We're trying to handle 'script', but foundKeyword is ${this.foundKeyword}`);
         }
-        if (/^[ \t]*script[ \t]*=[ \t]*\S+.*$/m.test(this.getCurrentLine())) {
-            let j: number = this.currentLineNumber + 1;
-            let nextLine: string | undefined = this.getLine(j);
-            while (nextLine && !(/\bscript\b/.test(nextLine) || /\bendscript\b/.test(nextLine))) {
-                nextLine = this.getLine(++j);
-            }
-            if (nextLine === undefined || /\bscript\b/.test(nextLine)) {
-                return;
-            }
+        const line: string = this.getCurrentLine();
+        if (!line.includes("=")) {
+            this.keywordsStack.push(this.foundKeyword);
         }
-        this.keywordsStack.push(this.foundKeyword);
     }
 
     /**
-     * Performs required operations
-     * After a section has finished
-     * Mostly empties arrays
+     * Performs required operations after a section has finished.
+     * Mostly empties arrays.
      */
     private handleSection(): void {
         this.checkPreviousSection();
