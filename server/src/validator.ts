@@ -468,6 +468,16 @@ export class Validator {
             if (this.match) {
                 this.handleFreemarker();
             }
+            this.match = /(^\s*\[)(\w+)\s*$/.exec(line);
+            if (this.match) {
+                this.result.push(createDiagnostic(
+                    Range.create(
+                        this.currentLineNumber, this.match[1].length,
+                        this.currentLineNumber, this.match[1].length + this.match[2].length,
+                    ),
+                    DiagnosticSeverity.Error, "Section tag is unclosed",
+                ));
+            }
         }
     }
 
@@ -526,6 +536,7 @@ export class Validator {
     }
 
     /**
+     * Lower-cases and returns the text on the line with the provided number
      * @param line line number
      * @returns undefined if line number is higher that number of lines, corresponding line otherwise
      */
