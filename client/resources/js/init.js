@@ -18,7 +18,6 @@ window.initChart = function () {
         if (err.status === 0) {
             $body.empty();
             $body.append(`<h3>SSL Certificate Error during connection to ${previewOptions.url}</h3>
-                    <hr>
                     <p>Restart VSCode with <code>--ignore-certificate-errors</code> flag or add the self-signed 
                     certificate to root CAs. 
                     See <a href="https://github.com/axibase/axibase-charts-vscode#ssl-certificates"> this note </a> 
