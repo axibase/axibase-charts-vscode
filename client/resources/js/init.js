@@ -1,5 +1,5 @@
 /**
- * Inital preview Script.
+ * Initial preview Script.
  * Tries to show chart, or display error's reasons as html elements.
  */
 window.initChart = function () {
