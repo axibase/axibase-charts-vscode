@@ -201,7 +201,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         const cssType: boolean = /.*\.css$/.test(resource);
         const resourcePath: string = `${cssType ? cssPath : jsPath}/${resource}`;
 
-        return `${resourcePath};${this.jsessionid ? `jsessionid=${this.jsessionid}` : ""}`;
+        return `${resourcePath}${this.jsessionid ? `;jsessionid=${this.jsessionid}` : ""}`;
     }
 
     /**
