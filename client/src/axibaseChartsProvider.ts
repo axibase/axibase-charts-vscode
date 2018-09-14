@@ -1,5 +1,6 @@
+import { join } from "path";
 import {
-    Event, EventEmitter, Extension, extensions, TextDocument, TextDocumentContentProvider, Uri, workspace,
+    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri, workspace,
 } from "vscode";
 import { languageId } from "./extension";
 
@@ -27,35 +28,24 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
     }
 
     public static readonly previewUri: Uri = Uri.parse("axibaseCharts://authority/axibaseCharts");
+    private readonly absolutePath: (path: string) => string;
 
-    /**
-     * Generates the path to a resource on the local filesystem
-     * @param resource path to a resource
-     */
-    private static extensionPath<T>(resource: string): string {
-        const extension: Extension<T> | undefined = extensions.getExtension("Axibase.axibasecharts-syntax");
-        if (extension) {
-            return `${extension.extensionPath}/client/${resource}`;
-        }
-        throw new Error("Illegal state");
-    }
-
-    private atsd: boolean;
+    private atsd!: boolean;
     private innerDocument: TextDocument;
     private jsessionid: string | undefined;
     private readonly onDidChangeEmitter: EventEmitter<Uri>;
     private text: string | undefined;
-    private url: string;
+    private url!: string;
 
-    public constructor(details: IConnectionDetails, document: TextDocument) {
+    public constructor(details: IConnectionDetails, document: TextDocument,
+                       absolutePath: (path: string) => string) {
+        if (document.languageId !== languageId) {
+            throw new Error("Incorrect language");
+        }
         this.onDidChangeEmitter = new EventEmitter<Uri>();
         this.innerDocument = document;
-        this.url = details.url;
-        if (details.cookie) {
-            this.jsessionid = details.cookie[0].split(";")[0]
-                .split("=")[1];
-        }
-        this.atsd = details.atsd;
+        this.updateSettings(details);
+        this.absolutePath = absolutePath;
     }
 
     /**
@@ -63,22 +53,14 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
      * @param details new settings
      */
     public changeSettings(details: IConnectionDetails): void {
-        this.url = details.url;
-        if (details.cookie) {
-            this.jsessionid = details.cookie[0].split(";")[0]
-                .split("=")[1];
-        }
-        this.atsd = details.atsd;
+        this.updateSettings(details);
         this.update();
     }
 
     /**
      * Provides html code to preview the configuration
      */
-    public async provideTextDocumentContent(): Promise<string> {
-        if (this.innerDocument.languageId !== languageId) {
-            return Promise.reject();
-        }
+    public provideTextDocumentContent(): string {
         this.text = deleteComments(this.innerDocument.getText());
         this.clearUrl();
         this.replaceImports();
@@ -132,6 +114,14 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     }
 
     /**
+     * Generates the path to a resource on the local filesystem
+     * @param resource path to a resource
+     */
+    private extensionPath(resource: string): string {
+        return this.absolutePath(join("client", resource));
+    }
+
+    /**
      * Creates the html from a configuration of a portal
      */
     private getHtml(): string {
@@ -140,14 +130,14 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         let darkTheme: string = "";
         if (theme && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme)) {
             darkTheme = `<link rel="stylesheet" type="text/css"
-            href="${AxibaseChartsProvider.extensionPath("resources/css/black.css")}">`;
+            href="${this.extensionPath("resources/css/black.css")}">`;
         }
 
         return `<!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" type="text/css"
-        href="${AxibaseChartsProvider.extensionPath("resources/css/jquery-ui-1.9.1.custom.min.css")}">
+        href="${this.extensionPath("resources/css/jquery-ui-1.9.1.custom.min.css")}">
     <link rel="stylesheet" type="text/css" href="${this.resource("charts.min.css")}">
     ${darkTheme}
 	<style>
@@ -167,11 +157,11 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 			});
 		}
 	</script>
-	<script src="${AxibaseChartsProvider.extensionPath("resources/js/jquery-1.8.2.min.js")}"></script>
-	<script src="${AxibaseChartsProvider.extensionPath("resources/js/jquery-ui-1.9.0.custom.min.js")}"></script>
-	<script src="${AxibaseChartsProvider.extensionPath("resources/js/d3.min.js")}"></script>
+	<script src="${this.extensionPath("resources/js/jquery-1.8.2.min.js")}"></script>
+	<script src="${this.extensionPath("resources/js/jquery-ui-1.9.0.custom.min.js")}"></script>
+	<script src="${this.extensionPath("resources/js/d3.min.js")}"></script>
 	<script src="${this.resource("charts.min.js")}"></script>
-	<script src="${AxibaseChartsProvider.extensionPath("resources/js/highlight.pack.js")}"></script>
+	<script src="${this.extensionPath("resources/js/highlight.pack.js")}"></script>
 	<script>
 	    window.initChart = function f() {
 	      $.get('${this.url}/api/v1/ping;jsessionid=${this.jsessionid}', onBodyLoad);
@@ -217,11 +207,24 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     private resource(resource: string, isCss?: boolean, isLocal: boolean = false): string {
         const jsPath: string = `${this.url}/${this.atsd ? "web/js/portal" : "JavaScript/portal/JavaScript"}`;
         const cssPath: string = `${this.url}/${this.atsd ? "web/css/portal" : "JavaScript/portal/CSS"}`;
-        const cssType: boolean | undefined = (isCss === undefined) ? /.*[.]css$/.test(resource) : isCss;
+        const cssType: boolean | undefined = (isCss === undefined) ? /.*\.css$/.test(resource) : isCss;
         const resourcePath: string =
-            isLocal ? AxibaseChartsProvider.extensionPath(resource) : `${cssType ? cssPath : jsPath}/${resource}`;
+            isLocal ? this.extensionPath(resource) : `${cssType ? cssPath : jsPath}/${resource}`;
 
         return `${resourcePath}${this.atsd ? "" : `;jsessionid=${this.jsessionid}`}`;
+    }
+
+    /**
+     * Updates the provider state
+     * @param details new connection details
+     */
+    private updateSettings(details: IConnectionDetails): void {
+        this.url = details.url;
+        if (details.cookie) {
+            this.jsessionid = details.cookie[0].split(";")[0]
+                .split("=")[1];
+        }
+        this.atsd = details.atsd;
     }
 }
 

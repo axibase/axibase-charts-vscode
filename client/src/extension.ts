@@ -82,7 +82,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
 
                 return Promise.resolve();
             }
-            provider = new AxibaseChartsProvider(details, document);
+            provider = new AxibaseChartsProvider(details, document, context.asAbsolutePath);
 
             context.subscriptions.push(workspace.registerTextDocumentContentProvider("axibaseCharts", provider));
             provider.update();
