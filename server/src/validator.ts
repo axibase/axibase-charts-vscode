@@ -739,8 +739,19 @@ export class Validator {
             throw new Error(`We're trying to handle 'script', but foundKeyword is ${this.foundKeyword}`);
         }
         const line: string = this.getCurrentLine();
-        if (!line.includes("=")) {
-            this.keywordsStack.push(this.foundKeyword);
+        if (/^\s*script\s*=.*$/.test(line)) {
+            return;
+        }
+        this.keywordsStack.push(this.foundKeyword);
+        this.match = /(^\s*)script\s*\S/.exec(line);
+        if (this.match) {
+            this.result.push(createDiagnostic(
+                Range.create(
+                    this.currentLineNumber, this.match[1].length,
+                    this.currentLineNumber, this.match[1].length + "script".length,
+                ),
+                DiagnosticSeverity.Error, "A linefeed character after 'script' keyword is required",
+            ));
         }
     }
 

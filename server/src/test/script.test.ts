@@ -82,6 +82,15 @@ endscript`,
                 DiagnosticSeverity.Error, "endscript has no matching script",
             )],
         ),
+        new Test(
+            "Incorrect script/endscript declaration",
+            `script alert("Hello, world!")
+endscript`,
+            [createDiagnostic(
+                Range.create(0, 0, 0, "script".length),
+                DiagnosticSeverity.Error, "A linefeed character after 'script' keyword is required",
+            )],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
