@@ -194,17 +194,14 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     /**
      * Generates the path to a resource.
      * @param resource name of a static resource
-     * @param isCss is this resource CSS file. If is not specified, the decides based on the file extension
-     * @param isLocal should this resource be downloaded from the target server
      */
-    private resource(resource: string, isCss?: boolean, isLocal: boolean = false): string {
+    private resource(resource: string): string {
         const jsPath: string = `${this.url}/${this.atsd ? "web/js/portal" : "JavaScript/portal/JavaScript"}`;
         const cssPath: string = `${this.url}/${this.atsd ? "web/css/portal" : "JavaScript/portal/CSS"}`;
-        const cssType: boolean | undefined = (isCss === undefined) ? /.*\.css$/.test(resource) : isCss;
-        const resourcePath: string =
-            isLocal ? this.extensionPath(resource) : `${cssType ? cssPath : jsPath}/${resource}`;
+        const cssType: boolean = /.*\.css$/.test(resource);
+        const resourcePath: string = `${cssType ? cssPath : jsPath}/${resource}`;
 
-        return `${resourcePath}${this.atsd ? "" : `;jsessionid=${this.jsessionid}`}`;
+        return `${resourcePath};${this.jsessionid ? `jsessionid=${this.jsessionid}` : ""}`;
     }
 
     /**
