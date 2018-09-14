@@ -129,16 +129,15 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
             .get("colorTheme");
         let darkTheme: string = "";
         if (theme && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme)) {
-            darkTheme = `<link rel="stylesheet" type="text/css"
+            darkTheme = `<link rel="stylesheet"
             href="${this.extensionPath("resources/css/black.css")}">`;
         }
 
         return `<!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css"
-        href="${this.extensionPath("resources/css/jquery-ui-1.9.1.custom.min.css")}">
-    <link rel="stylesheet" type="text/css" href="${this.resource("charts.min.css")}">
+    <link rel="stylesheet" href="${this.extensionPath("resources/css/jquery-ui-1.9.1.custom.min.css")}">
+    <link rel="stylesheet" href="${this.resource("charts.min.css")}">
     ${darkTheme}
 	<style>
 	  .portalPage body {
@@ -146,56 +145,21 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 		background: var(--vscode-editor-background);
 	  }
 	</style>
-	<script src="${this.resource("portal_init.js")}"></script>
 	<script>
-		if (typeof initializePortal === "function") {
-			initializePortal(function (callback) {
-				var configText = ${JSON.stringify(this.text)};
-				if (typeof callback === "function") {
-					callback([configText, portalPlaceholders = getPortalPlaceholders()]);
-				}
-			});
-		}
+	    window.previewOptions = ${JSON.stringify({
+            jsessionid: this.jsessionid,
+            text: this.text,
+            url: this.url,
+        })};
 	</script>
+	<script src="${this.resource("portal_init.js")}"></script>
+	<script src="${this.extensionPath("resources/js/config_init.js")}"></script>
 	<script src="${this.extensionPath("resources/js/jquery-1.8.2.min.js")}"></script>
 	<script src="${this.extensionPath("resources/js/jquery-ui-1.9.0.custom.min.js")}"></script>
 	<script src="${this.extensionPath("resources/js/d3.min.js")}"></script>
 	<script src="${this.resource("charts.min.js")}"></script>
 	<script src="${this.extensionPath("resources/js/highlight.pack.js")}"></script>
-	<script>
-	    window.initChart = function () {
-	      $.get('${this.url}/api/v1/ping${this.jsessionid ? `;jsessionid=${this.jsessionid}` : ""}', function (){
-            if (onBodyLoad) {
-                onBodyLoad();
-            } else {
-                var $body = $('body');
-                $body.empty()
-                .append('<h3>Corrupted charts.js files</h3>');
-            }
-            })
-	       .fail(function(err){
-	           console.log(err);
-	           var $body = $('body');
-	           if (err.status === 0) {
-                  $body.empty();
-	              $body.append('<h3>SSL Certificate Error during connection to ${this.url}</h3>')
-	              .append('<p>Restart VSCode with <code>--ignore-certificate-errors</code> ' +
-	               'flag or add the self-signed certificate to root CAs. ' +
-	               'See <a href="https://github.com/axibase/axibase-charts-vscode#ssl-certificates">' +
-	                'href="https://github.com/axibase/axibase-charts-vscode#ssl-certificates</a> ' +
-	                 'for more information.</p>');
-	           } else {
-	               if (onBodyLoad) {
-	                    onBodyLoad();
-	               } else {
-	                   $body.empty();
-	                   $body.append('<h3> Unexpected error: </h3>')
-	                   .append('<code>'+JSON.stringify(err, null, 2)+'</code>')
-	               }
-	           }
-	       });
-	    }
-	</script>
+	<script src="${this.extensionPath("resources/js/init.js")}"></script>
     </head>
     <body onload="initChart()">
         <div class="portalView"></div>
