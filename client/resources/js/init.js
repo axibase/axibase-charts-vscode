@@ -10,10 +10,9 @@ window.initChart = function () {
             onBodyLoad();
         } else {
             const $body = $('body');
-            $body.empty().append('<h3>Corrupted charts.js files</h3>');
+            $body.empty().append('<h3>Corrupted <code>charts</code> library files</h3>');
         }
     }).fail(err => {
-        console.log(err);
         const $body = $('body');
         if (err.status === 0) {
             $body.empty();
