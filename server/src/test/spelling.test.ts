@@ -114,6 +114,16 @@ type = chart`,
   column-value = null`,
             [],
         ),
+        new Test(
+            "Unclosed section tag",
+            `[series
+entity = nurswgvml006
+metric = cpu_iowait`,
+            [createDiagnostic(
+                Range.create(0, "[".length, 0, "[".length + "series".length),
+                DiagnosticSeverity.Error, "Section tag is unclosed",
+            )],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
