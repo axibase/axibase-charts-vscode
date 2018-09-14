@@ -66,18 +66,6 @@ var srv = ['srv1', 'srv2']`,
             )],
         ),
         new Test(
-            "Shadowing of a setting from parent section",
-            `[configuration]
-   entity = srv
-[series]
-   entity = srv2
-   metric = status`,
-            [createDiagnostic(
-                Range.create(Position.create(3, "   ".length), Position.create(3, "   ".length + "entity".length)),
-                DiagnosticSeverity.Hint, "entity is already defined",
-            )],
-        ),
-        new Test(
             "Repetition of aliases",
             `[series]
    entity = srv
@@ -139,31 +127,6 @@ endfor`,
                 createDiagnostic(
                     Range.create(9, "           ".length, 9, "           color".length),
                     DiagnosticSeverity.Error, "color is already defined",
-                )],
-        ),
-        new Test(
-            "Repetition of declared in parent settings in if",
-            `[widget]
-   type = chart
-   entity = srv
-list servers = 'srv1', 'srv2'
-for server in servers
-   [series]
-       metric = temp
-       if server = 'srv1'
-           entity = srv2
-       else
-           entity = srv1
-       endif
-endfor`,
-            [
-                createDiagnostic(
-                    Range.create(8, "           ".length, 8, "           entity".length),
-                    DiagnosticSeverity.Hint, "entity is already defined",
-                ),
-                createDiagnostic(
-                    Range.create(10, "           ".length, 10, "           entity".length),
-                    DiagnosticSeverity.Hint, "entity is already defined",
                 )],
         ),
         new Test(
