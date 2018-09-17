@@ -377,6 +377,8 @@ suite("Type check tests", () => {
   disconnect-interval = .25 year
 [configuration]
   disconnect-interval = all
+[configuration]
+  update-interval = 10 second
   `,
             [],
         ),
@@ -392,6 +394,8 @@ suite("Type check tests", () => {
   disconnect-interval = year 0.25
 [configuration]
   disconnect-interval = . year
+[configuration]
+  update-interval = 10
   `,
             [
                 createDiagnostic(
@@ -413,6 +417,11 @@ suite("Type check tests", () => {
                 createDiagnostic(
                     Range.create(9, "  ".length, 9, "  disconnect-interval".length),
                     DiagnosticSeverity.Error, "disconnect-interval type is interval",
+                ),
+                createDiagnostic(
+                    Range.create(11, "  ".length, 11, "  update-interval".length),
+                    DiagnosticSeverity.Warning, "Specifying the interval in seconds is deprecated.\n" +
+                    "Use `count unit` format, for example: `5 minute`.",
                 ),
             ],
         ),

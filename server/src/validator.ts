@@ -1019,16 +1019,25 @@ export class Validator {
         }
         const enumList: string | undefined = (setting.type !== "enum") ? undefined : setting.enum.join(";\n")
             .replace("\\d\+", "{num}");
+        let msg: string;
+        let ds: DiagnosticSeverity = DiagnosticSeverity.Error;
+        if (setting.type === "enum") {
+            msg = `${this.match[2]} must be one of:\n${enumList}`;
+        } else {
+            if ((setting.name === "updateinterval") && (/^\d+$/.test(settingValue))) {
+                msg = "Specifying the interval in seconds is deprecated.\n" +
+                "Use `count unit` format, for example: `5 minute`." ;
+                ds = DiagnosticSeverity.Warning 
+            } else{
+                msg = `${this.match[2]} type is ${setting.type}`;
+            } 
+        }
+
         this.result.push(createDiagnostic(
             Range.create(
                 this.currentLineNumber, this.match[1].length,
                 this.currentLineNumber, this.match[1].length + this.match[2].length,
-            ),
-            DiagnosticSeverity.Error, (setting.type === "enum") ?
-                `${this.match[2]} must be one of:\n${enumList}` :
-                `${this.match[2]} type is ${setting.type}`,
-        ));
-
+            ), ds, msg));
     }
 
     /**
