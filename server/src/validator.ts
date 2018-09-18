@@ -747,7 +747,7 @@ export class Validator {
             throw new Error(`We're trying to handle 'script', but foundKeyword is ${this.foundKeyword}`);
         }
         const line: string = this.getCurrentLine();
-        if (/^\s*script\s*=.*$/.test(line)) {
+        if (/^\s*script\s*=/.test(line)) {
             return;
         }
         this.keywordsStack.push(this.foundKeyword);
