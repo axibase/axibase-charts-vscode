@@ -7188,7 +7188,8 @@
         {
             "displayName": "tooltip",
             "type": "string",
-            "example": "NURSWGVML007"
+            "example": "NURSWGVML007",
+            "multiLine": true
         },
         {
             "displayName": "top-axis",
