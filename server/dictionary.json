@@ -6583,6 +6583,7 @@
             "example": "avg",
             "section": "series",
             "enum": [
+                "detail",
                 "count",
                 "min",
                 "max",
