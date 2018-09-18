@@ -826,7 +826,7 @@ export class Validator {
                 }
             }
 
-            if (!setting.multiLine || ["script", "thresholds"].includes(setting.name)) {
+            if (!setting.multiLine) {
                 this.checkRepetition(setting);
             }
 
