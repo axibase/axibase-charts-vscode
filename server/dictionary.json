@@ -2385,6 +2385,14 @@
             "widget": "gauge"
         },
         {
+            "displayName": "group",
+            "section": "widget",
+            "widget": "bar",
+            "type": "string",
+            "example": "region",
+            "defaultValue": "metric"
+        },
+        {
             "displayName": "group-first",
             "type": "boolean",
             "example": false,
