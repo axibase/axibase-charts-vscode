@@ -2783,7 +2783,8 @@
             "displayName": "label",
             "type": "string",
             "example": "CPU Busy - nurswgvml007",
-            "section": "series"
+            "section": "series",
+            "multiLine": true
         },
         {
             "displayName": "label-format",
