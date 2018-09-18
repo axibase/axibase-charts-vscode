@@ -214,7 +214,7 @@ export const isEmpty: (str: string) => boolean = (str: string): boolean => /^\s*
 export const repetitionDiagnostic: (range: Range, variable: Setting, name: string) => Diagnostic =
     (range: Range, variable: Setting, name: string): Diagnostic => {
         const diagnosticSeverity: DiagnosticSeverity =
-            (["script", "thresholds"].includes(variable.name)) ?
+            (["script", "thresholds", "colors"].includes(variable.name)) ?
                 DiagnosticSeverity.Warning : DiagnosticSeverity.Error;
         let message: string;
         switch (variable.name) {
@@ -230,6 +230,15 @@ thresholds = 60
 thresholds = 80
 
 thresholds = 0, 60, 80`;
+                break;
+            }
+            case "colors": {
+                message = `Replace multiple \`colors\` settings with one, for example:
+colors = red
+colors = yellow
+colors = green
+
+colors = red, yellow, green`;
                 break;
             }
             default: message = `${name} is already defined`;
