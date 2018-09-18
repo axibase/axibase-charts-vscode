@@ -6070,6 +6070,11 @@
             "defaultValue": false
         },
         {
+            "displayName": "single-entity",
+            "type": "boolean",
+            "example": true
+        },
+        {
             "displayName": "size",
             "type": "string",
             "defaultValue": "1",
