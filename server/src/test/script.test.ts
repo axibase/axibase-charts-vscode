@@ -66,7 +66,19 @@ type = chart`,
             `script = if
 script =		(!config.isDialog)
 script =			c = widget`,
-            [],
+            [
+
+                createDiagnostic(
+                    Range.create(1, 0, 1, "script".length),
+                    DiagnosticSeverity.Warning,
+                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                ),
+                createDiagnostic(
+                    Range.create(2, 0, 2, "script".length),
+                    DiagnosticSeverity.Warning,
+                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                ),
+            ],
         ),
         new Test(
             "Correct empty one-line script = ",

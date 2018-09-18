@@ -117,12 +117,18 @@ export class Validator {
             return result;
         }
         if (array && array.includes(variable)) {
+            let diagnosticSeverity: DiagnosticSeverity = DiagnosticSeverity.Error;
+            let message: string = `${name} is already defined`;
+            if (variable.name === "script") {
+                diagnosticSeverity = DiagnosticSeverity.Warning;
+                message = "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
+            }
             this.result.push(createDiagnostic(
                 Range.create(
                     Position.create(this.currentLineNumber, this.match[1].length),
                     Position.create(this.currentLineNumber, this.match[1].length + name.length),
                 ),
-                DiagnosticSeverity.Error, `${name} is already defined`,
+                diagnosticSeverity, message,
             ));
         } else {
             result.push(variable);
@@ -829,7 +835,7 @@ export class Validator {
                 }
             }
 
-            if (!setting.multiLine) {
+            if (!setting.multiLine || setting.name === "script") {
                 this.checkRepetition(setting);
             }
 
@@ -1026,11 +1032,11 @@ export class Validator {
         } else {
             if ((setting.name === "updateinterval") && (/^\d+$/.test(settingValue))) {
                 msg = "Specifying the interval in seconds is deprecated.\n" +
-                "Use `count unit` format, for example: `5 minute`." ;
-                ds = DiagnosticSeverity.Warning 
-            } else{
+                    "Use `count unit` format, for example: `5 minute`.";
+                ds = DiagnosticSeverity.Warning;
+            } else {
                 msg = `${this.match[2]} type is ${setting.type}`;
-            } 
+            }
         }
 
         this.result.push(createDiagnostic(

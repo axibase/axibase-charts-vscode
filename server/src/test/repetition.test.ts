@@ -239,7 +239,18 @@ endfor`,
             `script =  var stylesheet = document.createElement("style");
 script = stylesheet.innerHTML = ".axi-calendarchart .axi-chart-series rect:not([fill]) {fill:red}";
 script = document.head.appendChild(stylesheet);`,
-            [],
+            [
+                createDiagnostic(
+                    Range.create(1, 0, 1, "script".length),
+                    DiagnosticSeverity.Warning,
+                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                ),
+                createDiagnostic(
+                    Range.create(2, 0, 2, "script".length),
+                    DiagnosticSeverity.Warning,
+                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                ),
+            ],
         ),
         new Test(
             "Correct nodes and links",
