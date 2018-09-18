@@ -5168,7 +5168,6 @@
             "displayName": "script",
             "type": "string",
             "example": "console.log(widget.config)",
-            "multiLine": true,
             "script": {
                 "returnValue": "void",
                 "fields": [

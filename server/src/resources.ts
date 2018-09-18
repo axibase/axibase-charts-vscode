@@ -8,7 +8,7 @@ interface IDictionary { $schema: string; settings: Setting[]; }
  * @returns array of settings from the file
  */
 const readSettings: () => Setting[] = (): Setting[] => {
-    const dictionaryFilePath: string = join(__dirname, "dictionary.json");
+    const dictionaryFilePath: string = join(__dirname, "..", "dictionary.json");
     const jsonContent: string = readFileSync(dictionaryFilePath, "UTF-8");
     const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
 
