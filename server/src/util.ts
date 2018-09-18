@@ -203,3 +203,37 @@ export const addDisplayNames: (array?: string[]) => string[] = (array?: string[]
  * @returns true if the current line contains white spaces or nothing, false otherwise
  */
 export const isEmpty: (str: string) => boolean = (str: string): boolean => /^\s*$/.test(str);
+
+/**
+ * Creates a diagnostic for a repeated setting. Warning if this setting was
+ * multi-line previously, but now it is deprecated, error otherwise.
+ * @param range The range where the diagnostic will be displayed
+ * @param variable The setting, which has been repeated
+ * @param name The name of the setting which is used by the user
+ */
+export const repetitionDiagnostic: (range: Range, variable: Setting, name: string) => Diagnostic =
+    (range: Range, variable: Setting, name: string): Diagnostic => {
+        const diagnosticSeverity: DiagnosticSeverity =
+            (["script", "thresholds"].includes(variable.name)) ?
+                DiagnosticSeverity.Warning : DiagnosticSeverity.Error;
+        let message: string;
+        switch (variable.name) {
+            case "script": {
+                message =
+                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
+                break;
+            }
+            case "thresholds": {
+                message = `Replace multiple \`thresholds\` settings with one, for example:
+thresholds = 0
+thresholds = 60
+thresholds = 80
+
+thresholds = 0, 60, 80`;
+                break;
+            }
+            default: message = `${name} is already defined`;
+        }
+
+        return createDiagnostic(range, diagnosticSeverity, message);
+    };

@@ -7,7 +7,7 @@ import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import {
     addDisplayNames, countCsvColumns, createDiagnostic, deleteComments, getSetting,
-    isAnyInArray, isDate, isInMap, mapToArray, suggestionMessage,
+    isAnyInArray, isDate, isInMap, mapToArray, repetitionDiagnostic, suggestionMessage,
 } from "./util";
 
 export class Validator {
@@ -117,19 +117,11 @@ export class Validator {
             return result;
         }
         if (array && array.includes(variable)) {
-            let diagnosticSeverity: DiagnosticSeverity = DiagnosticSeverity.Error;
-            let message: string = `${name} is already defined`;
-            if (variable.name === "script") {
-                diagnosticSeverity = DiagnosticSeverity.Warning;
-                message = "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
-            }
-            this.result.push(createDiagnostic(
-                Range.create(
-                    Position.create(this.currentLineNumber, this.match[1].length),
-                    Position.create(this.currentLineNumber, this.match[1].length + name.length),
-                ),
-                diagnosticSeverity, message,
-            ));
+            const range: Range = Range.create(
+                Position.create(this.currentLineNumber, this.match[1].length),
+                Position.create(this.currentLineNumber, this.match[1].length + name.length),
+            );
+            this.result.push(repetitionDiagnostic(range, variable, name));
         } else {
             result.push(variable);
         }
@@ -413,11 +405,10 @@ export class Validator {
         if (!this.match) {
             return;
         }
-        const location: Range = Range.create(
+        const range: Range = Range.create(
             this.currentLineNumber, this.match[1].length,
             this.currentLineNumber, this.match[1].length + this.match[2].length,
         );
-        const message: string = `${this.match[2]} is already defined`;
 
         if (this.areWeIn("if")) {
             if (!this.lastCondition) {
@@ -426,9 +417,9 @@ export class Validator {
             let array: Setting[] | undefined = this.ifSettings.get(this.lastCondition);
             array = this.addToSettingArray(array);
             this.ifSettings.set(this.lastCondition, array);
-            if (this.currentSettings && this.currentSettings.includes(setting)) {
+            if (this.currentSettings.includes(setting)) {
                 // The setting was defined before if
-                this.result.push(createDiagnostic(location, DiagnosticSeverity.Error, message));
+                this.result.push(repetitionDiagnostic(range, setting, this.match[2]));
             }
         } else {
             this.addToSettingArray(this.currentSettings);
@@ -835,7 +826,7 @@ export class Validator {
                 }
             }
 
-            if (!setting.multiLine || setting.name === "script") {
+            if (!setting.multiLine || ["script", "thresholds"].includes(setting.name)) {
                 this.checkRepetition(setting);
             }
 
