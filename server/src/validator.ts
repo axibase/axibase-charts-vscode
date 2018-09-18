@@ -492,7 +492,7 @@ export class Validator {
      */
     private findDeAliases(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = /value\((['"])(\S+)\1\)/g;
+        const regexp: RegExp = /value\((['"])(\S+?)\1\)/g;
         const deAliasPosition: number = 2;
         this.match = regexp.exec(line);
         while (this.match) {
