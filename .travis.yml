@@ -19,9 +19,17 @@ script:
   - npm test --silent
   - npm run test:e2e --silent
 
+after_success:
+  - npm package
+
 cache:
   directories:
     - node_modules
     - server/node_modules
     - client/node_modules
     - server/.vscode-test
+
+addons:
+  artifacts:
+    target_paths:
+      - axibasecharts-syntax-*.vsix
