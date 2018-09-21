@@ -4958,9 +4958,13 @@
         },
         {
             "displayName": "refresh-interval",
-            "type": "integer",
+            "type": "enum",
             "example": 120,
-            "section": "series"
+            "section": "series",
+            "enum": [
+                "\\d+",
+                "auto"
+            ]
         },
         {
             "displayName": "replace-underscore",
