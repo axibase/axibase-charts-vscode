@@ -719,6 +719,20 @@ threshold_percent`,
                 ),
             ],
         ),
+        new Test(
+            "Allow none interval",
+            `[configuration]
+  period = none
+  rate = none`,
+            [],
+        ),
+        new Test(
+            "Allow auto interval",
+            `[configuration]
+  period = auto
+  refresh-interval = auto`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test): void => { test.validationTest(); });
