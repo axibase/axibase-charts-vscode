@@ -143,35 +143,6 @@ export class JsDomCaller {
         }
     }
 
-    private processVar(): void {
-        if (!this.match) {
-            throw new Error("We're trying to process var, but this.match is not defined");
-        }
-        let line: string | undefined = this.getCurrentLine();
-        let content: string;
-        let range: Range;
-        content = line;
-        range = {
-            end: { character: line.length, line: this.currentLineNumber },
-            start: { character: 0, line: this.currentLineNumber },
-        };
-        if (this.getLine(this.currentLineNumber + 1)) {
-            // if it's multiline var
-            while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
-                content += `${line}\n`;
-            }
-            range.end.line = this.currentLineNumber - 1;
-        }
-        content = JSON.stringify(content);
-        const statement: TextRange = new TextRange(
-            "const varProxyFunction = new Proxy(new Function(), {});" +
-            `(new Function(${content}))` +
-            `.call(window${JsDomCaller.generateCall(1, "varProxyFunction")})`,
-            range,
-        );
-        this.statements.push(statement);
-    }
-
     private processOptions(): void {
         if (!this.match) {
             throw new Error("We're trying to process options, but this.match is not defined");
@@ -315,4 +286,34 @@ export class JsDomCaller {
         );
         this.statements.push(statement);
     }
+
+    private processVar(): void {
+        if (!this.match) {
+            throw new Error("We're trying to process var, but this.match is not defined");
+        }
+        let line: string | undefined = this.getCurrentLine();
+        let content: string;
+        let range: Range;
+        content = line;
+        range = {
+            end: { character: line.length, line: this.currentLineNumber },
+            start: { character: 0, line: this.currentLineNumber },
+        };
+        if (this.getLine(this.currentLineNumber + 1)) {
+            // It's multiline var
+            while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
+                content += `${line}\n`;
+            }
+            range.end.line = this.currentLineNumber - 1;
+        }
+        content = JSON.stringify(content);
+        const statement: TextRange = new TextRange(
+            "const varProxyFunction = new Proxy(new Function(), {});" +
+            `(new Function(${content}))` +
+            `.call(window${JsDomCaller.generateCall(1, "varProxyFunction")})`,
+            range,
+        );
+        this.statements.push(statement);
+    }
+
 }
