@@ -117,7 +117,7 @@ export class JsDomCaller {
     private parseJsStatements(validateAll: boolean): void {
         for (; this.currentLineNumber < this.lines.length; this.currentLineNumber++) {
             const line: string = this.getCurrentLine();
-            if (validateAll || true) {
+            if (validateAll) {
                 this.match = /^[ \t]*script/.exec(line);
                 if (this.match) {
                     this.processScript();
