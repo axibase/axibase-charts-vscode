@@ -54,7 +54,7 @@ export class Test {
     }
 
     /**
-     * Tests Validator
+     * Tests JsDomCaller (JavaScript statements, including var)
      */
     public jsValidationTest(): void {
         test((this.name), () => {
