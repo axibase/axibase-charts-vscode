@@ -2,6 +2,7 @@ import * as assert from "assert";
 import { Diagnostic, FormattingOptions, TextEdit } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 import { Validator } from "../validator";
+import { JsDomCaller } from "../jsDomCaller";
 
 /**
  * Contains a test case and executes the test
@@ -49,6 +50,15 @@ export class Test {
     public validationTest(): void {
         test((this.name), () => {
             assert.deepStrictEqual(new Validator(this.text).lineByLine(), this.expected);
+        });
+    }
+
+    /**
+     * Tests Validator
+     */
+    public jsValidationTest(): void {
+        test((this.name), () => {
+            assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
         });
     }
 }

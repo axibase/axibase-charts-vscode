@@ -125,8 +125,10 @@ export class Validator {
             if (this.isKeywordEnd("csv")) {
                 this.validateCsv();
             }
-
-            this.eachLine();
+            if (!this.areWeIn("var")) {
+                // var section will be cheked in jsDomCaller.processVar()
+                this.eachLine();
+            }
 
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
@@ -1014,7 +1016,7 @@ export class Validator {
                 break;
             }
             case "var": {
-                if (/=\s*(\[|\{|\()(|.*,)\s*$/m.test(line)) {
+                if (/=\s*(\[|\{|\()*(|.*,)\s*$/m.test(line)) {
                     this.keywordsStack.push(this.foundKeyword);
                 }
                 this.match = /(var\s*)(\w+)\s*=/.exec(line);

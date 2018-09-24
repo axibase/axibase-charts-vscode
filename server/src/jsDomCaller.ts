@@ -52,11 +52,12 @@ export class JsDomCaller {
 
     /**
      * Evaluates all found JavaScript statements in this.document
+     * @param validateAll if `false`, validates var only 
      * @returns diagnostic for each invalid statement
      */
-    public validate(): Diagnostic[] {
+    public validate(validateAll: boolean): Diagnostic[] {
         const result: Diagnostic[] = [];
-        this.parseJsStatements();
+        this.parseJsStatements(validateAll);
 
         const dom: JSDOM = new JSDOM("<html></html>", { runScripts: "outside-only" });
         const window: DOMWindow = dom.window;
@@ -99,34 +100,41 @@ export class JsDomCaller {
         return (i < this.lines.length) ? this.lines[i] : undefined;
     }
 
-    private parseJsStatements(): void {
+    /**
+     * Calls corresponding processor for all found JavaScript statements 
+     * in this.document to prepare diagnostic if required
+     * @param validateAll if `false`, validates var only
+     */
+    private parseJsStatements(validateAll: boolean): void {
         for (; this.currentLineNumber < this.lines.length; this.currentLineNumber++) {
             const line: string = this.getCurrentLine();
-            this.match = /^[ \t]*script/.exec(line);
-            if (this.match) {
-                this.processScript();
-                continue;
-            }
-            this.match = /^[ \t]*import[ \t]+(\S+)[ \t]*=.+/.exec(line);
-            if (this.match) {
-                this.imports.push(this.match[1]);
-                this.importCounter++;
-                continue;
-            }
-            this.match = /(^[ \t]*replace-value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processReplaceValue();
-                continue;
-            }
-            this.match = /(^[ \t]*value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processValue();
-                continue;
-            }
-            this.match = /(^[ \t]*options[ \t]*=[ \t]*javascript:[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processOptions();
-                continue;
+            if (validateAll || true) {
+                this.match = /^[ \t]*script/.exec(line);
+                if (this.match) {
+                    this.processScript();
+                    continue;
+                }
+                this.match = /^[ \t]*import[ \t]+(\S+)[ \t]*=.+/.exec(line);
+                if (this.match) {
+                    this.imports.push(this.match[1]);
+                    this.importCounter++;
+                    continue;
+                }
+                this.match = /(^[ \t]*replace-value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processReplaceValue();
+                    continue;
+                }
+                this.match = /(^[ \t]*value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processValue();
+                    continue;
+                }
+                this.match = /(^[ \t]*options[ \t]*=[ \t]*javascript:[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processOptions();
+                    continue;
+                }
             }
             this.match = /^\s*var\s*\w+\s+=\s+[\[|\{|\(]*/m.exec(line);
             if (this.match) {
@@ -143,24 +151,17 @@ export class JsDomCaller {
         let content: string;
         let range: Range;
         content = line;
-        line = this.getLine(++this.currentLineNumber);
-        if (!line) {
-            throw new Error("this.currentLineNumber + 1 points to nowhere");
-        }
         range = {
             end: { character: line.length, line: this.currentLineNumber },
             start: { character: 0, line: this.currentLineNumber },
         };
-        while (line !== undefined && !/\bendvar\b/.test(line)) {
-            content += `${line}\n`;
-            line = this.getLine(++this.currentLineNumber);
+        if (this.getLine(this.currentLineNumber + 1)) {
+            // if it's multiline var
+            while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
+                content += `${line}\n`;
+            }
+            range.end.line = this.currentLineNumber - 1;
         }
-        if (!line) {
-            throw new Error("this.currentLineNumber points to nowhere");
-        }
-        range.end = {
-            character: line.length, line: this.currentLineNumber - 1,
-        };
         content = JSON.stringify(content);
         const statement: TextRange = new TextRange(
             "const varProxyFunction = new Proxy(new Function(), {});" +

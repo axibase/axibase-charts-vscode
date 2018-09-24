@@ -83,11 +83,9 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const jsDomCaller: JsDomCaller = new JsDomCaller(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
 
-        if (settings.validateFunctions || true) {
-            jsDomCaller.validate().forEach((element: Diagnostic) => {
-                diagnostics.push(element);
-            });
-        }
+        jsDomCaller.validate(settings.validateFunctions).forEach((element: Diagnostic) => {
+            diagnostics.push(element);
+        });
 
         // Send the computed diagnostics to VSCode.
         // connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
