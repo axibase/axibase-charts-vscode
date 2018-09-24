@@ -128,7 +128,7 @@ export class JsDomCaller {
                 this.processOptions();
                 continue;
             }
-            this.match = /(^[ \t]*var\s*)(\w+)\s*=/.exec(line);
+            this.match = /^\s*var\s*\w+\s+=\s+[\[|\{|\(]*/m.exec(line);
             if (this.match) {
                 this.processVar();
             }
@@ -142,71 +142,33 @@ export class JsDomCaller {
         let line: string | undefined = this.getCurrentLine();
         let content: string;
         let range: Range;
-        this.match = /(^[ \t]*var[ \t]*=[\s]*)(\S+[\s\S]*)$/m.exec(line);
-        if (this.match) {
-            content = this.match[JsDomCaller.CONTENT_POSITION];
-            const matchStart: number = this.match[1].length;
-            range = {
-                end: {
-                    character: matchStart + this.match[JsDomCaller.CONTENT_POSITION].length,
-                    line: this.currentLineNumber,
-                },
-                start: { character: this.match[1].length, line: this.currentLineNumber },
-            };
-            let j: number = this.currentLineNumber + 1;
-            let nextLine: string | undefined = this.getLine(j);
-            while (nextLine && !(/\var\b/.test(nextLine) || /\bendvar\b/.test(nextLine))) {
-                nextLine = this.getLine(++j);
-            }
-            if (!(j === this.lines.length || !nextLine || /\var\b/.test(nextLine))) {
-                line = this.getLine(++this.currentLineNumber);
-                while (line !== undefined && !/\bendvar\b/.test(line)) {
-                    content += `${line}\n`;
-                    line = this.getLine(++this.currentLineNumber);
-                }
-                line = this.getLine(this.currentLineNumber - 1);
-                if (!line) {
-                    throw new Error("this.currentLineNumber - 1 points to nowhere");
-                }
-                range.end = {
-                    character: line.length, line: this.currentLineNumber - 1,
-                };
-            }
-        } else {
-            line = this.getLine(this.currentLineNumber + 1);
-            if (!line) {
-                throw new Error("this.currentLineNumber + 1 points to nowhere");
-            }
-            range = {
-                end: { character: line.length, line: this.currentLineNumber + 1 },
-                start: { character: 0, line: this.currentLineNumber + 1 },
-            };
-            content = "";
-            line = this.getLine(this.currentLineNumber++);
-            while (line !== undefined && !/\bendvar\b/.test(line)) {
-                content += `${line}\n`;
-                line = this.getLine(this.currentLineNumber++);
-            }
-            line = this.getLine(this.currentLineNumber);
-            if (!line) {
-                throw new Error("this.currentLineNumber points to nowhere");
-            }
-            range.end = {
-                character: line.length, line: this.currentLineNumber - 1,
-            };
+        content = line;
+        line = this.getLine(++this.currentLineNumber);
+        if (!line) {
+            throw new Error("this.currentLineNumber + 1 points to nowhere");
         }
+        range = {
+            end: { character: line.length, line: this.currentLineNumber },
+            start: { character: 0, line: this.currentLineNumber },
+        };
+        while (line !== undefined && !/\bendvar\b/.test(line)) {
+            content += `${line}\n`;
+            line = this.getLine(++this.currentLineNumber);
+        }
+        if (!line) {
+            throw new Error("this.currentLineNumber points to nowhere");
+        }
+        range.end = {
+            character: line.length, line: this.currentLineNumber - 1,
+        };
         content = JSON.stringify(content);
-        const proxyCount: number = 2;
         const statement: TextRange = new TextRange(
-            "const proxy = new Proxy({}, {});" +
-            "const proxyFunction = new Proxy(new Function(), {});" +
-            `(new Function("widget","config","dialog", ${content}))` +
-            `.call(window${JsDomCaller.generateCall(1, "proxyFunction")}` +
-            `${JsDomCaller.generateCall(proxyCount, "proxy")})`,
+            "const varProxyFunction = new Proxy(new Function(), {});" +
+            `(new Function(${content}))` +
+            `.call(window${JsDomCaller.generateCall(1, "varProxyFunction")})`,
             range,
         );
         this.statements.push(statement);
-
     }
 
     private processOptions(): void {
