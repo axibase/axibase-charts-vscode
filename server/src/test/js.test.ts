@@ -25,6 +25,9 @@ suite("[JS] Var content tests", () => {
             [],
         ),
         new Test(
+            "Correct oneline var with function call",
+            `var offsets = range(2,6)`, []),
+        new Test(
             "Correct multiline var props",
             `var v = {
    "hello": "value",

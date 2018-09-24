@@ -7,6 +7,15 @@ import { TextRange } from "./textRange";
 
 export class JsDomCaller {
     private static readonly CONTENT_POSITION: number = 2;
+
+    /**
+     * Possible functions which can be assigned to var
+     */
+    private static readonly functionsList: string[] = [
+        "getTags", "getSeries", "getMetrics", "getEntities",
+        "range", "previous", "movavg", "meta",
+        "entityTag", "metricTag"
+    ]
     /**
      * Generates a list of arguments with same name to use in a function call
      * @param amount number of arguments
@@ -309,8 +318,8 @@ export class JsDomCaller {
         content = JSON.stringify(content);
         const statement: TextRange = new TextRange(
             "const varProxyFunction = new Proxy(new Function(), {});" +
-            `(new Function(${content}))` +
-            `.call(window${JsDomCaller.generateCall(1, "varProxyFunction")})`,
+            `(new Function("${JsDomCaller.functionsList.join('","')}", ${content}))` +
+            `.call(window${JsDomCaller.generateCall(JsDomCaller.functionsList.length + 1, "varProxyFunction")})`,
             range,
         );
         this.statements.push(statement);
