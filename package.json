@@ -20,7 +20,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Default configuration",
+      "title": "Axibase Charts",
       "properties": {
         "axibaseCharts.validateFunctions": {
           "type": "boolean",
