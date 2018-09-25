@@ -352,12 +352,12 @@ The setting supports [calendar](https://axibase.com/docs/atsd/shared/calendar.ht
 
 Define multiple entities with one setting.
 If both `entity` and `entities` are specified, the former takes precedence.
-Support `?` and `*` [wildcards](../../syntax/wildcards.md)|
+Support `?` and `*` [wildcards](https://github.com/axibase/charts/blob/master/syntax/wildcards.md)|
 
 ## entity
 
 Define the Entity.
-Supports `?` and `*` [wildcards](../../syntax/wildcards.md)
+Supports `?` and `*` [wildcards](https://github.com/axibase/charts/blob/master/syntax/wildcards.md)
 
 ## entityexpression
 
@@ -429,7 +429,7 @@ CSS styles applied to forecasts in `column` and `column-stack` modes.
 ## format
 
 Display series with the appropriate unit of measurement.
-See [Format Settings](../../syntax/format-settings.md) for complete syntax.
+See [Format Settings](https://github.com/axibase/charts/blob/master/syntax/format-settings.md) for complete syntax.
 
 ## formataxis
 
@@ -491,7 +491,7 @@ Assign a group period to a series for computing [group](https://axibase.com/docs
 ## groupstatistic
 
 Assign a group statistic function to the series.
-See [Aggregators](../../configuration/aggregators.md) for more information.
+See [Aggregators](https://github.com/axibase/charts/blob/master/configuration/aggregators.md) for more information.
 
 ## headerstyle
 
@@ -612,7 +612,7 @@ Text on label.
 ## labelformat
 
 Label series using text and placeholders.
-See [Label Formating](../../syntax/label-formatting.md).
+See [Label Formating](https://github.com/axibase/charts/blob/master/syntax/label-formatting.md).
 
 ## last
 
@@ -761,7 +761,7 @@ Key by which columns are grouped into rows.
 
 ## mergefields
 
-Combine series into series grouped based on field. Applies only in `multiple-series` mode. Series which use [wildcard](../../syntax/wildcards.md), `entities`, `entityGroup` settings or comma-separated tag values are treated as multiple series by default.
+Combine series into series grouped based on field. Applies only in `multiple-series` mode. Series which use [wildcard](https://github.com/axibase/charts/blob/master/syntax/wildcards.md), `entities`, `entityGroup` settings or comma-separated tag values are treated as multiple series by default.
 Possible values:
 `entity`: All series with the same entity are combined.
 `{tag-name}`: All series with the same value of tag `{tag-name}` are combined.
@@ -829,7 +829,7 @@ Disable moving average to set aggregation period based on calendar.
 
 ## multiplecolumn
 
-Applies to [wildcard](../../syntax/wildcards.md) series.
+Applies to [wildcard](https://github.com/axibase/charts/blob/master/syntax/wildcards.md) series.
 Default value: `false`.
 If `true`, series with the same entity and tags are grouped in the same column.
 This applies to derived series which are placed in the same column alongside the underlying series.
@@ -1117,7 +1117,7 @@ Set to the current value of the series using `value`.
 
 ## sizename
 
-Title for for `display-total`. 
+Title for for `display-total`.
 Displayed after `Total`.
 For example: `Total sum`.
 
@@ -1175,7 +1175,7 @@ The setting supports [calendar](../shared/calendar.md) keywords.
 ## statistic
 
 Apply aggregation statistical functions.
-See [Aggregators](../../configuration/aggregators.md) for more information.
+See [Aggregators](https://github.com/axibase/charts/blob/master/configuration/aggregators.md) for more information.
 
 ## statistics
 
