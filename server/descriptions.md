@@ -381,7 +381,7 @@ Ignore series with tags, other than those specified in the series configuration.
 
 ## expand
 
-Expand all segments or an individual segment. 
+Expand all segments or an individual segment.
 Double-click modifies `expand` setting interactively.
 
 ## expandpanels
@@ -915,7 +915,7 @@ Specifies an action to be performed when the user selects a series. For a Calend
 
 ## onseriesdoubleclick
 
-Disable [double click functionality](#syntax) in the widget.
+Disable [double click functionality](https://github.com/axibase/charts/blob/master/widgets/pie-chart/README.md#syntax) in the widget.
 
 ## options
 
@@ -1164,11 +1164,11 @@ Disable series grouping to display each series in a separate column.
 
 ## starttime
 
-Specifies the date and time in local or [ISO format](../shared/date-format.md) from which the values for the series are loaded.
+Specifies the date and time in local or [ISO format](https://axibase.com/docs/atsd/shared/date-format.html) from which the values for the series are loaded.
 The setting can be overridden by each widget separately.
 Note that `start-time` is **inclusive** and `end-time` is **exclusive**.
 This means that `start-time = 2017-09-14 10:00:00` includes data points that occurred exactly at `10:00:00` and later whereas `end-time = 2017-09-14 11:00:00` includes data points that occurred up to `10:59:59`, excluding points that occurred at `11:00:00`.
-The setting supports [calendar](../shared/calendar.md) keywords.
+The setting supports [calendar](https://axibase.com/docs/atsd/shared/calendar.html) keywords.
 
 ## startworkingminutes
 
