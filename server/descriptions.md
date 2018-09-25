@@ -121,7 +121,7 @@ Hierarchical contraction of edges ([Danny Holten](https://www.researchgate.net/p
 
 ## buttons
 
- Add buttons to the widget header. The buttons are visible on mouse-over.
+Add buttons to the widget header. The buttons are visible on mouse-over.
 `update` stops/resumes the loading of new data into the widget.
 `reset` is supported only in the table widget. The parameter resets column sorting to the initial order.
 
@@ -255,14 +255,14 @@ If the gap between data is greater than the specified interval, a break is displ
 ## disconnectvalue
 
 Apply disconnect value in tandem with disconnect interval or count.
- Define the value to be applied to disconnected areas.
+Define the value to be applied to disconnected areas.
 Use this setting when ATSD is not collecting `null` values or those below a minimum threshold.
 Additionally, toggle display of disconnect value with **Connect Values** on left axis mouseover menu.
 
 ## display
 
 Define a rule to display series.
- Filter series based on metric values for widgets containing many series.
+Filter series based on metric values for widgets containing many series.
 
 ## displaydate
 
@@ -382,7 +382,7 @@ Ignore series with tags, other than those specified in the series configuration.
 ## expand
 
 Expand all segments or an individual segment. 
- Double-click modifies `expand` setting interactively.
+Double-click modifies `expand` setting interactively.
 
 ## expandpanels
 
@@ -568,7 +568,7 @@ Interpolate missing aggregation periods.
 
 ## interpolateboundary
 
- Define [interpolation behavior](https://axibase.com/docs/atsd/api/data/series/interpolate.html#boundary) for leading and trailing values.
+Define [interpolation behavior](https://axibase.com/docs/atsd/api/data/series/interpolate.html#boundary) for leading and trailing values.
 
 ## interpolateextend
 
@@ -694,7 +694,7 @@ Parameter value is a value of scale when labels appear based on edge threshold.
 ## links
 
 List of edges associated with this series is defined by an ID or edge ID of the corresponding vertices with a hyphen.
- When edge ID contains a hyphen, it must be shielded with `""` double quotes.
+When edge ID contains a hyphen, it must be shielded with `""` double quotes.
 
 ## linkthresholds
 
@@ -812,7 +812,7 @@ Apply a forced range to the right axis, regardless of loaded data.
 ## minringwidth
 
 The minimum allowed width of the vertex ring.
- The value is from `0` to a maximum permissible value of the ring width.
+The value is from `0` to a maximum permissible value of the ring width.
 
 ## minseverity
 
@@ -969,7 +969,7 @@ Position of the column relative to other columns in the table.
 ## rangemerge
 
 If threshold is not defined, different set of ranges is computed for each series based on observed min and max values within the loaded timespan.
- `range-merge` computes a single set of ranges for all series in the widget by using `min` and `max` for all loaded series.
+`range-merge` computes a single set of ranges for all series in the widget by using `min` and `max` for all loaded series.
 
 ## rangeoffset
 
@@ -1043,7 +1043,7 @@ Can be specified as JavaScript code.
 
 ## rowstyle
 
- Style assigned to the entire row specified as JavaScript code.
+Style assigned to the entire row specified as JavaScript code.
 In the syntax example all alerts with severity less than `7` are hidden.
 Filter data prior display in the widget.
 
