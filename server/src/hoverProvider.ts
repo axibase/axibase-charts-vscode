@@ -87,7 +87,11 @@ export class HoverProvider {
             return null;
         }
         const start: number = lineLimits.start + match.index;
+        const end: number = start + match[0].length;
+        if (offset >= start && offset <= end) {
+            return { end, start };
+        }
 
-        return { end: start + match[0].length, start };
+        return null;
     }
 }
