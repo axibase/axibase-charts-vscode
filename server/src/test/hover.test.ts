@@ -39,7 +39,7 @@ suite("Hover tests", () => {
                 range: Range.create(1, "  ".length, 1, "  ".length + "entity expression".length),
             },
             undefined,
-            Position.create(0, "  entity expr".length),
+            Position.create(1, "  entity expr".length),
         ),
     ].forEach((test: Test): void => test.hoverTest());
 });
