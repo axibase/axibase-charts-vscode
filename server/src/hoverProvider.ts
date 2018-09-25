@@ -64,24 +64,30 @@ export class HoverProvider {
     }
 
     /**
+     * Finds limits of a line in text
+     * @param position position from which to start
+     */
+    private lineLimits(position: Position): IRange {
+        return {
+            end: this.positionToOffset(Position.create(position.line + 1, 0)) - 1,
+            start: this.positionToOffset(Position.create(position.line, 0)),
+        };
+    }
+
+    /**
      * Calculates the range where the setting is defined
      * @param offset offset from which to start
      */
     private calculateRange(offset: number): IRange | null {
+        const lineLimits: IRange = this.lineLimits(this.offsetToPosition(offset));
+        const line: string = this.text.substring(lineLimits.start, lineLimits.end);
         const regexp: RegExp = /\S.+?(?=\s+?=)/;
-        let start: number = this.text.lastIndexOf("\n", offset);
-        if (start < 0) {
-            return null;
-        }
-        const match: RegExpExecArray | null = regexp.exec(this.text.substring(start));
+        const match: RegExpExecArray | null = regexp.exec(line);
         if (match === null) {
             return null;
         }
-        start += match.index;
+        const start: number = lineLimits.start + match.index;
 
-        return {
-            end: start + match[0].length,
-            start,
-        };
+        return { end: start + match[0].length, start };
     }
 }
