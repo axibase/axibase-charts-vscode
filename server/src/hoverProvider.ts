@@ -16,19 +16,23 @@ export class HoverProvider {
         this.document = document;
     }
 
-    public provideHover(position: Position): Hover {
+    public provideHover(position: Position): Hover | null {
         const range: IRange = this.calculateRange(this.positionToOffset(position));
-        const word: string = this.text.substring(range.start, range.end);
-        const name: string = Setting.clearSetting(word);
-        const setting: Setting | undefined = getSetting(name);
-        if (setting != null) {
-            return {
-                contents: setting.description,
-                range: Range.create(this.offsetToPosition(range.start), this.offsetToPosition(range.end)),
-            };
-        } else {
+        if (range === null) {
             return null;
         }
+        const word: string = this.text.substring(range.start, range.end);
+        console.log(`Word is ${word}`);
+        const name: string = Setting.clearSetting(word);
+        const setting: Setting | undefined = getSetting(name);
+        if (setting == null) {
+            return null;
+        }
+
+        return {
+            contents: setting.description,
+            range: Range.create(this.offsetToPosition(range.start), this.offsetToPosition(range.end)),
+        };
     }
 
     private positionToOffset(position: Position): number {
@@ -39,16 +43,21 @@ export class HoverProvider {
         return this.document.positionAt(offset);
     }
 
-    private calculateRange(offset: number): IRange {
-        let start: number = offset;
-        let end: number = offset;
-        while (this.text.charAt(start) !== "\n" && start >= 0) {
-            start--;
+    private calculateRange(offset: number): IRange | null {
+        const regexp: RegExp = /\S.+?(?=\s+?=)/;
+        let start: number = this.text.lastIndexOf("\n", offset);
+        if (start < 0) {
+            return null;
         }
-        while (this.text.charAt(end) !== "=" && end < this.text.length - 1) {
-            end++;
+        const match: RegExpExecArray | null = regexp.exec(this.text.substring(start));
+        if (match === null) {
+            return null;
         }
+        start += match.index;
 
-        return { start, end };
+        return {
+            end: start + match[0].length,
+            start,
+        };
     }
 }
