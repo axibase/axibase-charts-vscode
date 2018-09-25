@@ -1,10 +1,9 @@
-/* tslint:disable:no-magic-numbers */
 import { DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 function intervalError(name: string, example: string): string {
-    return `${name} should be set as \`count unit\`.
+  return `${name} should be set as \`count unit\`.
 For example, ${example}. Supported units:
  * nanosecond
  * millisecond
@@ -19,10 +18,10 @@ For example, ${example}. Supported units:
 }
 
 suite("Type check tests", () => {
-    const tests: Test[] = [
-        new Test(
-            "Correct boolean settings",
-            `[configuration]
+  const tests: Test[] = [
+    new Test(
+      "Correct boolean settings",
+      `[configuration]
   add-meta = false
 [configuration]
   add-meta = no
@@ -47,35 +46,35 @@ suite("Type check tests", () => {
 [configuration]
   add-meta = 1
 `,
-            [],
-        ),
-        new Test(
-            "Incorrect boolean setting",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect boolean setting",
+      `[configuration]
   add-meta = not
 [configuration]
   add-meta = false true
 [configuration]
   add-meta = OFF 1
 `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  add-meta".length),
-                    DiagnosticSeverity.Error, "add-meta should be a boolean value. For example, true",
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  add-meta".length),
-                    DiagnosticSeverity.Error, "add-meta should be a boolean value. For example, true",
-                ),
-                createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  add-meta".length),
-                    DiagnosticSeverity.Error, "add-meta should be a boolean value. For example, true",
-                ),
-            ],
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  add-meta".length),
+          "add-meta should be a boolean value. For example, true",
         ),
-        new Test(
-            "Correct number settings",
-            `[configuration]
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  add-meta".length),
+          "add-meta should be a boolean value. For example, true",
+        ),
+        createDiagnostic(
+          Range.create(5, "  ".length, 5, "  add-meta".length),
+          "add-meta should be a boolean value. For example, true",
+        ),
+      ],
+    ),
+    new Test(
+      "Correct number settings",
+      `[configuration]
   arrow-length = 1
 [configuration]
   arrow-length = 100000
@@ -92,11 +91,11 @@ suite("Type check tests", () => {
 [configuration]
   arrow-length = 1000.333333333
 `,
-            [],
-        ),
-        new Test(
-            "Incorrect number settings",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect number settings",
+      `[configuration]
   arrow-length = false
 [configuration]
   arrow-length = 5 + 5
@@ -119,93 +118,93 @@ suite("Type check tests", () => {
 [configuration]
   arrow-length = hello 5
 `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(13, "  ".length, 13, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(15, "  ".length, 15, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(17, "  ".length, 17, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(19, "  ".length, 19, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-                createDiagnostic(
-                    Range.create(21, "  ".length, 21, "  arrow-length".length),
-                    DiagnosticSeverity.Error, "arrow-length should be a real (floating-point) number. For example, 0.3",
-                ),
-            ],
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
         ),
-        new Test(
-            "Correct enum settings",
-            `[configuration]
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(5, "  ".length, 5, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(7, "  ".length, 7, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(9, "  ".length, 9, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(11, "  ".length, 11, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(13, "  ".length, 13, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(15, "  ".length, 15, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(17, "  ".length, 17, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(19, "  ".length, 19, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+        createDiagnostic(
+          Range.create(21, "  ".length, 21, "  arrow-length".length),
+          "arrow-length should be a real (floating-point) number. For example, 0.3",
+        ),
+      ],
+    ),
+    new Test(
+      "Correct enum settings",
+      `[configuration]
   bottom-axis = percentiles
   buttons = update
   case = upper
   counter-position = top
   `,
-            [],
-        ),
-        new Test(
-            "Incorrect enum settings",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect enum settings",
+      `[configuration]
   bottom-axis = percentile
   buttons = updat
   case = uppe
   counter-position = to
   `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  bottom-axis".length),
-                    DiagnosticSeverity.Error, "bottom-axis must be one of:\nnone;\npercentiles;\nvalues",
-                ),
-                createDiagnostic(
-                    Range.create(2, "  ".length, 2, "  buttons".length),
-                    DiagnosticSeverity.Error, "buttons must be one of:\nmenu;\nupdate",
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  case".length),
-                    DiagnosticSeverity.Error, "case must be one of:\nupper;\nlower",
-                ),
-                createDiagnostic(
-                    Range.create(4, "  ".length, 4, "  counter-position".length),
-                    DiagnosticSeverity.Error, "counter-position must be one of:\nnone;\ntop;\nbottom",
-                ),
-            ],
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  bottom-axis".length),
+          "bottom-axis must be one of:\nnone;\npercentiles;\nvalues",
         ),
-        new Test(
-            "Correct date tests",
-            `[configuration]
+        createDiagnostic(
+          Range.create(2, "  ".length, 2, "  buttons".length),
+          "buttons must be one of:\nmenu;\nupdate",
+        ),
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  case".length),
+          "case must be one of:\nupper;\nlower",
+        ),
+        createDiagnostic(
+          Range.create(4, "  ".length, 4, "  counter-position".length),
+          "counter-position must be one of:\nnone;\ntop;\nbottom",
+        ),
+      ],
+    ),
+    new Test(
+      "Correct date tests",
+      `[configuration]
   start-time = 2018
 [configuration]
   start-time = 2018-12
@@ -244,11 +243,11 @@ suite("Type check tests", () => {
 [configuration]
   start-time = current_month - .5 * week
 `,
-            [],
-        ),
-        new Test(
-            "Incorrect date tests",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect date tests",
+      `[configuration]
   start-time = 1969
 [configuration]
   start-time = 2018-13
@@ -291,96 +290,96 @@ suite("Type check tests", () => {
 [configuration]
   start-time = current_month - .5 * my_period
 `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(13, "  ".length, 13, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(15, "  ".length, 15, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(17, "  ".length, 17, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(19, "  ".length, 19, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(21, "  ".length, 21, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(23, "  ".length, 23, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(25, "  ".length, 25, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(27, "  ".length, 27, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(29, "  ".length, 29, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(31, "  ".length, 31, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(33, "  ".length, 33, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(35, "  ".length, 35, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(37, "  ".length, 37, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(39, "  ".length, 39, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-                createDiagnostic(
-                    Range.create(41, "  ".length, 41, "  start-time".length),
-                    DiagnosticSeverity.Error, "start-time should be a date. For example, 2017-04-01T10:15:00Z",
-                ),
-            ],
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
         ),
-        new Test(
-            "Correct interval tests",
-            `[configuration]
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(5, "  ".length, 5, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(7, "  ".length, 7, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(9, "  ".length, 9, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(11, "  ".length, 11, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(13, "  ".length, 13, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(15, "  ".length, 15, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(17, "  ".length, 17, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(19, "  ".length, 19, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(21, "  ".length, 21, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(23, "  ".length, 23, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(25, "  ".length, 25, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(27, "  ".length, 27, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(29, "  ".length, 29, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(31, "  ".length, 31, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(33, "  ".length, 33, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(35, "  ".length, 35, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(37, "  ".length, 37, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(39, "  ".length, 39, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+        createDiagnostic(
+          Range.create(41, "  ".length, 41, "  start-time".length),
+          "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+        ),
+      ],
+    ),
+    new Test(
+      "Correct interval tests",
+      `[configuration]
   disconnect-interval = 1 minute
 [configuration]
   disconnect-interval = 20 hour
@@ -395,11 +394,11 @@ suite("Type check tests", () => {
 [configuration]
   update-interval = 10 second
   `,
-            [],
-        ),
-        new Test(
-            "Incorrect interval tests",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect interval tests",
+      `[configuration]
   disconnect-interval = 1 minutes
 [configuration]
   disconnect-interval = 20 hours
@@ -411,30 +410,30 @@ suite("Type check tests", () => {
   disconnect-interval = . year
 [configuration]
   update-interval = 10`,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  disconnect-interval".length),
-                    DiagnosticSeverity.Error, intervalError("disconnect-interval", "1 minute"),
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  disconnect-interval".length),
-                    DiagnosticSeverity.Error, intervalError("disconnect-interval", "1 minute"),
-                ),
-                createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  disconnect-interval".length),
-                    DiagnosticSeverity.Error, intervalError("disconnect-interval", "1 minute"),
-                ),
-                createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  disconnect-interval".length),
-                    DiagnosticSeverity.Error, intervalError("disconnect-interval", "1 minute"),
-                ),
-                createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  disconnect-interval".length),
-                    DiagnosticSeverity.Error, intervalError("disconnect-interval", "1 minute"),
-                ),
-                createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  update-interval".length),
-                    DiagnosticSeverity.Warning, `Specifying the interval in seconds is deprecated.
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  disconnect-interval".length),
+          intervalError("disconnect-interval", "1 minute"),
+        ),
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  disconnect-interval".length),
+          intervalError("disconnect-interval", "1 minute"),
+        ),
+        createDiagnostic(
+          Range.create(5, "  ".length, 5, "  disconnect-interval".length),
+          intervalError("disconnect-interval", "1 minute"),
+        ),
+        createDiagnostic(
+          Range.create(7, "  ".length, 7, "  disconnect-interval".length),
+          intervalError("disconnect-interval", "1 minute"),
+        ),
+        createDiagnostic(
+          Range.create(9, "  ".length, 9, "  disconnect-interval".length),
+          intervalError("disconnect-interval", "1 minute"),
+        ),
+        createDiagnostic(
+          Range.create(11, "  ".length, 11, "  update-interval".length),
+          `Specifying the interval in seconds is deprecated.
 Use \`count unit\` format.
 For example, 5 minute. Supported units:
  * nanosecond
@@ -446,13 +445,13 @@ For example, 5 minute. Supported units:
  * week
  * month
  * quarter
- * year`,
-                ),
-            ],
+ * year`, DiagnosticSeverity.Warning,
         ),
-        new Test(
-            "Allow \${} and @{} expressions",
-            `[configuration]
+      ],
+    ),
+    new Test(
+      "Allow \${} and @{} expressions",
+      `[configuration]
   <#assign setEndTime = endtime!lastInsertDate(entity, "nmon.wlmmem.memory_percent") >
   <#if setEndTime??>
   	endtime = \${setEndTime}
@@ -462,32 +461,32 @@ For example, 5 minute. Supported units:
     start-time = @{time}
   endfor
   `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  ".length + "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-            ],
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  ".length + "<#assign".length),
+          "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+          DiagnosticSeverity.Information,
         ),
-        new Test(
-            "Allow detail statistic",
-            `[series]
+      ],
+    ),
+    new Test(
+      "Allow detail statistic",
+      `[series]
   entity = test
   metric = test
   statistic = detail`,
-            [],
-        ),
-        new Test(
-            "Forbid unknown aggregator in statistic setting",
-            `[series]
+      [],
+    ),
+    new Test(
+      "Forbid unknown aggregator in statistic setting",
+      `[series]
   entity = test
   metric = test
   statistic = unknown-aggregator`,
-            [
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    DiagnosticSeverity.Error, `statistic must be one of:
+      [
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
+          `statistic must be one of:
 count;
 detail;
 min;
@@ -508,18 +507,18 @@ max_value_time;
 threshold_count;
 threshold_duration;
 threshold_percent`,
-                ),
-            ],
         ),
-        new Test(
-            "Allow summarize-statistic last",
-            `[configuration]
+      ],
+    ),
+    new Test(
+      "Allow summarize-statistic last",
+      `[configuration]
   summarize-statistic = last`,
-            [],
-        ),
-        new Test(
-            "Allow any percentile number in statistic settings",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Allow any percentile number in statistic settings",
+      `[configuration]
   group-statistic = percentile(25.5)
 [configuration]
   statistic = percentile_255
@@ -533,11 +532,11 @@ threshold_percent`,
   statistics = percentile(5)
 [configuration]
   summarize-statistic = percentile_5`,
-            [],
-        ),
-        new Test(
-            "Incorrect percentile is used",
-            `[configuration]
+      [],
+    ),
+    new Test(
+      "Incorrect percentile is used",
+      `[configuration]
   group-statistic = percentile_-5
 [configuration]
   statistic = percentile_-76
@@ -553,10 +552,10 @@ threshold_percent`,
   summarize-statistic = percentile_word
 [configuration]
   statistics = percentile("a word")`,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  ".length + "group-statistic".length),
-                    DiagnosticSeverity.Error, `group-statistic must be one of:
+      [
+        createDiagnostic(
+          Range.create(1, "  ".length, 1, "  ".length + "group-statistic".length),
+          `group-statistic must be one of:
 count;
 min;
 max;
@@ -576,10 +575,10 @@ max_value_time;
 threshold_count;
 threshold_duration;
 threshold_percent`,
-                ),
-                createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    DiagnosticSeverity.Error, `statistic must be one of:
+        ),
+        createDiagnostic(
+          Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
+          `statistic must be one of:
 count;
 detail;
 min;
@@ -600,126 +599,126 @@ max_value_time;
 threshold_count;
 threshold_duration;
 threshold_percent`,
-                ),
-                createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  ".length + "statistics".length),
-                    DiagnosticSeverity.Error, `statistics must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
-                ),
-                createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  ".length + "summarize-statistic".length),
-                    DiagnosticSeverity.Error, `summarize-statistic must be one of:
-avg;
-max;
-min;
-sum;
-count;
-last;
-percentile_{num};
-median`,
-                ),
-                createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  ".length + "group-statistic".length),
-                    DiagnosticSeverity.Error, `group-statistic must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
-                ),
-                createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  ".length + "group-statistic".length),
-                    DiagnosticSeverity.Error, `group-statistic must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
-                ),
-                createDiagnostic(
-                    Range.create(13, "  ".length, 13, "  ".length + "summarize-statistic".length),
-                    DiagnosticSeverity.Error, `summarize-statistic must be one of:
-avg;
-max;
-min;
-sum;
-count;
-last;
-percentile_{num};
-median`,
-                ),
-                createDiagnostic(
-                    Range.create(15, "  ".length, 15, "  ".length + "statistics".length),
-                    DiagnosticSeverity.Error, `statistics must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
-                ),
-            ],
         ),
-    ];
+        createDiagnostic(
+          Range.create(5, "  ".length, 5, "  ".length + "statistics".length),
+          `statistics must be one of:
+count;
+min;
+max;
+sum;
+avg;
+percentile_{num};
+median;
+standard_deviation;
+first;
+last;
+delta;
+counter;
+wtavg;
+wavg;
+min_value_time;
+max_value_time;
+threshold_count;
+threshold_duration;
+threshold_percent`,
+        ),
+        createDiagnostic(
+          Range.create(7, "  ".length, 7, "  ".length + "summarize-statistic".length),
+          `summarize-statistic must be one of:
+avg;
+max;
+min;
+sum;
+count;
+last;
+percentile_{num};
+median`,
+        ),
+        createDiagnostic(
+          Range.create(9, "  ".length, 9, "  ".length + "group-statistic".length),
+          `group-statistic must be one of:
+count;
+min;
+max;
+sum;
+avg;
+percentile_{num};
+median;
+standard_deviation;
+first;
+last;
+delta;
+counter;
+wtavg;
+wavg;
+min_value_time;
+max_value_time;
+threshold_count;
+threshold_duration;
+threshold_percent`,
+        ),
+        createDiagnostic(
+          Range.create(11, "  ".length, 11, "  ".length + "group-statistic".length),
+          `group-statistic must be one of:
+count;
+min;
+max;
+sum;
+avg;
+percentile_{num};
+median;
+standard_deviation;
+first;
+last;
+delta;
+counter;
+wtavg;
+wavg;
+min_value_time;
+max_value_time;
+threshold_count;
+threshold_duration;
+threshold_percent`,
+        ),
+        createDiagnostic(
+          Range.create(13, "  ".length, 13, "  ".length + "summarize-statistic".length),
+          `summarize-statistic must be one of:
+avg;
+max;
+min;
+sum;
+count;
+last;
+percentile_{num};
+median`,
+        ),
+        createDiagnostic(
+          Range.create(15, "  ".length, 15, "  ".length + "statistics".length),
+          `statistics must be one of:
+count;
+min;
+max;
+sum;
+avg;
+percentile_{num};
+median;
+standard_deviation;
+first;
+last;
+delta;
+counter;
+wtavg;
+wavg;
+min_value_time;
+max_value_time;
+threshold_count;
+threshold_duration;
+threshold_percent`,
+        ),
+      ],
+    ),
+  ];
 
-    tests.forEach((test: Test): void => { test.validationTest(); });
+  tests.forEach((test: Test): void => { test.validationTest(); });
 });

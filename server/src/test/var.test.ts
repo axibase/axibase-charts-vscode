@@ -1,4 +1,4 @@
-import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -39,7 +39,7 @@ endvar`,
 edvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
-                DiagnosticSeverity.Error, "var has no matching endvar",
+                "var has no matching endvar",
             )],
         ),
         new Test(
@@ -51,7 +51,7 @@ edvar`,
 edvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
-                DiagnosticSeverity.Error, "var has no matching endvar",
+                "var has no matching endvar",
             )],
         ),
         new Test(
@@ -63,7 +63,7 @@ edvar`,
 edvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
-                DiagnosticSeverity.Error, "var has no matching endvar",
+                "var has no matching endvar",
             )],
         ),
         new Test(

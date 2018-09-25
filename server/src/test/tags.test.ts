@@ -20,7 +20,7 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "starttime".length)),
-                DiagnosticSeverity.Information, errorMessage("starttime"),
+                errorMessage("starttime"), DiagnosticSeverity.Information,
             )],
         ),
         new Test(
@@ -37,7 +37,7 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "stArt-time".length)),
-                DiagnosticSeverity.Information, errorMessage("start-time"),
+                errorMessage("start-time"), DiagnosticSeverity.Information,
             )],
         ),
     ];
@@ -52,7 +52,7 @@ suite("Warn about deprecated [tag] section", () => {
     const expectedDiagnostic: Diagnostic = createDiagnostic(
         Range.create(Position.create(0, 1),
                      Position.create(0, 4)),
-        DiagnosticSeverity.Warning, deprecatedTagSection,
+        deprecatedTagSection, DiagnosticSeverity.Warning,
     );
     [
         new Test("Deprecated [tag]",
@@ -67,8 +67,8 @@ suite("Warn about tag keys with whitespaces that not wrapped in double quotes", 
     const expectedDiagnostic: Diagnostic =
         createDiagnostic(Range.create(Position.create(1, 2),
                                       Position.create(1, 11)),
-                         DiagnosticSeverity.Warning,
-                         tagNameWithWhitespaces("two words"));
+                         tagNameWithWhitespaces("two words"),
+                         DiagnosticSeverity.Warning);
     [
         new Test("Tag not wrapped in double-quote",
                  `[tags]
@@ -82,8 +82,8 @@ suite("Information about settingName in tags", () => {
     const expectedDiagnostic: Diagnostic =
         createDiagnostic(Range.create(Position.create(1, 0),
                                       Position.create(1, 5)),
-                         DiagnosticSeverity.Information,
-                         settingNameInTags("value"));
+                         settingNameInTags("value"),
+                         DiagnosticSeverity.Information);
     [
         new Test("setting as tag value in [tag] section",
                  `[tags]
@@ -92,10 +92,10 @@ value = key`,
         new Test("setting name is correct for tag section",
                  `[tag]
 value = correct`,
-                 [ createDiagnostic(
-                     Range.create(Position.create(0, 1),
-                                  Position.create(0, 4)),
-                     DiagnosticSeverity.Warning, deprecatedTagSection,
-                 )]),
+                 [createDiagnostic(
+                Range.create(Position.create(0, 1),
+                             Position.create(0, 4)),
+                deprecatedTagSection, DiagnosticSeverity.Warning,
+            )]),
     ].forEach((test: Test) => test.validationTest());
 });
