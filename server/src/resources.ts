@@ -23,7 +23,8 @@ function readDescriptions(): Map<string, string> {
     const descriptionsPath: string = join(__dirname, "..", "descriptions.md");
     const content: string = readFileSync(descriptionsPath, "UTF-8");
     const map: Map<string, string> = new Map();
-    const regExp: RegExp = /\#\# ([a-z]+?)\n\n([^#]+?)(?:\n\n(?=\#)|\n$)/g;
+    // ## settingname\n\nsetting description[url](hello#html)\n
+    const regExp: RegExp = /\#\# ([a-z]+?)\n\n([^\s#][\S\s]+?)\n(?:\n(?=\#)|$)/g;
     let match: RegExpExecArray | null = regExp.exec(content);
     while (match !== null) {
         const [, name, description] = match;
