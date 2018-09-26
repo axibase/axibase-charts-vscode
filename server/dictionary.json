@@ -4966,7 +4966,7 @@
             "displayName": "reload",
             "type": "boolean",
             "example": true
-        },
+},
         {
             "displayName": "replace-underscore",
             "section": "widget",
@@ -7192,6 +7192,7 @@
         {
             "displayName": "tooltip",
             "type": "string",
+            "multiLine": true,
             "example": "NURSWGVML007"
         },
         {
