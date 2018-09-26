@@ -7223,7 +7223,8 @@
             "displayName": "top-units",
             "type": "number",
             "section": "widget",
-            "example": 1
+            "example": 1,
+            "minValue": 0
         },
         {
             "displayName": "total-size",
@@ -8114,9 +8115,9 @@
         {
             "displayName": "width-units",
             "type": "number",
-            "minValue": 0,
             "example": 2,
-            "defaultValue": 6
+            "defaultValue": 6,
+            "minValue": 0
         },
         {
             "displayName": "zoom-svg",
