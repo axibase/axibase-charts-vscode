@@ -4973,6 +4973,7 @@
         },
         {
             "displayName": "reload",
+            "section": "dropdown",
             "type": "boolean",
             "example": true
         },
