@@ -2781,6 +2781,7 @@
         {
             "displayName": "label",
             "type": "string",
+            "multiLine": true,
             "example": "CPU Busy - nurswgvml007",
             "section": "series"
         },
