@@ -4963,6 +4963,11 @@
             "section": "series"
         },
         {
+            "displayName": "reload",
+            "type": "boolean",
+            "example": true
+        },
+        {
             "displayName": "replace-underscore",
             "section": "widget",
             "type": "boolean",
