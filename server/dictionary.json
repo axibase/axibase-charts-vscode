@@ -7211,7 +7211,7 @@
         },
         {
             "displayName": "top-units",
-            "type": "integer",
+            "type": "number",
             "section": "widget",
             "example": 1
         },
