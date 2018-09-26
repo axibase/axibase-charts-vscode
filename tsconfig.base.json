@@ -5,6 +5,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true,
-		"alwaysStrict": true
+		"alwaysStrict": true,
+		"strictNullChecks": false
 	}
 }

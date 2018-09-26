@@ -1,125 +1,130 @@
 {
-    "name": "axibasecharts-syntax",
-    "displayName": "Axibase Charts",
-    "description": "Axibase Charts syntax validation and highlighting extension",
-    "author": "Kirill Kamakin",
-    "version": "1.0.8",
-    "license": "Apache-2.0",
-    "icon": "images/icon.png",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/axibase/axibase-charts-vscode"
-    },
-    "publisher": "Axibase",
-    "engines": {
-        "vscode": "^1.26.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "Default configuration",
-            "properties": {
-                "axibaseCharts.validateFunctions": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Controls whether inline JS functions are validated or not."
-                },
-                "axibaseCharts.hostname": {
-                    "type": "string",
-                    "default": null,
-                    "description": "Enter the server hostname or IP address."
-                },
-                "axibaseCharts.username": {
-                    "type": "string",
-                    "default": null,
-                    "description": "Enter user name. Leave empty if api.guest.access.enabled is true."
-                },
-                "axibaseCharts.protocol": {
-                    "type": "string",
-                    "description": "Choose the protocol to connect to the ATSD server.",
-                    "default": "https",
-                    "enum": [
-                        "https",
-                        "http"
-                    ]
-                },
-                "axibaseCharts.port": {
-                    "type": "integer",
-                    "default": 8443,
-                    "description": "Enter the server port number."
-                }
-            }
+  "name": "axibasecharts-syntax",
+  "displayName": "Axibase Charts",
+  "description": "Axibase Charts syntax validation and highlighting extension",
+  "author": "Kirill Kamakin",
+  "version": "1.0.8",
+  "license": "Apache-2.0",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axibase/axibase-charts-vscode"
+  },
+  "publisher": "Axibase",
+  "engines": {
+    "vscode": "^1.26.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Axibase Charts",
+      "properties": {
+        "axibaseCharts.validateFunctions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Controls whether inline JS functions are validated or not."
         },
-        "configurationDefaults": {
-            "[axibasecharts]": {
-                "editor.tabSize": 2,
-                "editor.insertSpaces": true
-            }
+        "axibaseCharts.hostname": {
+          "type": "string",
+          "default": null,
+          "description": "Enter the server hostname or IP address."
         },
-        "languages": [
-            {
-                "id": "axibasecharts",
-                "aliases": [
-                    "Axibase Charts",
-                    "axibasecharts"
-                ],
-                "extensions": [
-                    ".config"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "axibasecharts",
-                "scopeName": "source.axibase.charts",
-                "path": "./syntaxes/axibasecharts.tmLanguage.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "axibasecharts",
-                "path": "./snippets/snippets.json"
-            }
-        ],
-        "commands": [
-            {
-                "command": "axibasecharts.showPortal",
-                "title": "Preview Charts",
-                "category": "Axibase Charts",
-                "icon": "./images/preview.svg"
-            }
-        ],
-        "menus": {
-            "editor/title": [
-                {
-                    "command": "axibasecharts.showPortal",
-                    "when": "editorLangId == axibasecharts",
-                    "group": "navigation"
-                }
-            ]
+        "axibaseCharts.username": {
+          "type": "string",
+          "default": null,
+          "description": "Enter user name. Leave empty if api.guest.access.enabled is true."
+        },
+        "axibaseCharts.protocol": {
+          "type": "string",
+          "description": "Choose the protocol to connect to the ATSD server.",
+          "default": "https",
+          "enum": [
+            "https",
+            "http"
+          ]
+        },
+        "axibaseCharts.port": {
+          "type": "integer",
+          "default": 8443,
+          "description": "Enter the server port number."
         }
+      }
     },
-    "main": "./client/out/extension",
-    "activationEvents": [
-        "onLanguage:axibasecharts"
+    "configurationDefaults": {
+      "[axibasecharts]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+      }
+    },
+    "languages": [
+      {
+        "id": "axibasecharts",
+        "aliases": [
+          "Axibase Charts",
+          "axibasecharts"
+        ],
+        "extensions": [
+          ".config"
+        ],
+        "configuration": "./language-configuration.json"
+      }
     ],
-    "scripts": {
-        "vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-        "compile:client": "tsc -p ./client/tsconfig.json",
-        "compile:server": "tsc -p ./server/tsconfig.json",
-        "watch:client": "tsc -w -p ./client/tsconfig.json",
-        "watch:server": "tsc -w -p ./server/tsconfig.json",
-        "compile": "npm run compile:client && npm run compile:server",
-        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-        "test": "cd server && npm test"
-    },
-    "devDependencies": {
-        "@types/node": "^10.9.4",
-        "tslint": "^5.11.0",
-        "typescript": "^3.0.3"
+    "grammars": [
+      {
+        "language": "axibasecharts",
+        "scopeName": "source.axibase.charts",
+        "path": "./syntaxes/axibasecharts.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "axibasecharts",
+        "path": "./snippets/snippets.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "axibasecharts.showPortal",
+        "title": "Preview Charts",
+        "category": "Axibase Charts",
+        "icon": {
+          "light": "./images/preview.svg",
+          "dark": "./images/preview-inverted.svg"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "axibasecharts.showPortal",
+          "when": "editorLangId == axibasecharts",
+          "group": "navigation"
+        }
+      ]
     }
+  },
+  "main": "./client/out/extension",
+  "activationEvents": [
+    "onLanguage:axibasecharts"
+  ],
+  "scripts": {
+    "vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
+    "compile:client": "tsc -p ./client/tsconfig.json",
+    "compile:server": "tsc -p ./server/tsconfig.json",
+    "watch:client": "tsc -w -p ./client/tsconfig.json",
+    "watch:server": "tsc -w -p ./server/tsconfig.json",
+    "compile": "npm run compile:client && npm run compile:server",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "test": "cd server && npm test",
+    "test:e2e": "sh ./scripts/e2e.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^10.9.4",
+    "@types/mocha": "^5.2.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  }
 }

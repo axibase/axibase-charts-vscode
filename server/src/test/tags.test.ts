@@ -1,7 +1,11 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import {
+    deprecatedTagSection,
+    settingNameInTags,
+    tagNameWithWhitespaces,
+} from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
-import { deprecatedTagSection } from "../messageUtil";
 
 const errorMessage: (setting: string) => string = (setting: string): string => `${setting} is interpreted as a` +
     " series tag and is sent to the server. Remove the setting from the [tags] section or enclose it" +
@@ -16,7 +20,7 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "starttime".length)),
-                DiagnosticSeverity.Information, errorMessage("starttime"),
+                errorMessage("starttime"), DiagnosticSeverity.Information,
             )],
         ),
         new Test(
@@ -33,7 +37,7 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "stArt-time".length)),
-                DiagnosticSeverity.Information, errorMessage("start-time"),
+                errorMessage("start-time"), DiagnosticSeverity.Information,
             )],
         ),
     ];
@@ -48,12 +52,50 @@ suite("Warn about deprecated [tag] section", () => {
     const expectedDiagnostic: Diagnostic = createDiagnostic(
         Range.create(Position.create(0, 1),
                      Position.create(0, 4)),
-        DiagnosticSeverity.Warning, deprecatedTagSection,
+        deprecatedTagSection, DiagnosticSeverity.Warning,
     );
     [
         new Test("Deprecated [tag]",
                  `[tag]
-                    a = b
+                    name = a
+                    value = b
             `,   [expectedDiagnostic]),
+    ].forEach((test: Test) => test.validationTest());
+});
+
+suite("Warn about tag keys with whitespaces that not wrapped in double quotes", () => {
+    const expectedDiagnostic: Diagnostic =
+        createDiagnostic(Range.create(Position.create(1, 2),
+                                      Position.create(1, 11)),
+                         tagNameWithWhitespaces("two words"),
+                         DiagnosticSeverity.Warning);
+    [
+        new Test("Tag not wrapped in double-quote",
+                 `[tags]
+  two words  = a
+  "two words" = b
+            `,   [expectedDiagnostic]),
+    ].forEach((test: Test) => test.validationTest());
+});
+
+suite("Information about settingName in tags", () => {
+    const expectedDiagnostic: Diagnostic =
+        createDiagnostic(Range.create(Position.create(1, 0),
+                                      Position.create(1, 5)),
+                         settingNameInTags("value"),
+                         DiagnosticSeverity.Information);
+    [
+        new Test("setting as tag value in [tag] section",
+                 `[tags]
+value = key`,
+                 [expectedDiagnostic]),
+        new Test("setting name is correct for tag section",
+                 `[tag]
+value = correct`,
+                 [createDiagnostic(
+                Range.create(Position.create(0, 1),
+                             Position.create(0, 4)),
+                deprecatedTagSection, DiagnosticSeverity.Warning,
+            )]),
     ].forEach((test: Test) => test.validationTest());
 });

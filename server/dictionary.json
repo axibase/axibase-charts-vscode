@@ -427,11 +427,13 @@
         },
         {
             "displayName": "alert-row-style",
+            "multiLine": true,
             "type": "string",
             "example": "background-color: red"
         },
         {
             "displayName": "alert-style",
+            "multiLine": true,
             "type": "string",
             "section": "link",
             "example": "stroke: red; stroke-width: 2",
@@ -674,6 +676,7 @@
         },
         {
             "displayName": "caption-style",
+            "multiLine": true,
             "type": "string",
             "example": "color: silver",
             "section": "widget"
@@ -801,6 +804,7 @@
         },
         {
             "displayName": "current-period-style",
+            "multiLine": true,
             "type": "string",
             "example": "fill-opacity: 0; stroke-width: 2; stroke-dasharray: 5, 2, 1, 2",
             "section": "widget",
@@ -2037,6 +2041,7 @@
         },
         {
             "displayName": "forecast-style",
+            "multiLine": true,
             "type": "string",
             "example": "stroke: magenta;",
             "section": "widget",
@@ -2385,6 +2390,14 @@
             "widget": "gauge"
         },
         {
+            "displayName": "group",
+            "section": "widget",
+            "widget": "bar",
+            "type": "string",
+            "example": "region",
+            "defaultValue": "metric"
+        },
+        {
             "displayName": "group-first",
             "type": "boolean",
             "example": false,
@@ -2440,7 +2453,7 @@
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -2458,6 +2471,7 @@
         },
         {
             "displayName": "header-style",
+            "multiLine": true,
             "type": "string",
             "example": "background-color: steelblue",
             "section": "widget"
@@ -2635,6 +2649,7 @@
         },
         {
             "displayName": "icon-alert-style",
+            "multiLine": true,
             "type": "string",
             "example": "return alert > 12000 ? 'fill: red' : 'fill:green';",
             "script": {
@@ -2774,6 +2789,7 @@
         {
             "displayName": "label",
             "type": "string",
+            "multiLine": true,
             "example": "CPU Busy - nurswgvml007",
             "section": "series"
         },
@@ -2904,6 +2920,7 @@
         },
         {
             "displayName": "link-alert-style",
+            "multiLine": true,
             "section": "series",
             "type": "string",
             "widget": "graph",
@@ -3669,6 +3686,7 @@
         },
         {
             "displayName": "negative-style",
+            "multiLine": true,
             "type": "string",
             "example": "fill: red",
             "widget": "chart",
@@ -4085,6 +4103,7 @@
         },
         {
             "displayName": "node-alert-style",
+            "multiLine": true,
             "widget": "graph",
             "type": "string",
             "example": "if (alert > 99) return 'fill:red';",
@@ -4953,11 +4972,18 @@
             "section": "series"
         },
         {
+            "displayName": "reload",
+            "section": "dropdown",
+            "type": "boolean",
+            "example": true
+        },
+        {
             "displayName": "replace-underscore",
             "section": "widget",
             "type": "boolean",
             "example": true,
-            "defaultValue": false
+            "defaultValue": false,
+            "widget": "table"
         },
         {
             "displayName": "replace-value",
@@ -5053,6 +5079,7 @@
         },
         {
             "displayName": "row-alert-style",
+            "multiLine": true,
             "type": "string",
             "example": "background-color: orange",
             "section": "column",
@@ -5068,6 +5095,7 @@
         },
         {
             "displayName": "row-style",
+            "multiLine": true,
             "type": "string",
             "section": "column",
             "example": "value > 1 ? 'background: orange' : null",
@@ -6045,6 +6073,7 @@
         },
         {
             "displayName": "severity-style",
+            "multiLine": true,
             "type": "enum",
             "example": "row",
             "widget": "console",
@@ -6576,11 +6605,12 @@
             "section": "series",
             "enum": [
                 "count",
+                "detail",
                 "min",
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -6607,7 +6637,7 @@
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -6632,6 +6662,7 @@
         },
         {
             "displayName": "style",
+            "multiLine": true,
             "type": "string",
             "multiLine": true,
             "example": "stroke-width: 4; color: green"
@@ -6651,11 +6682,8 @@
                 "min",
                 "sum",
                 "count",
-                "percentile_99",
-                "percentile_95",
-                "percentile_90",
-                "percentile_75",
-                "percentile_50",
+                "last",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median"
             ]
         },
@@ -6670,6 +6698,7 @@
         },
         {
             "displayName": "table-header-style",
+            "multiLine": true,
             "section": "widget",
             "type": "string",
             "example": "display: none"
@@ -6701,6 +6730,7 @@
         },
         {
             "displayName": "tags-dropdowns-style",
+            "multiLine": true,
             "type": "string",
             "section": "widget",
             "example": "max-width: 150px"
@@ -7173,6 +7203,7 @@
         {
             "displayName": "tooltip",
             "type": "string",
+            "multiLine": true,
             "example": "NURSWGVML007"
         },
         {
@@ -7190,9 +7221,10 @@
         },
         {
             "displayName": "top-units",
-            "type": "integer",
+            "type": "number",
             "section": "widget",
-            "example": 1
+            "example": 1,
+            "minValue": 0
         },
         {
             "displayName": "total-size",
@@ -8083,9 +8115,9 @@
         {
             "displayName": "width-units",
             "type": "number",
-            "minValue": 0,
             "example": 2,
-            "defaultValue": 6
+            "defaultValue": 6,
+            "minValue": 0
         },
         {
             "displayName": "zoom-svg",

@@ -1,6 +1,6 @@
 import { version as vscodeVersion } from "vscode";
 // @ts-ignore
-import { name, version } from "../../package.json";
+import { name, publisher, version } from "../../package.json";
 
 export const userAgent: string = `${name}/${version} vscode/${vscodeVersion}`;
 
@@ -30,3 +30,5 @@ export const statusFamily: (statusCode: number | undefined) => StatusFamily =
                 throw new Error(`Incorrect status code ${statusCode}`);
         }
     };
+
+export const appId: string = `${publisher}.${name}`;

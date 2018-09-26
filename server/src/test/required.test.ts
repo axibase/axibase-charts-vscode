@@ -1,5 +1,4 @@
-/* tslint:disable:no-magic-numbers */
-import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -18,7 +17,7 @@ suite("Required settings for sections tests", () => {
    metric = hello`,
             [createDiagnostic(
                 Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                DiagnosticSeverity.Error, "entity is required",
+                "entity is required",
             )],
         ),
         new Test(
@@ -77,7 +76,7 @@ suite("Required settings for sections tests", () => {
            metric = hello`,
             [createDiagnostic(
                 Range.create(Position.create(8, "       [".length), Position.create(8, "       [series".length)),
-                DiagnosticSeverity.Error, "entity is required",
+                "entity is required",
             )],
         ),
         new Test(
@@ -89,11 +88,11 @@ suite("Required settings for sections tests", () => {
             [
                 createDiagnostic(
                     Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                    DiagnosticSeverity.Error, "entity is required",
+                    "entity is required",
                 ),
                 createDiagnostic(
                     Range.create(Position.create(2, "[".length), Position.create(2, "[".length + "series".length)),
-                    DiagnosticSeverity.Error, "metric is required",
+                    "metric is required",
                 )],
         ),
         new Test(
@@ -124,7 +123,7 @@ for server in servers
 endfor`,
             [createDiagnostic(
                 Range.create(Position.create(2, "   [".length), Position.create(2, "   [".length + "series".length)),
-                DiagnosticSeverity.Error, "entity is required",
+                "entity is required",
             )],
         ),
         new Test(
@@ -134,7 +133,7 @@ endfor`,
   table = cpu_busy`,
             [createDiagnostic(
                 Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                DiagnosticSeverity.Error, "attribute is required",
+                "attribute is required",
             )],
         ),
         new Test(
@@ -144,7 +143,7 @@ endfor`,
   attribute = cpu_busy`,
             [createDiagnostic(
                 Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                DiagnosticSeverity.Error, "table is required",
+                "table is required",
             )],
         ),
         new Test(
@@ -186,7 +185,7 @@ endfor`,
     entity = @{lpar}`,
             [createDiagnostic(
                 Range.create(5, "  [".length, 5, "  [".length + "series".length),
-                DiagnosticSeverity.Error, "metric is required",
+                "metric is required",
             )],
         ),
         new Test(
@@ -199,7 +198,7 @@ endfor`,
     entity = @{lpar}`,
             [createDiagnostic(
                 Range.create(4, "  [".length, 4, "  [".length + "series".length),
-                DiagnosticSeverity.Error, "metric is required",
+                "metric is required",
             )],
         ),
         new Test(
@@ -212,6 +211,30 @@ endfor`,
   type = table
   metric = nmon.jfs_filespace_%used
   [series]`,
+            [],
+        ),
+        new Test(
+            "Table and attribute are declared in a grandparent section",
+            `[configuration]
+  table = abc
+  attribute = cde
+[group]
+  [widget]
+    type = calendar
+    [series]
+      entity = ent1`,
+            [],
+        ),
+        new Test(
+            "Allow entity-expression as an alternative to entity",
+            `[configuration]
+      width-units = 6.2
+[group]
+  [widget]
+    type = chart
+    [series]
+      entity-expression = entity-1, e-2
+      metric = metric-1`,
             [],
         ),
     ];

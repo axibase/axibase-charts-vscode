@@ -14,7 +14,7 @@ export class Setting {
         "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
     ];
     private static readonly intervalUnits: string[] = [
-        "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
+        "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
     ];
 
     private static readonly booleanRegExp: RegExp = new RegExp(`^(?:${Setting.booleanKeywords.join("|")})$`);
@@ -83,7 +83,6 @@ export class Setting {
     public readonly script?: Script;
     public readonly section?: string;
     public readonly type: string = "";
-
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
         this.enum = this.enum.map((v: string): string => v.toLowerCase());
@@ -106,15 +105,14 @@ export class Setting {
         switch (this.type) {
             case "string": {
                 if (value.length === 0) {
-                    result = createDiagnostic(range, DiagnosticSeverity.Error, `${name} can not be empty`);
+                    result = createDiagnostic(range, `${name} can not be empty`);
                 }
                 break;
             }
             case "number": {
                 if (!Setting.numberRegExp.test(value)) {
                     result = createDiagnostic(
-                        range, DiagnosticSeverity.Error,
-                        `${name} should be a real (floating-point) number. For example, ${this.example}`,
+                        range, `${name} should be a real (floating-point) number. For example, ${this.example}`,
                     );
                 }
                 break;
@@ -122,8 +120,7 @@ export class Setting {
             case "integer": {
                 if (!Setting.integerRegExp.test(value)) {
                     result = createDiagnostic(
-                        range, DiagnosticSeverity.Error,
-                        `${name} should be an integer number. For example, ${this.example}`,
+                        range, `${name} should be an integer number. For example, ${this.example}`,
                     );
                 }
                 break;
@@ -131,8 +128,7 @@ export class Setting {
             case "boolean": {
                 if (!Setting.booleanRegExp.test(value)) {
                     result = createDiagnostic(
-                        range, DiagnosticSeverity.Error,
-                        `${name} should be a boolean value. For example, ${this.example}`,
+                        range, `${name} should be a boolean value. For example, ${this.example}`,
                     );
                 }
                 break;
@@ -143,37 +139,30 @@ export class Setting {
                 );
                 if (index < 0) {
                     const enumList: string = this.enum.join(";\n")
-                        .replace("\\d\+", "{num}");
-                    result = createDiagnostic(
-                        range, DiagnosticSeverity.Error, `${name} must be one of:\n${enumList}`,
-                    );
+                        .replace(/percentile\(.+/, "percentile_{num};");
+                    result = createDiagnostic(range, `${name} must be one of:\n${enumList}`);
                 }
                 break;
             }
             case "interval": {
                 if (!Setting.intervalRegExp.test(value)) {
+                    const message: string =
+                        `.\nFor example, ${this.example}. Supported units:\n * ${Setting.intervalUnits.join("\n * ")}`;
                     if (this.name === "updateinterval" && /^\d+$/.test(value)) {
                         result = createDiagnostic(
-                            range, DiagnosticSeverity.Warning,
-                            `Specifying the interval in seconds is deprecated.
-Use \`count unit\` format, for example: \`5 minute\`.`,
+                            range,
+                            `Specifying the interval in seconds is deprecated.\nUse \`count unit\` format${message}`,
+                            DiagnosticSeverity.Warning,
                         );
                     } else {
-                        result = createDiagnostic(
-                            range, DiagnosticSeverity.Error,
-                            `${name} should be an interval. For example, ${this.example}`,
-                        );
+                        result = createDiagnostic(range, `${name} should be set as \`count unit\`${message}`);
                     }
                 }
-
                 break;
             }
             case "date": {
                 if (!Setting.isDate(value)) {
-                    result = createDiagnostic(
-                        range, DiagnosticSeverity.Error,
-                        `${name} should be a date. For example, ${this.example}`,
-                    );
+                    result = createDiagnostic(range, `${name} should be a date. For example, ${this.example}`);
                 }
                 break;
             }

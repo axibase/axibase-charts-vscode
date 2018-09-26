@@ -85,10 +85,7 @@ export class JsDomCaller {
                     }
                 }
                 if (!isImported) {
-                    result.push(createDiagnostic(
-                        statement.range,
-                        DiagnosticSeverity.Warning, err.message,
-                    ));
+                    result.push(createDiagnostic(statement.range, err.message, DiagnosticSeverity.Warning));
                 }
             }
         });

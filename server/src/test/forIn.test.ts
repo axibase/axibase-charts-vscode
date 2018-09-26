@@ -1,5 +1,4 @@
-/* tslint:disable:no-magic-numbers */
-import { DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Range } from "vscode-languageserver";
 import { unknownToken } from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
@@ -22,7 +21,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -33,7 +32,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -52,7 +51,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -83,7 +82,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(3, "for srv in ".length, 3, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -97,7 +96,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(4, "for srv in ".length, 4, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -122,7 +121,7 @@ for srv in server
 endfor`,
             [createDiagnostic(
                 Range.create(4, "for srv in ".length, 4, "for srv in ".length + "server".length),
-                DiagnosticSeverity.Error, unknownToken("server"),
+                unknownToken("server"),
             )],
         ),
         new Test(
@@ -147,7 +146,7 @@ var servers = {
 endvar`,
             [createDiagnostic(
                 Range.create(0, "for srv in ".length, 0, "for srv in ".length + "servers".length),
-                DiagnosticSeverity.Error, unknownToken("servers"),
+                unknownToken("servers"),
             )],
         ),
         new Test(
@@ -161,7 +160,7 @@ var servers = {
 endvar`,
             [createDiagnostic(
                 Range.create(0, "for srv in ".length, 0, "for srv in ".length + "servers".length),
-                DiagnosticSeverity.Error, unknownToken("servers"),
+                unknownToken("servers"),
             )],
         ),
         new Test(
@@ -171,7 +170,7 @@ endvar`,
 endfor`,
             [createDiagnostic(
                 Range.create(0, "for srv ".length, 0, "for srv ".length + "in".length),
-                DiagnosticSeverity.Error, "Empty 'in' statement",
+                "Empty 'in' statement",
             )],
         ),
         new Test(
@@ -206,7 +205,7 @@ endfor`,
                 Range.create(
                     6, "for agent in Object.keys(".length, 6, "for agent in Object.keys(".length + "pps".length,
                 ),
-                DiagnosticSeverity.Error, "pps is unknown.",
+                "pps is unknown.",
             )],
         ),
         new Test(

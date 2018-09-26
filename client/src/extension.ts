@@ -76,12 +76,23 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             const normalizedDiagnostic: Diagnostic[] = serverDiagnostic
                 .map((d: Diagnostic) =>
                     new Diagnostic(d.range, d.message, d.severity - 1));
-            diagnosticCollection.set(Uri.parse(uri), normalizedDiagnostic);
+            const validatedDocUri: Uri = Uri.parse(uri);
+            const validatedDoc: TextDocument | undefined = workspace.textDocuments
+                .find((doc: TextDocument) => !doc.isClosed && doc.uri.fsPath === validatedDocUri.fsPath);
+            if (validatedDoc) {
+                diagnosticCollection.set(validatedDoc.uri, normalizedDiagnostic);
+            }
         });
     });
 
     workspace.onDidCloseTextDocument((textDocument: TextDocument) => {
-        diagnosticCollection.delete(textDocument.uri);
+        const uri: Uri = Uri.file(textDocument.uri.fsPath);
+        if (textDocument.uri.scheme === "git") {
+            const sourcePath: string = textDocument.fileName.replace(".git", "");
+            const sourceUri: Uri = Uri.file(sourcePath);
+            diagnosticCollection.delete(sourceUri);
+        }
+        diagnosticCollection.delete(uri);
     });
 
     // Start the client. This will also launch the server
