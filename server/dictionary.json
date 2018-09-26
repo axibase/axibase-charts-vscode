@@ -2390,6 +2390,14 @@
             "widget": "gauge"
         },
         {
+            "displayName": "group",
+            "section": "widget",
+            "widget": "bar",
+            "type": "string",
+            "example": "region",
+            "defaultValue": "metric"
+        },
+        {
             "displayName": "group-first",
             "type": "boolean",
             "example": false,
@@ -2781,6 +2789,7 @@
         {
             "displayName": "label",
             "type": "string",
+            "multiLine": true,
             "example": "CPU Busy - nurswgvml007",
             "section": "series"
         },
@@ -4963,11 +4972,18 @@
             "section": "series"
         },
         {
+            "displayName": "reload",
+            "section": "dropdown",
+            "type": "boolean",
+            "example": true
+        },
+        {
             "displayName": "replace-underscore",
             "section": "widget",
             "type": "boolean",
             "example": true,
-            "defaultValue": false
+            "defaultValue": false,
+            "widget": "table"
         },
         {
             "displayName": "replace-value",
@@ -7187,6 +7203,7 @@
         {
             "displayName": "tooltip",
             "type": "string",
+            "multiLine": true,
             "example": "NURSWGVML007"
         },
         {
@@ -7204,9 +7221,10 @@
         },
         {
             "displayName": "top-units",
-            "type": "integer",
+            "type": "number",
             "section": "widget",
-            "example": 1
+            "example": 1,
+            "minValue": 0
         },
         {
             "displayName": "total-size",
@@ -8097,9 +8115,9 @@
         {
             "displayName": "width-units",
             "type": "number",
-            "minValue": 0,
             "example": 2,
-            "defaultValue": 6
+            "defaultValue": 6,
+            "minValue": 0
         },
         {
             "displayName": "zoom-svg",
