@@ -7,6 +7,15 @@ import { TextRange } from "./textRange";
 
 export class JsDomCaller {
     private static readonly CONTENT_POSITION: number = 2;
+
+    /**
+     * Possible functions which can be assigned to var
+     */
+    private static readonly functionsList: string[] = [
+        "getTags", "getSeries", "getMetrics", "getEntities",
+        "range", "previous", "movavg", "meta",
+        "entityTag", "metricTag"
+    ]
     /**
      * Generates a list of arguments with same name to use in a function call
      * @param amount number of arguments
@@ -52,11 +61,12 @@ export class JsDomCaller {
 
     /**
      * Evaluates all found JavaScript statements in this.document
+     * @param validateAll if `false`, validates var only 
      * @returns diagnostic for each invalid statement
      */
-    public validate(): Diagnostic[] {
+    public validate(validateAll: boolean): Diagnostic[] {
         const result: Diagnostic[] = [];
-        this.parseJsStatements();
+        this.parseJsStatements(validateAll);
 
         const dom: JSDOM = new JSDOM("<html></html>", { runScripts: "outside-only" });
         const window: DOMWindow = dom.window;
@@ -96,33 +106,45 @@ export class JsDomCaller {
         return (i < this.lines.length) ? this.lines[i] : undefined;
     }
 
-    private parseJsStatements(): void {
+    /**
+     * Calls corresponding processor for all found JavaScript statements 
+     * in this.document to prepare diagnostic if required
+     * @param validateAll if `false`, validates var only
+     */
+    private parseJsStatements(validateAll: boolean): void {
         for (; this.currentLineNumber < this.lines.length; this.currentLineNumber++) {
             const line: string = this.getCurrentLine();
-            this.match = /^[ \t]*script/.exec(line);
-            if (this.match) {
-                this.processScript();
-                continue;
+            if (validateAll) {
+                this.match = /^[ \t]*script/.exec(line);
+                if (this.match) {
+                    this.processScript();
+                    continue;
+                }
+                this.match = /^[ \t]*import[ \t]+(\S+)[ \t]*=.+/.exec(line);
+                if (this.match) {
+                    this.imports.push(this.match[1]);
+                    this.importCounter++;
+                    continue;
+                }
+                this.match = /(^[ \t]*replace-value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processReplaceValue();
+                    continue;
+                }
+                this.match = /(^[ \t]*value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processValue();
+                    continue;
+                }
+                this.match = /(^[ \t]*options[ \t]*=[ \t]*javascript:[ \t]*)(\S+[ \t\S]*)$/.exec(line);
+                if (this.match) {
+                    this.processOptions();
+                    continue;
+                }
             }
-            this.match = /^[ \t]*import[ \t]+(\S+)[ \t]*=.+/.exec(line);
+            this.match = /^\s*var\s*\w+\s*=/.exec(line);
             if (this.match) {
-                this.imports.push(this.match[1]);
-                this.importCounter++;
-                continue;
-            }
-            this.match = /(^[ \t]*replace-value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processReplaceValue();
-                continue;
-            }
-            this.match = /(^[ \t]*value[ \t]*=[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processValue();
-                continue;
-            }
-            this.match = /(^[ \t]*options[ \t]*=[ \t]*javascript:[ \t]*)(\S+[ \t\S]*)$/.exec(line);
-            if (this.match) {
-                this.processOptions();
+                this.processVar();
             }
         }
     }
@@ -234,7 +256,6 @@ export class JsDomCaller {
             range,
         );
         this.statements.push(statement);
-
     }
 
     private processValue(): void {
@@ -271,4 +292,40 @@ export class JsDomCaller {
         );
         this.statements.push(statement);
     }
+
+    private processVar(): void {
+        if (!this.match) {
+            throw new Error("We're trying to process var, but this.match is not defined");
+        }
+        let line: string | undefined = this.getCurrentLine();
+        let content: string;
+        let range: Range;
+        content = line;
+        range = {
+            end: { character: line.length, line: this.currentLineNumber },
+            start: { character: 0, line: this.currentLineNumber },
+        };
+        let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+        let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+        if (openBrackets) {
+            if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
+                closeBrackets.map(s => s.trim()).join("").length
+                || closeBrackets === null) {
+                // multiline var
+                while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
+                    content += `${line}\n`;
+                }
+                range.end.line = this.currentLineNumber - 1;
+            }
+        }
+        content = JSON.stringify(content);
+        const statement: TextRange = new TextRange(
+            "const varProxyFunction = new Proxy(new Function(), {});" +
+            `(new Function("${JsDomCaller.functionsList.join('","')}", ${content}))` +
+            `.call(window${JsDomCaller.generateCall(JsDomCaller.functionsList.length + 1, "varProxyFunction")})`,
+            range,
+        );
+        this.statements.push(statement);
+    }
+
 }

@@ -56,6 +56,7 @@ export class Validator {
      * Stack of nested keywords. For example, if can be included to a for.
      */
     private readonly keywordsStack: TextRange[] = [];
+
     /**
      * Last if statement. Used to get/set settings in ifSettigns
      */
@@ -130,8 +131,10 @@ export class Validator {
             if (this.isKeywordEnd("csv")) {
                 this.validateCsv();
             }
-
-            this.eachLine();
+            if (!this.areWeIn("var")) {
+                // lines in multiline var section will be cheked in jsDomCaller.processVar()
+                this.eachLine();
+            }
 
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
@@ -1045,8 +1048,15 @@ export class Validator {
                 break;
             }
             case "var": {
-                if (/=\s*(\[|\{)(|.*,)\s*$/m.test(line)) {
-                    this.keywordsStack.push(this.foundKeyword);
+                let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+                let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+                if (openBrackets) {
+                    if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
+                        closeBrackets.map(s => s.trim()).join("").length
+                        || closeBrackets === null) {
+                        // multiline var
+                        this.keywordsStack.push(this.foundKeyword);
+                    }
                 }
                 this.match = /(var\s*)(\w+)\s*=/.exec(line);
                 this.addToStringMap(this.variables, "varNames");
