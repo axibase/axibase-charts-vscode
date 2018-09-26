@@ -20,16 +20,17 @@ const readSettings: () => Setting[] = (): Setting[] => {
  * @param setting the setting to test
  * @returns true, if setting is complete, false otherwise
  */
-const isCompleteSetting: (setting?: Partial<Setting>) => boolean = (setting?: Partial<Setting>): boolean =>
-    setting !== undefined &&
-    setting.displayName !== undefined &&
-    setting.type !== undefined &&
-    setting.example !== undefined;
+function isCompleteSetting(setting?: Partial<Setting>): boolean {
+    return setting !== undefined &&
+        setting.displayName !== undefined &&
+        setting.type !== undefined &&
+        setting.example !== undefined;
+}
 
 /**
  * @returns map of settings, key is the setting name, value is instance of Setting
  */
-const createSettingsMap: () => Map<string, Setting> = (): Map<string, Setting> => {
+function createSettingsMap(): Map<string, Setting> {
     const map: Map<string, Setting> = new Map();
     for (const setting of readSettings()) {
         if (isCompleteSetting(setting)) {
@@ -39,7 +40,8 @@ const createSettingsMap: () => Map<string, Setting> = (): Map<string, Setting> =
     }
 
     return map;
-};
+}
+
 export const settingsMap: Map<string, Setting> = createSettingsMap();
 
 /**
@@ -81,7 +83,7 @@ export const parentSections: Map<string, string[]> = new Map([
 /**
  * @returns array of parent sections for the section
  */
-export const getParents: (section: string) => string[] = (section: string): string[] => {
+export function getParents(section: string): string[] {
     let parents: string[] = [];
     const found: string[] | undefined = parentSections.get(section);
     if (found !== undefined) {
@@ -92,7 +94,7 @@ export const getParents: (section: string) => string[] = (section: string): stri
     }
 
     return parents;
-};
+}
 
 /**
  * Array of all possible sections

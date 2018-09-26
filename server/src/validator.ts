@@ -245,7 +245,7 @@ export class Validator {
                     Position.create(this.currentLineNumber, indent.length),
                     Position.create(this.currentLineNumber, indent.length + variable.length),
                 ),
-                DiagnosticSeverity.Error, `${variable} is already defined`,
+                `${variable} is already defined`,
             ));
         } else {
             result.push(variable);
@@ -272,7 +272,7 @@ export class Validator {
                     Position.create(this.currentLineNumber, startPosition),
                     Position.create(this.currentLineNumber, startPosition + variable.length),
                 ),
-                DiagnosticSeverity.Error, `${variable} is already defined`,
+                `${variable} is already defined`,
             ));
         } else {
             let array: string[] | undefined = map.get(key);
@@ -304,9 +304,7 @@ export class Validator {
     private checkAliases(): void {
         this.deAliases.forEach((deAlias: TextRange) => {
             if (!this.aliases.includes(deAlias.text)) {
-                this.result.push(createDiagnostic(
-                    deAlias.range, DiagnosticSeverity.Error, unknownToken(deAlias.text),
-                ));
+                this.result.push(createDiagnostic(deAlias.range, unknownToken(deAlias.text)));
             }
         });
     }
@@ -328,7 +326,7 @@ export class Validator {
         }
         if (!this.areWeIn(expectedEnd)) {
             this.result.push(createDiagnostic(
-                this.foundKeyword.range, DiagnosticSeverity.Error,
+                this.foundKeyword.range,
                 `${this.foundKeyword.text} has no matching ${expectedEnd}`,
             ));
         } else {
@@ -336,7 +334,7 @@ export class Validator {
                 this.keywordsStack.findIndex((keyword: TextRange) => keyword.text === expectedEnd);
             this.keywordsStack.splice(index, 1);
             this.result.push(createDiagnostic(
-                this.foundKeyword.range, DiagnosticSeverity.Error,
+                this.foundKeyword.range,
                 `${expectedEnd} has finished before ${lastKeyword}`,
             ));
         }
@@ -359,7 +357,7 @@ export class Validator {
                     this.currentLineNumber, indent.length + name.length,
                 );
                 this.result.push(createDiagnostic(
-                    range, DiagnosticSeverity.Error,
+                    range,
                     `${setting.displayName} can not be specified simultaneously with ${item.displayName}`,
                 ));
             }
@@ -378,8 +376,8 @@ export class Validator {
                     this.currentLineNumber, this.match.index,
                     this.currentLineNumber, this.match.index + this.match[0].length,
                 ),
-                DiagnosticSeverity.Information,
                 "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                DiagnosticSeverity.Information,
             ));
         }
     }
@@ -399,11 +397,11 @@ export class Validator {
             const declaration: string = this.match[0];
             let start: number;
             let end: number;
-            let settingMatch: RegExpExecArray | null;
             let settingName: string;
             const regSetting: RegExp = new RegExp("(\\w+)", "g");
             const freeMarkerVariables: string[] | undefined = this.variables.get("freemarker");
-            while ((settingMatch = regSetting.exec(declaration)) != null) {
+            let settingMatch: RegExpExecArray | null = regSetting.exec(declaration);
+            while (settingMatch != null) {
                 settingName = settingMatch[0];
                 start = line.indexOf(declaration) + settingMatch.index;
                 end = start + settingName.length;
@@ -414,9 +412,10 @@ export class Validator {
                             this.currentLineNumber, start,
                             this.currentLineNumber, end,
                         ),
-                        DiagnosticSeverity.Error, unknownToken(settingName),
+                        unknownToken(settingName),
                     ));
                 }
+                settingMatch = regSetting.exec(declaration);
             }
         }
     }
@@ -475,9 +474,7 @@ export class Validator {
             notFound.push(displayName);
         }
         for (const option of notFound) {
-            this.result.push(createDiagnostic(
-                this.currentSection.range, DiagnosticSeverity.Error, `${option} is required`,
-            ));
+            this.result.push(createDiagnostic(this.currentSection.range, `${option} is required`));
         }
         this.requiredSettings.splice(0, this.requiredSettings.length);
     }
@@ -518,7 +515,7 @@ export class Validator {
     private diagnosticForLeftKeywords(): void {
         for (const nestedConstruction of this.keywordsStack) {
             this.result.push(createDiagnostic(
-                nestedConstruction.range, DiagnosticSeverity.Error,
+                nestedConstruction.range,
                 `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
             ));
         }
@@ -558,7 +555,7 @@ export class Validator {
                         this.currentLineNumber, this.match[1].length,
                         this.currentLineNumber, this.match[1].length + this.match[2].length,
                     ),
-                    DiagnosticSeverity.Error, "Section tag is unclosed",
+                    "Section tag is unclosed",
                 ));
             }
         }
@@ -660,7 +657,7 @@ export class Validator {
                     this.currentLineNumber, this.match[1].length,
                     this.currentLineNumber, this.match[1].length + name.length,
                 ),
-                DiagnosticSeverity.Error, message,
+                message,
             ));
 
             return undefined;
@@ -709,7 +706,7 @@ export class Validator {
             message = `${this.foundKeyword.text} has started before ${this.getLastKeyword()} has finished`;
         }
         if (message !== undefined) {
-            this.result.push(createDiagnostic(this.foundKeyword.range, DiagnosticSeverity.Error, message));
+            this.result.push(createDiagnostic(this.foundKeyword.range, message));
         }
     }
 
@@ -754,7 +751,7 @@ export class Validator {
                 range.end.character += variable.length;
                 if (!isInMap(variable, this.variables)) {
                     const message: string = unknownToken(variable);
-                    this.result.push(createDiagnostic(range, DiagnosticSeverity.Error, message));
+                    this.result.push(createDiagnostic(range, message));
                 }
             } else {
                 this.result.push(createDiagnostic(
@@ -762,7 +759,7 @@ export class Validator {
                         Position.create(this.currentLineNumber, matching[0].length - "in".length),
                         Position.create(this.currentLineNumber, matching[0].length),
                     ),
-                    DiagnosticSeverity.Error, "Empty 'in' statement",
+                    "Empty 'in' statement",
                 ));
             }
             this.match = matching;
@@ -794,7 +791,7 @@ export class Validator {
                     this.currentLineNumber, line.indexOf(listVariable),
                     this.currentLineNumber, line.indexOf(listVariable) + listVariable.length,
                 ),
-                DiagnosticSeverity.Error, unknownToken(listVariable),
+                unknownToken(listVariable),
             ));
         }
 
@@ -848,7 +845,7 @@ export class Validator {
                     this.currentLineNumber, this.match[1].length,
                     this.currentLineNumber, this.match[1].length + "script".length,
                 ),
-                DiagnosticSeverity.Error, "A linefeed character after 'script' keyword is required",
+                "A linefeed character after 'script' keyword is required",
             ));
         }
     }
@@ -949,7 +946,7 @@ export class Validator {
                         this.currentLineNumber, indent.length,
                         this.currentLineNumber, indent.length + name.length,
                     ),
-                    DiagnosticSeverity.Information, settingNameInTags(name),
+                    settingNameInTags(name), DiagnosticSeverity.Information,
                 ));
             }
         }
@@ -971,14 +968,14 @@ export class Validator {
                 );
                 if (this.currentSection.text === "tags") {
                     if (!/^["].+["]$/.test(settingName)) {
-                        this.result.push(createDiagnostic(range,
-                                                          DiagnosticSeverity.Warning,
-                                                          tagNameWithWhitespaces(settingName)));
+                        this.result.push(createDiagnostic(
+                            range, tagNameWithWhitespaces(settingName), DiagnosticSeverity.Warning,
+                        ));
                     }
                 } else {
-                    this.result.push(createDiagnostic(range,
-                                                      DiagnosticSeverity.Warning,
-                                                      settingsWithWhitespaces(settingName)));
+                    this.result.push(createDiagnostic(
+                        range, settingsWithWhitespaces(settingName), DiagnosticSeverity.Warning,
+                    ));
                 }
             }
         }
@@ -1009,11 +1006,11 @@ export class Validator {
         if (!dictionary.includes(word)) {
             this.result.push(createDiagnostic(
                 range,
-                DiagnosticSeverity.Error, unknownToken(word),
+                unknownToken(word),
             ));
         } else {
             if (word === "tag") {
-                this.result.push(createDiagnostic(range, DiagnosticSeverity.Warning, deprecatedTagSection));
+                this.result.push(createDiagnostic(range, deprecatedTagSection, DiagnosticSeverity.Warning));
             }
         }
     }
@@ -1107,7 +1104,7 @@ export class Validator {
         if (columns !== this.csvColumns && !/^[ \t]*$/m.test(line)) {
             this.result.push(createDiagnostic(
                 Range.create(this.currentLineNumber, 0, this.currentLineNumber, line.length),
-                DiagnosticSeverity.Error, `Expected ${this.csvColumns} columns, but found ${columns}`,
+                `Expected ${this.csvColumns} columns, but found ${columns}`,
             ));
         }
     }
@@ -1140,7 +1137,7 @@ export class Validator {
                             this.currentLineNumber, position,
                             this.currentLineNumber, position + variable.length,
                         ),
-                        DiagnosticSeverity.Error, message,
+                        message,
                     ));
                 }
                 this.match = varRegexp.exec(substr);

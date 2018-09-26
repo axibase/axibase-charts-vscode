@@ -3,20 +3,59 @@ import { getParents } from "./resources";
 import { TextRange } from "./textRange";
 import { isEmpty } from "./util";
 
+/**
+ * Formats the document
+ */
 export class Formatter {
-    private static readonly CONTENT_POSITION: number = 2;
-    private current: string | undefined;
+    /**
+     * Current section name
+     */
+    private current?: string;
+    /**
+     * Currently used indent
+     */
     private currentIndent: string = "";
+    /**
+     * Current line number
+     */
     private currentLine: number = 0;
+    /**
+     * Created TextEdits
+     */
     private readonly edits: TextEdit[] = [];
+    /**
+     * A flag used to determine are we inside of a keyword or not
+     */
     private isKeyword: boolean = false;
+    /**
+     * Array containing indents at start of keywords to restore them later
+     */
     private readonly keywordsLevels: string[] = [];
-    private lastLine: string | undefined;
-    private lastLineNumber: number | undefined;
+    /**
+     * Caches last line returned by getLine() to avoid several calls to `removeExtraSpaces`
+     * and improve performance
+     */
+    private lastLine?: string;
+    /**
+     * Contains the number of last returned by getLine() line.
+     */
+    private lastLineNumber?: number;
+    /**
+     * Contains all lines of the current text document
+     */
     private readonly lines: string[];
+    /**
+     * Contains the result of the last executed regular expression
+     */
     private match: RegExpExecArray | null | undefined;
+    /**
+     * Contains options from user's settings which are used to format document
+     */
     private readonly options: FormattingOptions;
-    private previous: string | undefined;
+    /**
+     * Previous section name
+     */
+    private previous?: string;
 
     public constructor(text: string, formattingOptions: FormattingOptions) {
         this.options = formattingOptions;
@@ -65,7 +104,7 @@ export class Formatter {
             throw new Error("this.match or/and this.current is not defined in calculateIndent");
         }
         this.previous = this.current;
-        this.current = this.match[Formatter.CONTENT_POSITION];
+        [, , this.current] = this.match;
         if (/\[(?:group|configuration)\]/i.test(this.getCurrentLine())) {
             this.setIndent("");
 

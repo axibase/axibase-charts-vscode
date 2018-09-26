@@ -18,7 +18,7 @@ suite("FreeMarker unknown variables", () => {
 [widget]
     type = gauge
     title = \${lpar[1]}
-    
+
 <#assign cpus = getTags("nmon.cpu.idle%", "example", "id") >
 <#list cpus as id >
     [series]
@@ -28,23 +28,23 @@ suite("FreeMarker unknown variables", () => {
             [
                 createDiagnostic(
                     Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(12, 0, 12, "<#assign".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(13, 0, 13, "<#list".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
             ],
         ),
@@ -64,13 +64,13 @@ suite("FreeMarker unknown variables", () => {
             [
                 createDiagnostic(
                     Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
             ],
         ),
@@ -91,22 +91,20 @@ suite("FreeMarker unknown variables", () => {
             [
                 createDiagnostic(
                     Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(10, "    title = \${".length, 10, "    title = \${".length + "lbar".length),
-                    DiagnosticSeverity.Error,
                     unknownToken("lbar"),
                 ),
                 createDiagnostic(
-                    Range.create(11, "    label = \${100 * ".length, 11, "    label = \${100 * ".length + "lbar".length),
-                    DiagnosticSeverity.Error,
+                    Range.create(11, "    label = \${100 * ".length, 11, "    label = \${100 * lbar".length),
                     unknownToken("lbar"),
                 ),
             ],
@@ -127,17 +125,16 @@ suite("FreeMarker unknown variables", () => {
             [
                 createDiagnostic(
                     Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
                     "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                    DiagnosticSeverity.Information,
                 ),
                 createDiagnostic(
                     Range.create(5, "<#list ".length, 5, "<#list ".length + "lbars".length),
-                    DiagnosticSeverity.Error,
                     unknownToken("lbars"),
                 ),
             ],

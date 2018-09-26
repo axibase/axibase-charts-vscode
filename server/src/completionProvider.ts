@@ -3,22 +3,29 @@ import {
 } from "vscode-languageserver";
 import { deleteComments, deleteScripts } from "./util";
 
+/**
+ * Provides dynamic completion items.
+ */
 export class CompletionProvider {
     private readonly text: string;
 
     public constructor(textDocument: TextDocument, position: Position) {
-        const text: string = textDocument.getText()
-            .substr(0, textDocument.offsetAt(position));
+        const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
         this.text = deleteScripts(deleteComments(text));
     }
 
+    /**
+     * Creates completion items
+     */
     public getCompletionItems(): CompletionItem[] {
-        return [this.completeFor()]
-            .concat(this.completeIf());
+        return [this.completeFor()].concat(this.completeIf());
     }
 
     /**
-     * @returns Completion for `for` loop declaration based on previously declared lists and vars
+     * Creates a completion item containing `for` loop.
+     * `in` statement is generated based on previously declared lists and vars if any.
+     * Variable name is generated based on `in` statement.
+     * @returns completion item
      */
     private completeFor(): CompletionItem {
         const regexp: RegExp = /^[ \t]*(?:list|var)[ \t]+(\S+)[ \t]*=/mg;
@@ -53,7 +60,9 @@ endfor`;
     }
 
     /**
-     * @returns Completion for `if` condition declaration based on previously declared for loops
+     * Creates an array of completion items containing `if` statement.
+     * Conditions are generated based on previously declared `for` loops.
+     * @returns array containing variants of `if` statement
      */
     private completeIf(): CompletionItem[] {
         const regexp: RegExp = /^[ \t]*for[ \t]+(\w+)[ \t]+in/img;

@@ -1,4 +1,3 @@
-/* tslint:disable:no-magic-numbers */
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { Test } from "./test";
 
