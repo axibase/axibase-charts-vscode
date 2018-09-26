@@ -4982,7 +4982,8 @@
             "section": "widget",
             "type": "boolean",
             "example": true,
-            "defaultValue": false
+            "defaultValue": false,
+            "widget": "table"
         },
         {
             "displayName": "replace-value",
