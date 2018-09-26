@@ -2390,6 +2390,14 @@
             "widget": "gauge"
         },
         {
+            "displayName": "group",
+            "section": "widget",
+            "widget": "bar",
+            "type": "string",
+            "example": "region",
+            "defaultValue": "metric"
+        },
+        {
             "displayName": "group-first",
             "type": "boolean",
             "example": false,
@@ -4967,7 +4975,7 @@
             "displayName": "reload",
             "type": "boolean",
             "example": true
-},
+        },
         {
             "displayName": "replace-underscore",
             "section": "widget",
