@@ -82,4 +82,6 @@ export class Test {
     public jsValidationTest(): void {
         test((this.name), () => {
             assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
+        }
+    }
 }
