@@ -28,6 +28,11 @@ suite("[JS] Var content tests", () => {
             "Correct oneline var with function call",
             `var offsets = range(2,6)`, []),
         new Test(
+            "Correct oneline var without emty string after",
+            `[widget]
+            var ff = []
+            type = chart`, []),
+        new Test(
             "Correct multiline var props",
             `var v = {
    "hello": "value",
@@ -37,16 +42,26 @@ endvar`,
             [],
         ),
         new Test(
-            "Correct multiline var array",
+            "Correct multiline var multiarray",
             `var v = [
 [9,3], [9,4]
 ]
 endvar`, []),
         new Test(
-            "Correct multiline var array with different types",
+            "Correct multiline var array",
+            `  var a = ["abc"
+]
+endvar`, []),
+        new Test(
+            "Correct multiline var arrays with different types",
             `var v = [
 ["abc"],
 [1],,,
+]
+endvar
+
+var c = [["abc"],
+  [1,2,3]
 ]
 endvar`, []),
         new Test(

@@ -126,7 +126,7 @@ export class Validator {
                 this.validateCsv();
             }
             if (!this.areWeIn("var")) {
-                // var section will be cheked in jsDomCaller.processVar()
+                // lines in multiline var section will be cheked in jsDomCaller.processVar()
                 this.eachLine();
             }
 
@@ -1016,8 +1016,15 @@ export class Validator {
                 break;
             }
             case "var": {
-                if (/=\s*(\[|\{|\()*(|.*,)\s*$/m.test(line)) {
-                    this.keywordsStack.push(this.foundKeyword);
+                let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+                let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+                if (openBrackets) {
+                    if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
+                        closeBrackets.map(s => s.trim()).join("").length
+                        || closeBrackets === null) {
+                        // multiline var
+                        this.keywordsStack.push(this.foundKeyword);
+                    }
                 }
                 this.match = /(var\s*)(\w+)\s*=/.exec(line);
                 this.addToStringMap(this.variables, "varNames");

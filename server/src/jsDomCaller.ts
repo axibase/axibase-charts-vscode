@@ -145,7 +145,7 @@ export class JsDomCaller {
                     continue;
                 }
             }
-            this.match = /^\s*var\s*\w+\s+=\s+[\[|\{|\(]*/m.exec(line);
+            this.match = /^\s*var\s*\w+\s*=/.exec(line);
             if (this.match) {
                 this.processVar();
             }
@@ -308,12 +308,18 @@ export class JsDomCaller {
             end: { character: line.length, line: this.currentLineNumber },
             start: { character: 0, line: this.currentLineNumber },
         };
-        if (this.getLine(this.currentLineNumber + 1)) {
-            // It's multiline var
-            while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
-                content += `${line}\n`;
+        let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+        let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+        if (openBrackets) {
+            if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
+                closeBrackets.map(s => s.trim()).join("").length
+                || closeBrackets === null) {
+                // multiline var
+                while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
+                    content += `${line}\n`;
+                }
+                range.end.line = this.currentLineNumber - 1;
             }
-            range.end.line = this.currentLineNumber - 1;
         }
         content = JSON.stringify(content);
         const statement: TextRange = new TextRange(
