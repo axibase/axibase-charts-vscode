@@ -224,7 +224,7 @@ endfor`,
         new Test(
             "Does not affect equals signs in setting value",
             `[configuration]
-  script = var hello = value()`,
+  script = var hello= value()`,
             [], FormattingOptions.create(2, true),
         ),
     ];
