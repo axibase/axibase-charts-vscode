@@ -1,4 +1,4 @@
-import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
+import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { getParents } from "./resources";
 import { TextRange } from "./textRange";
 import { isEmpty } from "./util";
@@ -67,33 +67,56 @@ export class Formatter {
      * @returns array of text edits to properly format document
      */
     public lineByLine(): TextEdit[] {
-        this.lines.forEach(
-            (line: string, index: number) => {
-                this.currentLine = index;
-                if (this.isSection() || isEmpty(line)) {
-                    if (this.isSection()) {
-                        this.calculateIndent();
-                        this.checkIndent();
-                        this.increaseIndent();
-                    }
-
-                    return;
-                }
-                if (TextRange.isClosing(line)) {
-                    const stackHead: string | undefined = this.keywordsLevels.pop();
-                    this.setIndent(stackHead);
-                }
-                this.checkIndent();
-                if (TextRange.isCloseAble(line) && this.shouldBeClosed()) {
-                    this.keywordsLevels.push(this.currentIndent);
+        this.currentLine = -1;
+        for (const line of this.lines) {
+            this.currentLine++;
+            if (this.isSection() || isEmpty(line)) {
+                if (this.isSection()) {
+                    this.calculateIndent();
+                    this.checkIndent();
                     this.increaseIndent();
-                    this.isKeyword = true;
                 }
-            },
-            this,
-        );
+                continue;
+            } else {
+                this.checkEquals();
+            }
+            if (TextRange.isClosing(line)) {
+                const stackHead: string | undefined = this.keywordsLevels.pop();
+                this.setIndent(stackHead);
+            }
+            this.checkIndent();
+            if (TextRange.isCloseAble(line) && this.shouldBeClosed()) {
+                this.keywordsLevels.push(this.currentIndent);
+                this.increaseIndent();
+                this.isKeyword = true;
+            }
+        }
 
         return this.edits;
+    }
+
+    /**
+     * Checks how many spaces are between equals sign and setting name
+     */
+    private checkEquals(): void {
+        const line: string = this.getCurrentLine();
+        const regexp: RegExp = /(^\s*.+?)(\s*?)=/;
+        const match: RegExpExecArray | null = regexp.exec(line);
+        if (match === null) {
+            return;
+        }
+        const [, declaration, spaces] = match;
+        if (spaces !== " ") {
+            this.edits.push(
+                TextEdit.replace(
+                    Range.create(
+                        Position.create(this.currentLine, declaration.length),
+                        Position.create(this.currentLine, declaration.length + spaces.length),
+                    ),
+                    " ",
+                ),
+            );
+        }
     }
 
     /**
