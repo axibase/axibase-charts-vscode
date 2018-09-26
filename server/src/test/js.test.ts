@@ -1,4 +1,4 @@
-import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -72,7 +72,7 @@ endvar`, []),
 endvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(2, "var v = [".length)),
-                DiagnosticSeverity.Warning, "abc is not defined",
+                "abc is not defined",
             )]
         ),
         new Test(
@@ -81,14 +81,14 @@ endvar`,
 "abc"
 endvar`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(1, "var v = [".length)),
-                DiagnosticSeverity.Warning, "Unexpected token }",
+                "Unexpected token }",
             )]
         ),
         new Test(
             "Incorrect oneline var: no opening bracket",
             `var v = ]`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var v = ]".length)),
-                DiagnosticSeverity.Warning, "Unexpected token ]",
+                "Unexpected token ]",
             )]
         )
     ];
