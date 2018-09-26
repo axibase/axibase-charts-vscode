@@ -81,7 +81,7 @@ export class HoverProvider {
     private calculateRange(offset: number): IRange | null {
         const lineLimits: IRange = this.lineLimits(this.offsetToPosition(offset));
         const line: string = this.text.substring(lineLimits.start, lineLimits.end);
-        const regexp: RegExp = /\S.+?(?=\s+?=)/;
+        const regexp: RegExp = /\S.+?(?=\s*?=)/;
         const match: RegExpExecArray | null = regexp.exec(line);
         if (match === null) {
             return null;
