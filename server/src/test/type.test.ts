@@ -720,15 +720,152 @@ threshold_percent`,
             ],
         ),
         new Test(
-            "Settings are validated even though a space between name and equals sign is absent",
+            "Spaces before and after the sign are absent",
             `[configuration]
   add-meta=not-a-boolean-value
   zoom-svg=not-a-number-value
   widgets-per-row=not-an-interger-value
   start-time=not-a-date-value
   period=not-an-interval-value
-  source=not-an-enum-value
-  `,
+  source=not-an-enum-value`,
+            [
+                createDiagnostic(
+                    Range.create(1, "  ".length, 1, "  add-meta".length),
+                    "add-meta should be a boolean value. For example, true",
+                ),
+                createDiagnostic(
+                    Range.create(2, "  ".length, 2, "  zoom-svg".length),
+                    "zoom-svg should be a real (floating-point) number. For example, 1.2",
+                ),
+                createDiagnostic(
+                    Range.create(3, "  ".length, 3, "  widgets-per-row".length),
+                    "widgets-per-row should be an integer number. For example, 3",
+                ),
+                createDiagnostic(
+                    Range.create(4, "  ".length, 4, "  start-time".length),
+                    "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+                ),
+                createDiagnostic(
+                    Range.create(5, "  ".length, 5, "  period".length),
+                    `period should be set as \`count unit\`.
+For example, 15 minute. Supported units:
+ * nanosecond
+ * millisecond
+ * second
+ * minute
+ * hour
+ * day
+ * week
+ * month
+ * quarter
+ * year`,
+                ),
+                createDiagnostic(
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                ),
+            ],
+        ),
+        new Test(
+            "Space between name and sign is absent, several spaces after sign are present",
+            `[configuration]
+  add-meta=  not-a-boolean-value
+  zoom-svg=  not-a-number-value
+  widgets-per-row=  not-an-interger-value
+  start-time=  not-a-date-value
+  period=  not-an-interval-value
+  source=  not-an-enum-value`,
+            [
+                createDiagnostic(
+                    Range.create(1, "  ".length, 1, "  add-meta".length),
+                    "add-meta should be a boolean value. For example, true",
+                ),
+                createDiagnostic(
+                    Range.create(2, "  ".length, 2, "  zoom-svg".length),
+                    "zoom-svg should be a real (floating-point) number. For example, 1.2",
+                ),
+                createDiagnostic(
+                    Range.create(3, "  ".length, 3, "  widgets-per-row".length),
+                    "widgets-per-row should be an integer number. For example, 3",
+                ),
+                createDiagnostic(
+                    Range.create(4, "  ".length, 4, "  start-time".length),
+                    "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+                ),
+                createDiagnostic(
+                    Range.create(5, "  ".length, 5, "  period".length),
+                    `period should be set as \`count unit\`.
+For example, 15 minute. Supported units:
+ * nanosecond
+ * millisecond
+ * second
+ * minute
+ * hour
+ * day
+ * week
+ * month
+ * quarter
+ * year`,
+                ),
+                createDiagnostic(
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                ),
+            ],
+        ),
+        new Test(
+            "Space between name and sign is present, space after sign is absent",
+            `[configuration]
+  add-meta =not-a-boolean-value
+  zoom-svg =not-a-number-value
+  widgets-per-row =not-an-interger-value
+  start-time =not-a-date-value
+  period =not-an-interval-value
+  source =not-an-enum-value`,
+            [
+                createDiagnostic(
+                    Range.create(1, "  ".length, 1, "  add-meta".length),
+                    "add-meta should be a boolean value. For example, true",
+                ),
+                createDiagnostic(
+                    Range.create(2, "  ".length, 2, "  zoom-svg".length),
+                    "zoom-svg should be a real (floating-point) number. For example, 1.2",
+                ),
+                createDiagnostic(
+                    Range.create(3, "  ".length, 3, "  widgets-per-row".length),
+                    "widgets-per-row should be an integer number. For example, 3",
+                ),
+                createDiagnostic(
+                    Range.create(4, "  ".length, 4, "  start-time".length),
+                    "start-time should be a date. For example, 2017-04-01T10:15:00Z",
+                ),
+                createDiagnostic(
+                    Range.create(5, "  ".length, 5, "  period".length),
+                    `period should be set as \`count unit\`.
+For example, 15 minute. Supported units:
+ * nanosecond
+ * millisecond
+ * second
+ * minute
+ * hour
+ * day
+ * week
+ * month
+ * quarter
+ * year`,
+                ),
+                createDiagnostic(
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                ),
+            ],
+        ),
+        new Test(
+            "Several spaces between name and sign are present, space after sign is absent",
+            `[configuration]
+  add-meta   =not-a-boolean-value
+  zoom-svg   =not-a-number-value
+  widgets-per-row   =not-an-interger-value
+  start-time   =not-a-date-value
+  period   =not-an-interval-value
+  source   =not-an-enum-value`,
             [
                 createDiagnostic(
                     Range.create(1, "  ".length, 1, "  add-meta".length),
