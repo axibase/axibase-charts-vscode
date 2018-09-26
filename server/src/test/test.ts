@@ -68,12 +68,6 @@ export class Test {
     }
 
     /**
-     * Tests JsDomCaller (JavaScript statements, including var)
-     */
-    public jsValidationTest(): void {
-        test((this.name), () => {
-            assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
-    /**
      * Tests Hover
      */
     public hoverTest(): void {
@@ -81,4 +75,11 @@ export class Test {
             assert.deepStrictEqual(new HoverProvider(this.document).provideHover(this.position), this.expected);
         });
     }
+    
+    /**
+     * Tests JsDomCaller (JavaScript statements, including var)
+     */
+    public jsValidationTest(): void {
+        test((this.name), () => {
+            assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
 }
