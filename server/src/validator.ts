@@ -812,7 +812,7 @@ export class Validator {
             throw new Error(`We're trying to handle 'list', but foundKeyword is ${this.foundKeyword}`);
         }
         const line: string = this.getCurrentLine();
-        this.match = /(^\s*list\s+)(\w+)\s+=/.exec(line);
+        this.match = /(^\s*list\s+)(\w+)\s*=/.exec(line);
         this.addToStringMap(this.variables, "listNames");
         if (/(=|,)[ \t]*$/m.test(line)) {
             this.keywordsStack.push(this.foundKeyword);

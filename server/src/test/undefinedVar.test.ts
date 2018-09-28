@@ -226,6 +226,13 @@ endfor`,
                 unknownToken(firstVar),
             )],
         ),
+        new Test(
+            "Space between list name and equals sign is absent",
+            `list servers= server1, server2
+for server in servers
+endfor`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
