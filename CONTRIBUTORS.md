@@ -1,5 +1,9 @@
 # Notes for contributors
 
+## Building
+
+To activate incremental compilation use `Ctrl+Shift+B`.
+
 ## Testing
 
 ### Server Testing
