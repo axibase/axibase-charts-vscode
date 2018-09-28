@@ -2,7 +2,6 @@ import {
     ClientRequest,
     IncomingMessage,
     OutgoingHttpHeaders,
-    OutgoingMessage,
     request as http,
 } from "http";
 import { request as https, RequestOptions } from "https";
@@ -249,7 +248,7 @@ function performRequest(address: string, username?: string, password?: string): 
             });
             clientRequest.on("timeout", () => {
                 clientRequest.abort();
-                reject(new Error("timeout"));
+                reject(new Error("The request has exceeded the timeout"));
             });
             clientRequest.on("error", reject);
             clientRequest.end();
