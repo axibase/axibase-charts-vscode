@@ -1,5 +1,4 @@
-/* tslint:disable:no-magic-numbers */
-import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -54,11 +53,11 @@ endfor`,
             [
                 createDiagnostic(
                     Range.create(5, "    ".length, 5, "    ".length + "elseif".length),
-                    DiagnosticSeverity.Error, elseIfError,
+                    elseIfError,
                 ),
                 createDiagnostic(
                     Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-                    DiagnosticSeverity.Error, endIfError,
+                    endIfError,
                 )],
         ),
         new Test(
@@ -75,11 +74,11 @@ endfor`,
             [
                 createDiagnostic(
                     Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "else".length)),
-                    DiagnosticSeverity.Error, elseError,
+                    elseError,
                 ),
                 createDiagnostic(
                     Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-                    DiagnosticSeverity.Error, endIfError,
+                    endIfError,
                 )],
         ),
         new Test(
@@ -98,11 +97,11 @@ endfor`,
                     Range.create(
                         5, "    /* this is a comment */ ".length, 5, "    /* this is a comment */ else".length,
                     ),
-                    DiagnosticSeverity.Error, elseError,
+                    elseError,
                 ),
                 createDiagnostic(
                     Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-                    DiagnosticSeverity.Error, endIfError,
+                    endIfError,
                 )],
         ),
         new Test(
@@ -120,11 +119,11 @@ endfor`,
             [
                 createDiagnostic(
                     Range.create(Position.create(9, 0), Position.create(9, "endfor".length)),
-                    DiagnosticSeverity.Error, "for has finished before if",
+                    "for has finished before if",
                 ),
                 createDiagnostic(
                     Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "if".length)),
-                    DiagnosticSeverity.Error, ifError,
+                    ifError,
                 )],
         ),
 

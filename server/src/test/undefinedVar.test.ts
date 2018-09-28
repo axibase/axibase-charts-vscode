@@ -1,7 +1,6 @@
-import { DiagnosticSeverity } from "vscode-languageserver";
-import { createDiagnostic} from "../util";
-import { Test } from "./test";
 import { unknownToken } from "../messageUtil";
+import { createDiagnostic } from "../util";
+import { Test } from "./test";
 
 const firstVar: string = "serv";
 const secondVar: string = "server";
@@ -57,7 +56,7 @@ endfor`,
                     end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
                 },
-                DiagnosticSeverity.Error, unknownToken(firstVar),
+                unknownToken(firstVar),
             )],
         ),
         new Test(
@@ -79,14 +78,14 @@ endfor`,
                         end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                         start: { character: "       entity = @{".length, line: 4 },
                     },
-                    DiagnosticSeverity.Error, unknownToken(firstVar),
+                    unknownToken(firstVar),
                 ),
                 createDiagnostic(
                     {
                         end: { character: "       entity = @{".length + secondVar.length, line: 9 },
                         start: { character: "       entity = @{".length, line: 9 },
                     },
-                    DiagnosticSeverity.Error, unknownToken(secondVar),
+                    unknownToken(secondVar),
                 )],
         ),
         new Test(
@@ -107,7 +106,7 @@ endfor`,
                     end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
                 },
-                DiagnosticSeverity.Error, unknownToken(firstVar),
+                unknownToken(firstVar),
             )],
         ),
         new Test(
@@ -149,7 +148,7 @@ endfor`,
                     end: { character: "           entity = @{".length + thirdVar.length, line: 8 },
                     start: { character: "           entity = @{".length, line: 8 },
                 },
-                DiagnosticSeverity.Error, unknownToken(thirdVar),
+                unknownToken(thirdVar),
             )],
         ),
         new Test(
@@ -175,7 +174,7 @@ endfor`,
                     end: { character: "       entity = @{".length + secondVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
                 },
-                DiagnosticSeverity.Error, unknownToken(secondVar),
+                unknownToken(secondVar),
             )],
         ),
         new Test(
@@ -224,8 +223,15 @@ endfor`,
                     },
                     start: { character: `       entity = @{keepAfterLast(${secondVar}, 'v')}, @{`.length, line: 4 },
                 },
-                DiagnosticSeverity.Error, unknownToken(firstVar),
+                unknownToken(firstVar),
             )],
+        ),
+        new Test(
+            "Space between list name and equals sign is absent",
+            `list servers= server1, server2
+for server in servers
+endfor`,
+            [],
         ),
     ];
 

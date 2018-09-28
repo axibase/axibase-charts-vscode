@@ -1,11 +1,12 @@
 import {
     ClientCapabilities, CompletionItem, CompletionParams, createConnection, Diagnostic,
     DidChangeConfigurationNotification, DidChangeConfigurationParams,
-    DocumentFormattingParams, IConnection, InitializeParams, ProposedFeatures,
-    TextDocument, TextDocumentChangeEvent, TextDocuments, TextEdit,
+    DocumentFormattingParams, Hover, IConnection, InitializeParams,
+    ProposedFeatures, TextDocument, TextDocumentChangeEvent, TextDocumentPositionParams, TextDocuments, TextEdit,
 } from "vscode-languageserver";
 import { CompletionProvider } from "./completionProvider";
 import { Formatter } from "./formatter";
+import { HoverProvider } from "./hoverProvider";
 import { JsDomCaller } from "./jsDomCaller";
 import { Validator } from "./validator";
 
@@ -29,6 +30,7 @@ connection.onInitialize((params: InitializeParams) => {
         capabilities: {
             completionProvider: { resolveProvider: true },
             documentFormattingProvider: true,
+            hoverProvider: true,
             textDocumentSync: documents.syncKind,
         },
     };
@@ -39,6 +41,12 @@ connection.onInitialized(() => {
         // Register for all configuration changes.
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
+});
+
+connection.onHover((params: TextDocumentPositionParams): Hover => {
+    const document: TextDocument = documents.get(params.textDocument.uri);
+
+    return new HoverProvider(document).provideHover(params.position);
 });
 
 interface IServerSettings {
@@ -83,11 +91,9 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const jsDomCaller: JsDomCaller = new JsDomCaller(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
 
-        if (settings.validateFunctions) {
-            jsDomCaller.validate().forEach((element: Diagnostic) => {
-                diagnostics.push(element);
-            });
-        }
+        jsDomCaller.validate(settings.validateFunctions).forEach((element: Diagnostic) => {
+            diagnostics.push(element);
+        });
 
         // Send the computed diagnostics to VSCode.
         // connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });

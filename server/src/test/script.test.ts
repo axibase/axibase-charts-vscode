@@ -18,7 +18,7 @@ endscript`,
 endscrpt`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "script".length)),
-                DiagnosticSeverity.Error, unknownToken,
+                unknownToken,
             )],
         ),
         new Test(
@@ -46,7 +46,7 @@ script
 endscrpt`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "script".length)),
-                DiagnosticSeverity.Error, unknownToken,
+                unknownToken,
             )],
         ),
         new Test(
@@ -70,13 +70,13 @@ script =			c = widget`,
 
                 createDiagnostic(
                     Range.create(1, 0, 1, "script".length),
-                    DiagnosticSeverity.Warning,
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                    DiagnosticSeverity.Warning,
                 ),
                 createDiagnostic(
                     Range.create(2, 0, 2, "script".length),
-                    DiagnosticSeverity.Warning,
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                    DiagnosticSeverity.Warning,
                 ),
             ],
         ),
@@ -91,7 +91,7 @@ script =			c = widget`,
 endscript`,
             [createDiagnostic(
                 Range.create(1, 0, 1, "endscript".length),
-                DiagnosticSeverity.Error, "endscript has no matching script",
+                "endscript has no matching script",
             )],
         ),
         new Test(
@@ -100,7 +100,7 @@ endscript`,
 endscript`,
             [createDiagnostic(
                 Range.create(0, 0, 0, "script".length),
-                DiagnosticSeverity.Error, "A linefeed character after 'script' keyword is required",
+                "A linefeed character after 'script' keyword is required",
             )],
         ),
         new Test(

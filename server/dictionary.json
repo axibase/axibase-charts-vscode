@@ -2390,6 +2390,14 @@
             "widget": "gauge"
         },
         {
+            "displayName": "group",
+            "section": "widget",
+            "widget": "bar",
+            "type": "string",
+            "example": "region",
+            "defaultValue": "metric"
+        },
+        {
             "displayName": "group-first",
             "type": "boolean",
             "example": false,
@@ -2445,7 +2453,7 @@
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -2776,6 +2784,7 @@
         {
             "displayName": "label",
             "type": "string",
+            "multiLine": true,
             "example": "CPU Busy - nurswgvml007",
             "section": "series"
         },
@@ -3647,8 +3656,7 @@
                 "pie",
                 "ring",
                 "auto"
-            ],
-            "multiLine": true
+            ]
         },
         {
             "displayName": "moving-average",
@@ -4958,11 +4966,18 @@
             "section": "series"
         },
         {
+            "displayName": "reload",
+            "section": "dropdown",
+            "type": "boolean",
+            "example": true
+        },
+        {
             "displayName": "replace-underscore",
             "section": "widget",
             "type": "boolean",
             "example": true,
-            "defaultValue": false
+            "defaultValue": false,
+            "widget": "table"
         },
         {
             "displayName": "replace-value",
@@ -6589,7 +6604,7 @@
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -6616,7 +6631,7 @@
                 "max",
                 "sum",
                 "avg",
-                "percentile_\\d+",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median",
                 "standard_deviation",
                 "first",
@@ -6661,11 +6676,8 @@
                 "min",
                 "sum",
                 "count",
-                "percentile_99",
-                "percentile_95",
-                "percentile_90",
-                "percentile_75",
-                "percentile_50",
+                "last",
+                "percentile(?:_\\d{1,3}|\\(\\d{1,2}(?:\\.\\d)?\\))",
                 "median"
             ]
         },
@@ -7185,6 +7197,7 @@
         {
             "displayName": "tooltip",
             "type": "string",
+            "multiLine": true,
             "example": "NURSWGVML007"
         },
         {
@@ -7202,9 +7215,10 @@
         },
         {
             "displayName": "top-units",
-            "type": "integer",
+            "type": "number",
             "section": "widget",
-            "example": 1
+            "example": 1,
+            "minValue": 0
         },
         {
             "displayName": "total-size",
@@ -8095,9 +8109,9 @@
         {
             "displayName": "width-units",
             "type": "number",
-            "minValue": 0,
             "example": 2,
-            "defaultValue": 6
+            "defaultValue": 6,
+            "minValue": 0
         },
         {
             "displayName": "zoom-svg",

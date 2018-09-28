@@ -1,4 +1,3 @@
-/* tslint:disable:no-magic-numbers */
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
@@ -11,7 +10,7 @@ suite("Repetition of variables or settings tests", () => {
 var servers = 'srv1', 'srv2'`,
             [createDiagnostic(
                 Range.create(Position.create(1, "var ".length), Position.create(1, "var ".length + "servers".length)),
-                DiagnosticSeverity.Error, "servers is already defined",
+                "servers is already defined",
             )],
         ),
         new Test(
@@ -21,7 +20,7 @@ for servers in servers
 endfor`,
             [createDiagnostic(
                 Range.create(Position.create(1, "for ".length), Position.create(1, "for ".length + "servers".length)),
-                DiagnosticSeverity.Error, "servers is already defined",
+                "servers is already defined",
             )],
         ),
         new Test(
@@ -32,7 +31,7 @@ csv servers = vps, vds
 endcsv`,
             [createDiagnostic(
                 Range.create(Position.create(1, "csv ".length), Position.create(1, "csv ".length + "servers".length)),
-                DiagnosticSeverity.Error, "servers is already defined",
+                "servers is already defined",
             )],
         ),
         new Test(
@@ -43,7 +42,7 @@ endcsv
 list servers = 'srv1', 'srv2'`,
             [createDiagnostic(
                 Range.create(Position.create(3, "list ".length), Position.create(3, "list ".length + "servers".length)),
-                DiagnosticSeverity.Error, "servers is already defined",
+                "servers is already defined",
             )],
         ),
         new Test(
@@ -62,7 +61,7 @@ var srv = ['srv1', 'srv2']`,
    metric = status`,
             [createDiagnostic(
                 Range.create(Position.create(2, "   ".length), Position.create(2, "   ".length + "entity".length)),
-                DiagnosticSeverity.Error, "entity is already defined",
+                "entity is already defined",
             )],
         ),
         new Test(
@@ -77,7 +76,7 @@ var srv = ['srv1', 'srv2']`,
    alias = server`,
             [createDiagnostic(
                 Range.create(Position.create(7, "   alias = ".length), Position.create(7, "   alias = server".length)),
-                DiagnosticSeverity.Error, "server is already defined",
+                "server is already defined",
             )],
         ),
         new Test(
@@ -122,11 +121,11 @@ endfor`,
             [
                 createDiagnostic(
                     Range.create(7, "           ".length, 7, "           color".length),
-                    DiagnosticSeverity.Error, "color is already defined",
+                    "color is already defined",
                 ),
                 createDiagnostic(
                     Range.create(9, "           ".length, 9, "           color".length),
-                    DiagnosticSeverity.Error, "color is already defined",
+                    "color is already defined",
                 )],
         ),
         new Test(
@@ -145,7 +144,7 @@ for server in servers
 endfor`,
             [createDiagnostic(
                 Range.create(7, "           ".length, 7, "           color".length),
-                DiagnosticSeverity.Error, "color is already defined",
+                "color is already defined",
             )],
         ),
         new Test(
@@ -164,7 +163,7 @@ for server in servers
 endfor`,
             [createDiagnostic(
                 Range.create(9, "           ".length, 9, "           color".length),
-                DiagnosticSeverity.Error, "color is already defined",
+                "color is already defined",
             )],
         ),
         new Test(
@@ -185,7 +184,7 @@ for server in servers
 endfor`,
             [createDiagnostic(
                 Range.create(11, "           ".length, 11, "           color".length),
-                DiagnosticSeverity.Error, "color is already defined",
+                "color is already defined",
             )],
         ),
         new Test(
@@ -242,13 +241,13 @@ script = document.head.appendChild(stylesheet);`,
             [
                 createDiagnostic(
                     Range.create(1, 0, 1, "script".length),
-                    DiagnosticSeverity.Warning,
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                    DiagnosticSeverity.Warning,
                 ),
                 createDiagnostic(
                     Range.create(2, 0, 2, "script".length),
-                    DiagnosticSeverity.Warning,
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
+                    DiagnosticSeverity.Warning,
                 ),
             ],
         ),

@@ -16,30 +16,56 @@ const readSettings: () => Setting[] = (): Setting[] => {
 };
 
 /**
+ * Reads descriptions from "descriptions.md" file
+ * @returns map of settings names and descriptions
+ */
+function readDescriptions(): Map<string, string> {
+    const descriptionsPath: string = join(__dirname, "..", "descriptions.md");
+    const content: string = readFileSync(descriptionsPath, "UTF-8");
+    const map: Map<string, string> = new Map();
+    // ## settingname\n\nsetting description[url](hello#html)\n
+    const regExp: RegExp = /\#\# ([a-z]+?)\n\n([^\s#][\S\s]+?)\n(?:\n(?=\#)|$)/g;
+    let match: RegExpExecArray | null = regExp.exec(content);
+    while (match !== null) {
+        const [, name, description] = match;
+        map.set(name, description);
+        match = regExp.exec(content);
+    }
+
+    return map;
+}
+
+/**
  * Tests if the provided setting complete or not
  * @param setting the setting to test
  * @returns true, if setting is complete, false otherwise
  */
-const isCompleteSetting: (setting?: Partial<Setting>) => boolean = (setting?: Partial<Setting>): boolean =>
-    setting !== undefined &&
-    setting.displayName !== undefined &&
-    setting.type !== undefined &&
-    setting.example !== undefined;
+function isCompleteSetting(setting?: Partial<Setting>): boolean {
+    return setting !== undefined &&
+        setting.displayName !== undefined &&
+        setting.type !== undefined &&
+        setting.example !== undefined;
+}
 
 /**
  * @returns map of settings, key is the setting name, value is instance of Setting
  */
-const createSettingsMap: () => Map<string, Setting> = (): Map<string, Setting> => {
+function createSettingsMap(): Map<string, Setting> {
+    const descriptions: Map<string, string> = readDescriptions();
+    const settings: Setting[] = readSettings();
     const map: Map<string, Setting> = new Map();
-    for (const setting of readSettings()) {
+    for (const setting of settings) {
         if (isCompleteSetting(setting)) {
+            const name: string = Setting.clearSetting(setting.displayName);
+            Object.assign(setting, { name, description: descriptions.get(name) });
             const completeSetting: Setting = new Setting(setting);
             map.set(completeSetting.name, completeSetting);
         }
     }
 
     return map;
-};
+}
+
 export const settingsMap: Map<string, Setting> = createSettingsMap();
 
 /**
@@ -52,6 +78,7 @@ export const requiredSectionSettingsMap: Map<string, Setting[][]> = new Map([
         [
             settingsMap.get("entity")!, settingsMap.get("value")!,
             settingsMap.get("entities")!, settingsMap.get("entitygroup")!,
+            settingsMap.get("entityexpression")!,
         ],
         [
             settingsMap.get("metric")!, settingsMap.get("value")!,
@@ -80,7 +107,7 @@ export const parentSections: Map<string, string[]> = new Map([
 /**
  * @returns array of parent sections for the section
  */
-export const getParents: (section: string) => string[] = (section: string): string[] => {
+export function getParents(section: string): string[] {
     let parents: string[] = [];
     const found: string[] | undefined = parentSections.get(section);
     if (found !== undefined) {
@@ -91,7 +118,7 @@ export const getParents: (section: string) => string[] = (section: string): stri
     }
 
     return parents;
-};
+}
 
 /**
  * Array of all possible sections

@@ -1,4 +1,3 @@
-/* tslint:disable:no-magic-numbers */
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { Test } from "./test";
 
@@ -184,6 +183,48 @@ endfor`,
       entity = @{item}
       metric = cpu_busy
   endfor`,
+            [], FormattingOptions.create(2, true),
+        ),
+        new Test(
+            "Adds a space between setting name and equals sign",
+            `[configuration]
+  entity= cpu_busy`,
+            [
+                TextEdit.insert(Position.create(1, "  entity".length), " "),
+            ],
+            FormattingOptions.create(2, true),
+        ),
+        new Test(
+            "Removes an extra space between setting name and equals sign",
+            `[configuration]
+  entity  = cpu_busy`,
+            [
+                TextEdit.replace(Range.create(1, "  entity".length, 1, "  entity  ".length), " "),
+            ],
+            FormattingOptions.create(2, true),
+        ),
+        new Test(
+            "Adds a space between list name and equals sign",
+            `[configuration]
+  list entities= entity1, entity2`,
+            [
+                TextEdit.insert(Position.create(1, "  list entities".length), " "),
+            ],
+            FormattingOptions.create(2, true),
+        ),
+        new Test(
+            "Removes an extra space between list name and equals sign",
+            `[configuration]
+  list entities  = entity1, entity2`,
+            [
+                TextEdit.replace(Range.create(1, "  list entities".length, 1, "  list entities  ".length), " "),
+            ],
+            FormattingOptions.create(2, true),
+        ),
+        new Test(
+            "Does not affect equals signs in setting value",
+            `[configuration]
+  script = var hello= value()`,
             [], FormattingOptions.create(2, true),
         ),
     ];

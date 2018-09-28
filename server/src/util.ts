@@ -39,16 +39,18 @@ export function isAnyInArray<T>(target: T[], array: T[]): boolean {
     return false;
 }
 /**
+ * Clears the passed argument and looks for a setting with the same name
  * @param name name of the wanted setting
  * @returns the wanted setting or undefined if not found
  */
-export const getSetting: (name: string) => Setting | undefined = (name: string): Setting | undefined => {
+export function getSetting(name: string): Setting | undefined {
     const clearedName: string = Setting.clearSetting(name);
 
     return settingsMap.get(clearedName);
-};
+}
 
 /**
+ * Counts CSV columns using RegExp.
  * @param line a CSV-formatted line
  * @returns number of CSV columns in the line
  */
@@ -71,16 +73,22 @@ export function countCsvColumns(line: string): number {
  * @param severity How severe is that problem?
  * @param message What message should be passed to the user?
  */
-export const createDiagnostic: (range: Range, severity: DiagnosticSeverity, message: string) => Diagnostic =
-    (range: Range, severity: DiagnosticSeverity, message: string): Diagnostic =>
-        Diagnostic.create(range, message, severity, undefined, DIAGNOSTIC_SOURCE);
+export function createDiagnostic(
+    range: Range,
+    message: string,
+    severity: DiagnosticSeverity = DiagnosticSeverity.Error,
+): Diagnostic {
+    return Diagnostic.create(range, message, severity, undefined, DIAGNOSTIC_SOURCE);
+}
 
 /**
- * Replaces all comments with spaces
+ * Replaces all comments with spaces.
+ * We need to remember places of statements in the original configuration,
+ * that's why it is not possible to delete all comments, whereas they must be ignored.
  * @param text the text to replace comments
  * @returns the modified text
  */
-export const deleteComments: (text: string) => string = (text: string): string => {
+export function deleteComments(text: string): string {
     let content: string = text;
     const multiLine: RegExp = /\/\*[\s\S]*?\*\//g;
     const oneLine: RegExp = /^[ \t]*#.*/mg;
@@ -103,19 +111,23 @@ export const deleteComments: (text: string) => string = (text: string): string =
     }
 
     return content;
-};
+}
 
 /**
  * Replaces scripts body with newline character
  * @param text the text to perform modifications
  * @returns the modified text
  */
-export const deleteScripts: (text: string) => string = (text: string): string =>
-    text.replace(/\bscript\b([\s\S]+?)\bendscript\b/g, "script\nendscript");
+export function deleteScripts(text: string): string {
+    return text.replace(/\bscript\b([\s\S]+?)\bendscript\b/g, "script\nendscript");
+}
+
 /**
  * @returns true if the current line contains white spaces or nothing, false otherwise
  */
-export const isEmpty: (str: string) => boolean = (str: string): boolean => /^\s*$/.test(str);
+export function isEmpty(str: string): boolean {
+    return /^\s*$/.test(str);
+}
 
 /**
  * Creates a diagnostic for a repeated setting. Warning if this setting was
@@ -124,39 +136,38 @@ export const isEmpty: (str: string) => boolean = (str: string): boolean => /^\s*
  * @param variable The setting, which has been repeated
  * @param name The name of the setting which is used by the user
  */
-export const repetitionDiagnostic: (range: Range, variable: Setting, name: string) => Diagnostic =
-    (range: Range, variable: Setting, name: string): Diagnostic => {
-        const diagnosticSeverity: DiagnosticSeverity =
-            (["script", "thresholds", "colors"].includes(variable.name)) ?
-                DiagnosticSeverity.Warning : DiagnosticSeverity.Error;
-        let message: string;
-        switch (variable.name) {
-            case "script": {
-                message =
-                    "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
-                break;
-            }
-            case "thresholds": {
-                message = `Replace multiple \`thresholds\` settings with one, for example:
+export function repetitionDiagnostic(range: Range, variable: Setting, name: string): Diagnostic {
+    const diagnosticSeverity: DiagnosticSeverity =
+        (["script", "thresholds", "colors"].includes(variable.name)) ?
+            DiagnosticSeverity.Warning : DiagnosticSeverity.Error;
+    let message: string;
+    switch (variable.name) {
+        case "script": {
+            message =
+                "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
+            break;
+        }
+        case "thresholds": {
+            message = `Replace multiple \`thresholds\` settings with one, for example:
 thresholds = 0
 thresholds = 60
 thresholds = 80
 
 thresholds = 0, 60, 80`;
-                break;
-            }
-            case "colors": {
-                message = `Replace multiple \`colors\` settings with one, for example:
+            break;
+        }
+        case "colors": {
+            message = `Replace multiple \`colors\` settings with one, for example:
 colors = red
 colors = yellow
 colors = green
 
 colors = red, yellow, green`;
-                break;
-            }
-            default:
-                message = `${name} is already defined`;
+            break;
         }
+        default:
+            message = `${name} is already defined`;
+    }
 
-        return createDiagnostic(range, diagnosticSeverity, message);
-    };
+    return createDiagnostic(range, message, diagnosticSeverity);
+}

@@ -7,7 +7,7 @@
 			"request": "launch",
 			"name": "Launch Client",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"args": ["--disable-extensions","--extensionDevelopmentPath=${workspaceRoot}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
@@ -29,11 +29,26 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}/server/",
 				"--extensionTestsPath=${workspaceFolder}/server/out/test"
 			],
 			"outFiles": [
-				"${workspaceFolder}/server/out/test/**/*.js"
+				"${workspaceFolder}/server/out/test/**/*.js",
+			]
+		},
+		{
+			"name": "e2e Tests Server",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceFolder}/",
+				"--extensionTestsPath=${workspaceFolder}/client/out/test"
+			],
+			"outFiles": [
+				"${workspaceFolder}/client/out/test/**/*.js",
 			]
 		}
 	]
