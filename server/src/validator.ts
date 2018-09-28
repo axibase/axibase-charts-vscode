@@ -25,7 +25,7 @@ export class Validator {
     /**
      * Number of CSV columns in the current CSV header
      */
-    private csvColumns: number | undefined;
+    private csvColumns?: number;
     /**
      * Index of the current line
      */
@@ -33,7 +33,7 @@ export class Validator {
     /**
      * TextRange containing name and position of the current section declaration
      */
-    private currentSection: TextRange | undefined;
+    private currentSection?: TextRange;
     /**
      * Array of settings declared in current section
      */
@@ -45,7 +45,7 @@ export class Validator {
     /**
      * The last found keyword (script, csv, var, for...) and the position
      */
-    private foundKeyword: TextRange | undefined;
+    private foundKeyword?: TextRange;
     /**
      * Map of settings declared in if statement.
      * Key is line number and keyword. For example, "70if server == 'vps'", "29else".
@@ -60,7 +60,7 @@ export class Validator {
     /**
      * Last if statement. Used to get/set settings in ifSettigns
      */
-    private lastCondition: string | undefined;
+    private lastCondition?: string;
     /**
      * Array of lines of the current document
      */
@@ -68,7 +68,7 @@ export class Validator {
     /**
      * Result of last regexp execution
      */
-    private match: RegExpExecArray | null | undefined;
+    private match?: RegExpExecArray | null;
     /**
      * Map of settings declared in parent sections. Keys are section names.
      */
@@ -76,7 +76,7 @@ export class Validator {
     /**
      * Position of declaration of previous section and the name of the section
      */
-    private previousSection: TextRange | undefined;
+    private previousSection?: TextRange;
     /**
      * Settings declared in the previous section
      */
@@ -106,7 +106,7 @@ export class Validator {
     /**
      * Type of the current widget
      */
-    private currentWidget: string | undefined;
+    private currentWidget?: string;
 
     public constructor(text: string) {
         this.lines = deleteComments(text)
