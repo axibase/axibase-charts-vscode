@@ -25,7 +25,7 @@ export class Validator {
     /**
      * Number of CSV columns in the current CSV header
      */
-    private csvColumns: number | undefined;
+    private csvColumns?: number;
     /**
      * Index of the current line
      */
@@ -33,7 +33,7 @@ export class Validator {
     /**
      * TextRange containing name and position of the current section declaration
      */
-    private currentSection: TextRange | undefined;
+    private currentSection?: TextRange;
     /**
      * Array of settings declared in current section
      */
@@ -45,7 +45,7 @@ export class Validator {
     /**
      * The last found keyword (script, csv, var, for...) and the position
      */
-    private foundKeyword: TextRange | undefined;
+    private foundKeyword?: TextRange;
     /**
      * Map of settings declared in if statement.
      * Key is line number and keyword. For example, "70if server == 'vps'", "29else".
@@ -60,7 +60,7 @@ export class Validator {
     /**
      * Last if statement. Used to get/set settings in ifSettigns
      */
-    private lastCondition: string | undefined;
+    private lastCondition?: string;
     /**
      * Array of lines of the current document
      */
@@ -68,7 +68,7 @@ export class Validator {
     /**
      * Result of last regexp execution
      */
-    private match: RegExpExecArray | null | undefined;
+    private match?: RegExpExecArray | null;
     /**
      * Map of settings declared in parent sections. Keys are section names.
      */
@@ -76,7 +76,7 @@ export class Validator {
     /**
      * Position of declaration of previous section and the name of the section
      */
-    private previousSection: TextRange | undefined;
+    private previousSection?: TextRange;
     /**
      * Settings declared in the previous section
      */
@@ -106,7 +106,7 @@ export class Validator {
     /**
      * Type of the current widget
      */
-    private currentWidget: string | undefined;
+    private currentWidget?: string;
 
     public constructor(text: string) {
         this.lines = deleteComments(text)
@@ -894,46 +894,7 @@ export class Validator {
         }
         const line: string = this.getCurrentLine();
         if (this.currentSection === undefined || !/(?:tag|key)s?/.test(this.currentSection.text)) {
-            // We are not in tags or keys section
-            this.addSettingValue();
-            const setting: Setting | undefined = this.getSettingCheck();
-            if (setting === undefined) {
-                return;
-            }
-
-            if (setting.name === "table") {
-                const attribute: Setting | undefined = getSetting("attribute");
-                if (attribute !== undefined) {
-                    this.requiredSettings.push([attribute]);
-                }
-            } else if (setting.name === "attribute") {
-                const table: Setting | undefined = getSetting("table");
-                if (table !== undefined) {
-                    this.requiredSettings.push([table]);
-                }
-            }
-
-            if (setting.name === "type") {
-                this.currentWidget = this.match[3];
-            }
-
-            if (!setting.multiLine) {
-                this.checkRepetition(setting);
-            }
-            this.typeCheck(setting);
-            this.checkExcludes(setting);
-
-            if (setting.name === "urlparameters") {
-                this.findUrlParams();
-            } else {
-                this.checkFreemarkerValue();
-            }
-            // Aliases
-            if (setting.name === "alias") {
-                this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
-                this.addToStringArray(this.aliases);
-            }
-            this.findDeAliases();
+            this.handleRegularSetting();
         } else if (/(?:tag|key)s?/.test(this.currentSection.text) &&
             // We are in tags/keys section
             /(^[ \t]*)([a-z].*?[a-z])[ \t]*=/.test(line)) {
@@ -943,7 +904,7 @@ export class Validator {
             }
             const [, indent, name] = this.match;
             const setting: Setting | undefined = getSetting(name);
-            if (setting !== undefined && this.currentSection.text !== "tag") {
+            if (this.isAllowedWidget(setting)) {
                 this.result.push(createDiagnostic(
                     Range.create(
                         this.currentLineNumber, indent.length,
@@ -953,6 +914,64 @@ export class Validator {
                 ));
             }
         }
+    }
+
+    /**
+     * Checks whether the setting is defined and is allowed to be defined in the current widget
+     * @param setting the setting to be checked
+     */
+    private isAllowedWidget(setting: Setting): boolean {
+        return setting !== undefined
+            && this.currentSection.text !== "tag"
+            && (setting.widget == null
+                || this.currentWidget === undefined
+                || setting.widget === this.currentWidget);
+    }
+
+    /**
+     * Processes a regular setting which is defined not in tags/keys section
+     */
+    private handleRegularSetting(): void {
+        const line: string = this.getCurrentLine();
+        this.addSettingValue();
+        const setting: Setting | undefined = this.getSettingCheck();
+        if (setting === undefined) {
+            return;
+        }
+
+        if (setting.name === "table") {
+            const attribute: Setting | undefined = getSetting("attribute");
+            if (attribute !== undefined) {
+                this.requiredSettings.push([attribute]);
+            }
+        } else if (setting.name === "attribute") {
+            const table: Setting | undefined = getSetting("table");
+            if (table !== undefined) {
+                this.requiredSettings.push([table]);
+            }
+        }
+
+        if (setting.name === "type") {
+            this.currentWidget = this.match[3];
+        }
+
+        if (!setting.multiLine) {
+            this.checkRepetition(setting);
+        }
+        this.typeCheck(setting);
+        this.checkExcludes(setting);
+
+        if (setting.name === "urlparameters") {
+            this.findUrlParams();
+        } else {
+            this.checkFreemarkerValue();
+        }
+        // Aliases
+        if (setting.name === "alias") {
+            this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
+            this.addToStringArray(this.aliases);
+        }
+        this.findDeAliases();
     }
 
     /**
@@ -1048,11 +1067,11 @@ export class Validator {
                 break;
             }
             case "var": {
-                let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
-                let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+                const openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+                const closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
                 if (openBrackets) {
-                    if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
-                        closeBrackets.map(s => s.trim()).join("").length
+                    if (closeBrackets && openBrackets.map((s: string) => s.trim()).join("").length !==
+                        closeBrackets.map((s: string) => s.trim()).join("").length
                         || closeBrackets === null) {
                         // multiline var
                         this.keywordsStack.push(this.foundKeyword);
