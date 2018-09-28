@@ -97,5 +97,15 @@ value = correct`,
                              Position.create(0, 4)),
                 deprecatedTagSection, DiagnosticSeverity.Warning,
             )]),
+        new Test("Error is not raised if the setting is not allowed in the widget",
+                 `[widget]
+  type = box
+  entity = test
+  metric = cpu_busy
+  [series]
+    display = false
+    [tags]
+      Disk_Name = *
+      Parent = *`, []),
     ].forEach((test: Test) => test.validationTest());
 });
