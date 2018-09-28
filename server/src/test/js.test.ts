@@ -1,4 +1,4 @@
-import { Position, Range } from "vscode-languageserver";
+import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -26,7 +26,7 @@ suite("[JS] Var content tests", () => {
         ),
         new Test(
             "Correct oneline var with function call",
-            `var offsets = range(2,6)`, []),
+            "var offsets = range(2,6)", []),
         new Test(
             "Correct oneline var without emty string after",
             `[widget]
@@ -46,12 +46,12 @@ endvar`,
             `var v = [
 [9,3], [9,4]
 ]
-endvar`, []),
+endvar`,    []),
         new Test(
             "Correct multiline var array",
             `  var a = ["abc"
 ]
-endvar`, []),
+endvar`,    []),
         new Test(
             "Correct multiline var arrays with different types",
             `var v = [
@@ -63,7 +63,7 @@ endvar
 var c = [["abc"],
   [1,2,3]
 ]
-endvar`, []),
+endvar`,    []),
         new Test(
             "Incorrect multiline var array: unexpected variable",
             `var v = [
@@ -72,25 +72,25 @@ endvar`, []),
 endvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(2, "var v = [".length)),
-                "abc is not defined",
-            )]
+                "abc is not defined", DiagnosticSeverity.Warning,
+            )],
         ),
         new Test(
             "Incorrect multiline var array: no closing bracket",
             `var v = [
 "abc"
-endvar`, [createDiagnostic(
+endvar`,    [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(1, "var v = [".length)),
-                "Unexpected token }",
-            )]
+                "Unexpected token }", DiagnosticSeverity.Warning,
+            )],
         ),
         new Test(
             "Incorrect oneline var: no opening bracket",
-            `var v = ]`, [createDiagnostic(
+            "var v = ]", [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var v = ]".length)),
-                "Unexpected token ]",
-            )]
-        )
+                "Unexpected token ]", DiagnosticSeverity.Warning,
+            )],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.jsValidationTest(); });
