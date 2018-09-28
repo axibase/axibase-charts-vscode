@@ -43,21 +43,21 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     // The server is implemented in node
     const serverModule: string = context.asAbsolutePath(join("server", "out", "server.js"));
     // The debug options for the server
-    const debugOptions: ForkOptions = {execArgv: ["--nolazy", "--inspect=6009"]};
+    const debugOptions: ForkOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 
     const diagnosticCollection: DiagnosticCollection = languages.createDiagnosticCollection();
 
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     const serverOptions: ServerOptions = {
-        debug: {module: serverModule, options: debugOptions, transport: TransportKind.ipc},
-        run: {module: serverModule, transport: TransportKind.ipc},
+        debug: { module: serverModule, options: debugOptions, transport: TransportKind.ipc },
+        run: { module: serverModule, transport: TransportKind.ipc },
     };
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
-        documentSelector: [{language: languageId, scheme: "file"}],
+        documentSelector: [{ language: languageId, scheme: "file" }],
         outputChannelName: "Axibase Charts",
         synchronize: {
             // Notify the server about file changes to ".clientrc files contain in the workspace
@@ -211,7 +211,7 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
     window.showInformationMessage(`Connected to ${address}:${port} ${username ? `as ${username}` : ""}`);
     atsd = atsd === undefined ? true : atsd;
 
-    return {url, cookie, atsd};
+    return { url, cookie, atsd };
 };
 
 /**
@@ -227,8 +227,8 @@ const performRequest: (address: string, username?: string, password?: string) =>
             "Authorization": `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
             "user-agent": userAgent,
         } : {
-            "user-agent": userAgent,
-        };
+                "user-agent": userAgent,
+            };
 
         const options: RequestOptions = {
             hostname: url.hostname,
@@ -250,10 +250,7 @@ const performRequest: (address: string, username?: string, password?: string) =>
                     const family: StatusFamily = statusFamily(res.statusCode);
                     if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
                         if (res.statusCode === 401) {
-                            return reject(new Error(`;
-    Login;
-    failed;
-    with status code ${res.statusCode}`));
+                            return reject(new Error(`Login failed with status code ${res.statusCode}`));
                         } else {
                             return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
                         }
