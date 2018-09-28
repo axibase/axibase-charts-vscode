@@ -64,6 +64,11 @@ export class TextRange {
     }
 
     /**
+     * Priority of the text, used in jsDomCaller: settings with higher priority are placed earlier in test js "file"
+     */
+    public readonly priority: number = 0;
+
+    /**
      * Position of the text
      */
     public readonly range: Range;
@@ -72,8 +77,10 @@ export class TextRange {
      * Text at this position
      */
     public readonly text: string;
-    public constructor(text: string, range: Range) {
+
+    public constructor(text: string, range: Range, priority?: number) {
         this.range = range;
         this.text = text;
+        this.priority = priority;
     }
 }

@@ -1,4 +1,4 @@
-import { Position, Range } from "vscode-languageserver";
+import { Position, Range, DiagnosticSeverity } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -72,7 +72,7 @@ endvar`, []),
 endvar`,
             [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(2, "var v = [".length)),
-                "abc is not defined",
+                "abc is not defined", DiagnosticSeverity.Warning,
             )]
         ),
         new Test(
@@ -81,14 +81,21 @@ endvar`,
 "abc"
 endvar`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(1, "var v = [".length)),
-                "Unexpected token }",
+                "Unexpected token }", DiagnosticSeverity.Warning,
             )]
         ),
         new Test(
             "Incorrect oneline var: no opening bracket",
             `var v = ]`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var v = ]".length)),
-                "Unexpected token ]",
+                "Unexpected token ]", DiagnosticSeverity.Warning,
+            )]
+        ),
+        new Test(
+            "Incorrect oneline var: unallowed function",
+            `var v = sum()`, [createDiagnostic(
+                Range.create(Position.create(0, 0), Position.create(0, "var v = sum()".length)),
+                "sum is not defined", DiagnosticSeverity.Warning,
             )]
         )
     ];
