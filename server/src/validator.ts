@@ -268,7 +268,7 @@ export class Validator {
             return map;
         }
         const [, indent, variable] = this.match;
-        if (isInMap(variable, map) && key !== "freemarker") {
+        if (isInMap(variable, map)) {
             const startPosition: number = this.match.index + indent.length;
             this.result.push(createDiagnostic(
                 Range.create(
