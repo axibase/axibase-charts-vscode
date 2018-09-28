@@ -903,6 +903,31 @@ For example, 15 minute. Supported units:
                 ),
             ],
         ),
+        new Test(
+            "An error is not raised when a setting name or value is concatenated with equals sign",
+            `[configuration]
+  add-meta=true
+  zoom-svg=5.4
+  widgets-per-row=5
+  start-time=2018-07-08
+  period=15 second
+  source=message
+[configuration]
+  add-meta= true
+  zoom-svg= 5.4
+  widgets-per-row= 5
+  start-time= 2018-07-08
+  period= 15 second
+  source= message
+[configuration]
+  add-meta =true
+  zoom-svg =5.4
+  widgets-per-row =5
+  start-time =2018-07-08
+  period =15 second
+  source =message`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test): void => { test.validationTest(); });
