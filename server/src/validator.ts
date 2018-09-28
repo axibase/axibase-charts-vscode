@@ -894,46 +894,7 @@ export class Validator {
         }
         const line: string = this.getCurrentLine();
         if (this.currentSection === undefined || !/(?:tag|key)s?/.test(this.currentSection.text)) {
-            // We are not in tags or keys section
-            this.addSettingValue();
-            const setting: Setting | undefined = this.getSettingCheck();
-            if (setting === undefined) {
-                return;
-            }
-
-            if (setting.name === "table") {
-                const attribute: Setting | undefined = getSetting("attribute");
-                if (attribute !== undefined) {
-                    this.requiredSettings.push([attribute]);
-                }
-            } else if (setting.name === "attribute") {
-                const table: Setting | undefined = getSetting("table");
-                if (table !== undefined) {
-                    this.requiredSettings.push([table]);
-                }
-            }
-
-            if (setting.name === "type") {
-                this.currentWidget = this.match[3];
-            }
-
-            if (!setting.multiLine) {
-                this.checkRepetition(setting);
-            }
-            this.typeCheck(setting);
-            this.checkExcludes(setting);
-
-            if (setting.name === "urlparameters") {
-                this.findUrlParams();
-            } else {
-                this.checkFreemarkerValue();
-            }
-            // Aliases
-            if (setting.name === "alias") {
-                this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
-                this.addToStringArray(this.aliases);
-            }
-            this.findDeAliases();
+            this.handleRegularSetting();
         } else if (/(?:tag|key)s?/.test(this.currentSection.text) &&
             // We are in tags/keys section
             /(^[ \t]*)([a-z].*?[a-z])[ \t]*=/.test(line)) {
@@ -943,7 +904,7 @@ export class Validator {
             }
             const [, indent, name] = this.match;
             const setting: Setting | undefined = getSetting(name);
-            if (setting !== undefined && this.currentSection.text !== "tag") {
+            if (this.isAllowedWidget(setting)) {
                 this.result.push(createDiagnostic(
                     Range.create(
                         this.currentLineNumber, indent.length,
@@ -953,6 +914,64 @@ export class Validator {
                 ));
             }
         }
+    }
+
+    /**
+     * Checks whether the setting is defined and is allowed to be defined in the current widget
+     * @param setting the setting to be checked
+     */
+    private isAllowedWidget(setting: Setting): boolean {
+        return setting !== undefined
+            && this.currentSection.text !== "tag"
+            && (setting.widget == null
+                || this.currentWidget === undefined
+                || setting.widget === this.currentWidget);
+    }
+
+    /**
+     * Processes a regular setting which is defined not in tags/keys section
+     */
+    private handleRegularSetting(): void {
+        const line: string = this.getCurrentLine();
+        this.addSettingValue();
+        const setting: Setting | undefined = this.getSettingCheck();
+        if (setting === undefined) {
+            return;
+        }
+
+        if (setting.name === "table") {
+            const attribute: Setting | undefined = getSetting("attribute");
+            if (attribute !== undefined) {
+                this.requiredSettings.push([attribute]);
+            }
+        } else if (setting.name === "attribute") {
+            const table: Setting | undefined = getSetting("table");
+            if (table !== undefined) {
+                this.requiredSettings.push([table]);
+            }
+        }
+
+        if (setting.name === "type") {
+            this.currentWidget = this.match[3];
+        }
+
+        if (!setting.multiLine) {
+            this.checkRepetition(setting);
+        }
+        this.typeCheck(setting);
+        this.checkExcludes(setting);
+
+        if (setting.name === "urlparameters") {
+            this.findUrlParams();
+        } else {
+            this.checkFreemarkerValue();
+        }
+        // Aliases
+        if (setting.name === "alias") {
+            this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
+            this.addToStringArray(this.aliases);
+        }
+        this.findDeAliases();
     }
 
     /**
