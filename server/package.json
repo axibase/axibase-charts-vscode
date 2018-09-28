@@ -15,15 +15,14 @@
 	"dependencies": {
 		"jquery": "^3.3.1",
 		"jsdom": "^12.0.0",
-		"vscode-languageserver": "^5.0.3"
+		"vscode-languageserver": "^5.1.0"
 	},
 	"scripts": {
 		"test": "node node_modules/vscode/bin/test --node-ipc"
 	},
 	"devDependencies": {
-		"@types/jquery": "^3.3.6",
-		"@types/jsdom": "^11.0.6",
-		"@types/levenshtein": "^1.0.1",
+		"@types/jquery": "^3.3.10",
+		"@types/jsdom": "^11.12.0",
 		"@types/mocha": "^5.2.5",
 		"vscode": "^1.1.21"
 	}

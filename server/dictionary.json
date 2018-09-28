@@ -3661,8 +3661,7 @@
                 "pie",
                 "ring",
                 "auto"
-            ],
-            "multiLine": true
+            ]
         },
         {
             "displayName": "moving-average",
