@@ -220,57 +220,56 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
  * @param username the target user's username
  * @param password the target user's password
  */
-const performRequest: (address: string, username?: string, password?: string) => Promise<[string[], boolean]> =
-    async (address: string, username?: string, password?: string): Promise<[string[], boolean]> => {
-        const url: URL = new URL(address);
-        const headers: OutgoingHttpHeaders = (username && password) ? {
-            "Authorization": `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
+function performRequest(address: string, username?: string, password?: string): Promise<[string[], boolean]> {
+    const url: URL = new URL(address);
+    const headers: OutgoingHttpHeaders = (username && password) ? {
+        "Authorization": `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
+        "user-agent": userAgent,
+    } : {
             "user-agent": userAgent,
-        } : {
-                "user-agent": userAgent,
-            };
-
-        const options: RequestOptions = {
-            hostname: url.hostname,
-            method: "GET",
-            path: (username && password) ? "/api/v1/ping" : "",
-            port: url.port,
-            protocol: url.protocol,
-            rejectUnauthorized: false, // allows self-signed certificates
-            timeout: 3000, // milliseconds (3 s)
         };
-        options.headers = headers;
-        const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
-            => ClientRequest = (url.protocol === "https:") ? https : http;
 
-        return new Promise<[string[], boolean]>(
-            (resolve: (result: [string[], boolean]) => void, reject: (err: Error) => void): void => {
-                const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
-                    res.on("error", reject);
-                    const family: StatusFamily = statusFamily(res.statusCode);
-                    if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
-                        if (res.statusCode === 401) {
-                            return reject(new Error(`Login failed with status code ${res.statusCode}`));
-                        } else {
-                            return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
-                        }
-                    }
-                    const cookies: string[] | undefined = res.headers["set-cookie"];
-                    if (!cookies || cookies.length < 1) {
-                        return reject(new Error("Cookie is empty"));
-                    }
-                    const server: string | string[] | undefined = res.headers.server;
-                    let atsd: boolean;
-                    if (!server || Array.isArray(server)) {
-                        atsd = false;
-                    } else {
-                        const lowerCased: string = server.toLowerCase();
-                        atsd = lowerCased.includes("atsd");
-                    }
-                    resolve([cookies, atsd]);
-                });
-
-                outgoing.on("error", reject);
-                outgoing.end();
-            });
+    const options: RequestOptions = {
+        hostname: url.hostname,
+        method: "GET",
+        path: (username && password) ? "/api/v1/ping" : "",
+        port: url.port,
+        protocol: url.protocol,
+        rejectUnauthorized: false, // allows self-signed certificates
+        timeout: 3000, // milliseconds (3 s)
     };
+    options.headers = headers;
+    const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
+        => ClientRequest = (url.protocol === "https:") ? https : http;
+
+    return new Promise<[string[], boolean]>(
+        (resolve: (result: [string[], boolean]) => void, reject: (err: Error) => void): void => {
+            const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
+                res.on("error", reject);
+                const family: StatusFamily = statusFamily(res.statusCode);
+                if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
+                    if (res.statusCode === 401) {
+                        return reject(new Error(`Login failed with status code ${res.statusCode}`));
+                    } else {
+                        return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
+                    }
+                }
+                const cookies: string[] | undefined = res.headers["set-cookie"];
+                if (!cookies || cookies.length < 1) {
+                    return reject(new Error("Cookie is empty"));
+                }
+                const server: string | string[] | undefined = res.headers.server;
+                let atsd: boolean;
+                if (!server || Array.isArray(server)) {
+                    atsd = false;
+                } else {
+                    const lowerCased: string = server.toLowerCase();
+                    atsd = lowerCased.includes("atsd");
+                }
+                resolve([cookies, atsd]);
+            });
+
+            outgoing.on("error", reject);
+            outgoing.end();
+        });
+}
