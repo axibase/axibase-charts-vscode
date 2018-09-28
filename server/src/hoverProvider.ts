@@ -15,14 +15,14 @@ function hoverContent(setting: Setting): string {
     // TODO: describe a script which is allowed as the setting value
     // TODO: describe a widget where the setting is allowed
     return `${setting.description}
-${setting.example == null || setting.example === "" ? "" : `Example: ${setting.displayName} = ${setting.example}`}
-${setting.type == null || setting.type === "" ? "" : `Type: ${setting.type}`}
-${setting.defaultValue == null || setting.defaultValue === "" ? "" : `Default value: ${setting.defaultValue}`}
-${setting.enum == null || setting.enum.length === 0 ? "" : `Possible values: ${setting.enum}`}
-${setting.excludes == null || setting.excludes.length === 0 ? "" : `Can not be specified with: ${setting.excludes}`}
-${setting.maxValue == null || setting.maxValue === Infinity ? "" : `Maximum: ${setting.maxValue}`}
-${setting.minValue == null || setting.minValue === -Infinity ? "" : `Minimum: ${setting.minValue}`}
-${setting.section == null || setting.section === "" ? "" : `Allowed in section: ${setting.section}`}`;
+${setting.example == null || setting.example === "" ? "" : `Example: ${setting.displayName} = ${setting.example}  `}
+${setting.type == null || setting.type === "" ? "" : `Type: ${setting.type}  `}
+${setting.defaultValue == null || setting.defaultValue === "" ? "" : `Default value: ${setting.defaultValue}  `}
+${setting.enum == null || setting.enum.length === 0 ? "" : `Possible values: ${setting.enum}  `}
+${setting.excludes == null || setting.excludes.length === 0 ? "" : `Can not be specified with: ${setting.excludes}  `}
+${setting.maxValue == null || setting.maxValue === Infinity ? "" : `Maximum: ${setting.maxValue}  `}
+${setting.minValue == null || setting.minValue === -Infinity ? "" : `Minimum: ${setting.minValue}  `}
+${setting.section == null || setting.section === "" ? "" : `Allowed in section: ${setting.section}  `}`;
 }
 
 /**
@@ -55,7 +55,7 @@ export class HoverProvider {
         const word: string = this.text.substring(range.start, range.end);
         const name: string = Setting.clearSetting(word);
         const setting: Setting | undefined = getSetting(name);
-        if (setting == null) {
+        if (setting == null || setting.description == null) {
             return null;
         }
 
