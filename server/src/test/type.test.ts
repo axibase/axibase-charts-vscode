@@ -453,22 +453,13 @@ For example, 5 minute. Supported units:
         new Test(
             "Allow \${} and @{} expressions",
             `[configuration]
-  <#assign setEndTime = endtime!lastInsertDate(entity, "nmon.wlmmem.memory_percent") >
-  <#if setEndTime??>
   	endtime = \${setEndTime}
-  </#if>
   list times = 2018, 2019
   for time in times
     start-time = @{time}
   endfor
   `,
-            [
-                createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  ".length + "<#assign".length),
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                    DiagnosticSeverity.Information,
-                ),
-            ],
+            [],
         ),
         new Test(
             "Allow detail statistic",

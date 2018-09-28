@@ -124,17 +124,6 @@ metric = cpu_iowait`,
                 "Section tag is unclosed",
             )],
         ),
-        new Test(
-            "timezone test",
-            `[configuration]
-  timezone = \${timezone}`,
-            [
-                createDiagnostic(
-                    Range.create(1, "  timezone = \${".length, 1, "  timezone = \${".length + "timezone".length),
-                    unknownToken("timezone"),
-                ),
-            ],
-        ),
     ];
 
     tests.forEach((test: Test) => {
