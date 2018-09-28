@@ -98,6 +98,7 @@ export class Setting {
      * @param name name of the setting which is used by user
      */
     public checkType(value: string, range: Range, name: string, _widget?: string): Diagnostic | undefined {
+        // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions
         if (Setting.calculatedRegExp.test(value)) {
@@ -175,6 +176,9 @@ export class Setting {
         return result;
     }
 
+    /**
+     * Generates a string containing fully available information about the setting
+     */
     public toString(): string {
         // TODO: describe a script which is allowed as the setting value
         if (this.description == null) {
