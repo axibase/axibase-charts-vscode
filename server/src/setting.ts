@@ -173,4 +173,39 @@ export class Setting {
 
         return result;
     }
+
+    public toString(): string {
+        // TODO: describe a script which is allowed as the setting value
+        // TODO: describe a widget where the setting is allowed
+        if (this.description == null) {
+            return "";
+        }
+        let result: string = `${this.description}  \n\n`;
+        if (this.example != null && this.example !== "") {
+            result += `Example: ${this.displayName} = ${this.example}  \n`;
+        }
+        if (this.type != null && this.type !== "") {
+            result += `Type: ${this.type}  \n`;
+        }
+        if (this.defaultValue != null && this.defaultValue !== "") {
+            result += `Default value: ${this.defaultValue}  \n`;
+        }
+        if (this.enum == null && this.enum.length === 0) {
+            result += `Possible values: ${this.enum.join()}  \n`;
+        }
+        if (this.excludes != null && this.excludes.length !== 0) {
+            result += `Can not be specified with: ${this.excludes.join()}  \n`;
+        }
+        if (this.maxValue != null && this.maxValue !== Infinity) {
+            result += `Maximum: ${this.maxValue}  \n`;
+        }
+        if (this.minValue != null && this.minValue !== -Infinity) {
+            result += `Minimum: ${this.minValue}  \n`;
+        }
+        if (this.section != null && this.section !== "") {
+            result += `Allowed in section: ${this.section}  \n`;
+        }
+
+        return result;
+    }
 }

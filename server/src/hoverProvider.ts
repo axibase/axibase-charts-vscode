@@ -8,26 +8,6 @@ interface IRange {
 }
 
 /**
- * Generates a description for the provided setting
- * @param setting the setting to be described
- */
-function hoverContent(setting: Setting): string {
-    // TODO: describe a script which is allowed as the setting value
-    // TODO: describe a widget where the setting is allowed
-    return `${`${setting.description}  `}
-${setting.example == null || setting.example === "" ? "" : `Example: ${setting.displayName} = ${setting.example}  `}
-${setting.type == null || setting.type === "" ? "" : `Type: ${setting.type}  `}
-${setting.defaultValue == null || setting.defaultValue === "" ? "" : `Default value: ${setting.defaultValue}  `}
-${setting.enum == null || setting.enum.length === 0 ? "" : `Possible values: ${setting.enum.join()}  `}
-${setting.excludes == null || setting.excludes.length === 0 ?
-    "" : `Can not be specified with: ${setting.excludes.join()}  `
-}
-${setting.maxValue == null || setting.maxValue === Infinity ? "" : `Maximum: ${setting.maxValue}  `}
-${setting.minValue == null || setting.minValue === -Infinity ? "" : `Minimum: ${setting.minValue}  `}
-${setting.section == null || setting.section === "" ? "" : `Allowed in section: ${setting.section}  `}`;
-}
-
-/**
  * Provides hints for settings
  */
 export class HoverProvider {
@@ -62,7 +42,7 @@ export class HoverProvider {
         }
 
         return {
-            contents: hoverContent(setting),
+            contents: setting.toString(),
             range: Range.create(this.offsetToPosition(range.start), this.offsetToPosition(range.end)),
         };
     }
