@@ -98,7 +98,7 @@ export class Validator {
      */
     private readonly urlParameters: string[] = [];
     /**
-     * Map of defined variables, where key is type (for, freemarker, var, csv...)
+     * Map of defined variables, where key is type (for, var, csv...)
      */
     private readonly variables: Map<string, string[]> = new Map([
         ["freemarker", ["entity", "entities", "type"]],
@@ -297,8 +297,7 @@ export class Validator {
      */
     private areWeIn(name: string): boolean {
         return this.keywordsStack
-            .map((textRange: TextRange): string => textRange.text)
-            .includes(name);
+            .some((textRange: TextRange): boolean => textRange.text === name);
     }
 
     /**
@@ -368,11 +367,10 @@ export class Validator {
     }
 
     /**
-     * Creates a diagnostic if the current line contains FreeMarker expressions
      */
     private checkFreemarker(): void {
         const line: string = this.getCurrentLine();
-        this.match = /<#(?:list|assign)/.exec(line);
+        this.match = /<\/?#.*?\/?>/.exec(line);
         if (this.match !== null) {
             this.result.push(createDiagnostic(
                 Range.create(
@@ -382,44 +380,6 @@ export class Validator {
                 "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
                 DiagnosticSeverity.Information,
             ));
-        }
-    }
-
-    /**
-     * Creates diagnostics for statements like `${variable}`
-     * where the `variable` is not defined;
-     * ariphmetic operations are allowed
-     */
-    private checkFreemarkerValue(): void {
-        if (this.match == null) {
-            return;
-        }
-        const line: string = this.getCurrentLine();
-        this.match = /\$\{(\w+).*\}/.exec(this.match[3]);
-        if (this.match !== null) {
-            const declaration: string = this.match[0];
-            let start: number;
-            let end: number;
-            let settingName: string;
-            const regSetting: RegExp = new RegExp("(\\w+)", "g");
-            const freeMarkerVariables: string[] | undefined = this.variables.get("freemarker");
-            let settingMatch: RegExpExecArray | null = regSetting.exec(declaration);
-            while (settingMatch != null) {
-                settingName = settingMatch[0];
-                start = line.indexOf(declaration) + settingMatch.index;
-                end = start + settingName.length;
-                if (freeMarkerVariables === undefined || !freeMarkerVariables.includes(settingName) &&
-                    !/\d+/.test(settingName)) {
-                    this.result.push(createDiagnostic(
-                        Range.create(
-                            this.currentLineNumber, start,
-                            this.currentLineNumber, end,
-                        ),
-                        unknownToken(settingName),
-                    ));
-                }
-                settingMatch = regSetting.exec(declaration);
-            }
         }
     }
 
@@ -546,10 +506,6 @@ export class Validator {
                 if (this.areWeIn("for")) {
                     this.validateFor();
                 }
-            }
-            this.match = /(^\s*)<#(?:assign|list\s+(\w+)\s+as)\s+(\w+)/i.exec(line);
-            if (this.match !== null) {
-                this.handleFreemarker();
             }
             this.match = /(^\s*\[)(\w+)\s*$/.exec(line);
             if (this.match !== null) {
@@ -771,38 +727,6 @@ export class Validator {
     }
 
     /**
-     * Adds new variables to the corresponding map,
-     * Checks if a variable is used before the definition
-     */
-    private handleFreemarker(): void {
-        if (this.match == null) {
-            return;
-        }
-        // Initialize
-        const line: string = this.getCurrentLine();
-        let freeMarkerVariables: string[] | undefined = this.variables.get("freemarker");
-        if (freeMarkerVariables === undefined) {
-            freeMarkerVariables = [];
-            this.variables.set("freemarker", freeMarkerVariables);
-        }
-
-        // Handle undefined variable used in <#list _here_ as
-        const listVariable: string | undefined = this.match[2];
-        if (listVariable !== undefined && !freeMarkerVariables.includes(listVariable)) {
-            this.result.push(createDiagnostic(
-                Range.create(
-                    this.currentLineNumber, line.indexOf(listVariable),
-                    this.currentLineNumber, line.indexOf(listVariable) + listVariable.length,
-                ),
-                unknownToken(listVariable),
-            ));
-        }
-
-        this.match = /(^\s*<#(?:assign|list\s+\w+\s+as)\s+)(\w+)/i.exec(line);
-        this.addToStringMap(this.variables, "freemarker");
-    }
-
-    /**
      * Adds new variable to corresponding map,
      * Pushes a new keyword to the keyword stack
      * If necessary (`list hello = value1, value2` should not be closed)
@@ -963,8 +887,6 @@ export class Validator {
 
         if (setting.name === "urlparameters") {
             this.findUrlParams();
-        } else {
-            this.checkFreemarkerValue();
         }
         // Aliases
         if (setting.name === "alias") {
