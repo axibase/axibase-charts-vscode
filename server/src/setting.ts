@@ -206,6 +206,9 @@ export class Setting {
         if (this.section != null && this.section !== "") {
             result += `Allowed in section: ${this.section}  \n`;
         }
+        if (this.widget != null && this.widget !== "") {
+            result += `Allowed in widget: ${this.widget}  \n`;
+        }
 
         return result;
     }
