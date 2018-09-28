@@ -230,7 +230,8 @@ Maximum depth of the hierarchy is default.
 
 ## dialogmaximize
 
-If enabled, the dialog window is expanded to the entire portal page.<br>Dialog window can be opened by clicking on the widget header.
+If enabled, the dialog window is expanded to the entire portal page.
+Dialog window can be opened by clicking on the widget header.
 
 ## disablealert
 
