@@ -177,7 +177,6 @@ export class Setting {
 
     public toString(): string {
         // TODO: describe a script which is allowed as the setting value
-        // TODO: describe a widget where the setting is allowed
         if (this.description == null) {
             return "";
         }
