@@ -220,6 +220,7 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
  * @param password the target user's password
  */
 function performRequest(address: string, username?: string, password?: string): Promise<[string[], boolean]> {
+    const timeout: number = 3000; // milliseconds (3 s)
     const url: URL = new URL(address);
     const headers: OutgoingHttpHeaders = (username && password) ? {
         "Authorization": `Basic ${new Buffer(`${username}:${password}`).toString("base64")}`,
@@ -235,7 +236,7 @@ function performRequest(address: string, username?: string, password?: string): 
         port: url.port,
         protocol: url.protocol,
         rejectUnauthorized: false, // allows self-signed certificates
-        timeout: 3000, // milliseconds (3 s)
+        timeout,
     };
     options.headers = headers;
     const request: (options: RequestOptions | string | URL, callback?: (res: IncomingMessage) => void)
@@ -245,6 +246,9 @@ function performRequest(address: string, username?: string, password?: string): 
         (resolve: (result: [string[], boolean]) => void, reject: (err: Error) => void): void => {
             const clientRequest: ClientRequest = request(options, (res: IncomingMessage) => {
                 handleResponse(res, resolve, reject);
+            });
+            clientRequest.on("socket", () => {
+                clientRequest.setTimeout(timeout);
             });
             clientRequest.on("timeout", () => {
                 clientRequest.abort();
