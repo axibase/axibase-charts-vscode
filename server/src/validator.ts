@@ -1048,11 +1048,11 @@ export class Validator {
                 break;
             }
             case "var": {
-                let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
-                let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
+                const openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+                const closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
                 if (openBrackets) {
-                    if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
-                        closeBrackets.map(s => s.trim()).join("").length
+                    if (closeBrackets && openBrackets.map((s: string) => s.trim()).join("").length !==
+                        closeBrackets.map((s: string) => s.trim()).join("").length
                         || closeBrackets === null) {
                         // multiline var
                         this.keywordsStack.push(this.foundKeyword);
