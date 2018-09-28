@@ -8,8 +8,6 @@ import {
 import { request as https, RequestOptions } from "https";
 import { join } from "path";
 import { URL } from "url";
-// tslint:disable-next-line:no-require-imports
-import urlRegex = require("url-regex");
 import {
     commands,
     ConfigurationChangeEvent,
@@ -169,14 +167,6 @@ export const deactivate: () => Thenable<void> = (): Thenable<void> => {
 };
 
 /**
- * Ensures the provided URL is valid
- * @param url the URL to be validated
- */
-const validateUrl: (url: string) => boolean = (url: string): boolean =>
-    urlRegex({exact: true, strict: true})
-        .test(url);
-
-/**
  * Constructs connection details based on the extension configuration and an input box
  */
 const constructConnection: () => Promise<IConnectionDetails> = async (): Promise<IConnectionDetails> => {
@@ -193,12 +183,7 @@ const constructConnection: () => Promise<IConnectionDetails> = async (): Promise
     if (!port) {
         return Promise.reject(errorMessage);
     }
-
     const url: string = `${protocol}://${address}:${port}`;
-    if (!validateUrl(url)) {
-        return Promise.reject(`"${url}" is invalid`);
-    }
-
     let password: string | undefined;
     const username: string | undefined = config.get("username");
     if (username) {
