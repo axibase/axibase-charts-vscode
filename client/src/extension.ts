@@ -244,32 +244,50 @@ function performRequest(address: string, username?: string, password?: string): 
 
     return new Promise<[string[], boolean]>(
         (resolve: (result: [string[], boolean]) => void, reject: (err: Error) => void): void => {
-            const outgoing: OutgoingMessage = request(options, (res: IncomingMessage) => {
-                res.on("error", reject);
-                const family: StatusFamily = statusFamily(res.statusCode);
-                if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
-                    if (res.statusCode === 401) {
-                        return reject(new Error(`Login failed with status code ${res.statusCode}`));
-                    } else {
-                        return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
-                    }
-                }
-                const cookies: string[] | undefined = res.headers["set-cookie"];
-                if (!cookies || cookies.length < 1) {
-                    return reject(new Error("Cookie is empty"));
-                }
-                const server: string | string[] | undefined = res.headers.server;
-                let atsd: boolean;
-                if (!server || Array.isArray(server)) {
-                    atsd = false;
-                } else {
-                    const lowerCased: string = server.toLowerCase();
-                    atsd = lowerCased.includes("atsd");
-                }
-                resolve([cookies, atsd]);
+            const clientRequest: ClientRequest = request(options, (res: IncomingMessage) => {
+                handleResponse(res, resolve, reject);
             });
+            clientRequest.on("timeout", () => {
+                clientRequest.abort();
+                reject(new Error("timeout"));
+            });
+            clientRequest.on("error", reject);
+            clientRequest.end();
+        },
+    );
+}
 
-            outgoing.on("error", reject);
-            outgoing.end();
-        });
+/**
+ * Processes the incoming message
+ * @param res the incoming message
+ * @param resolve callback on success
+ * @param reject callback on error
+ */
+function handleResponse(
+    res: IncomingMessage,
+    resolve: (result: [string[], boolean]) => void,
+    reject: (err: Error) => void,
+): void {
+    res.on("error", reject);
+    const family: StatusFamily = statusFamily(res.statusCode);
+    if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
+        if (res.statusCode === 401) {
+            return reject(new Error(`Login failed with status code ${res.statusCode}`));
+        } else {
+            return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
+        }
+    }
+    const cookies: string[] | undefined = res.headers["set-cookie"];
+    if (!cookies || cookies.length < 1) {
+        return reject(new Error("Cookie is empty"));
+    }
+    const server: string | string[] | undefined = res.headers.server;
+    let atsd: boolean;
+    if (!server || Array.isArray(server)) {
+        atsd = false;
+    } else {
+        const lowerCased: string = server.toLowerCase();
+        atsd = lowerCased.includes("atsd");
+    }
+    resolve([cookies, atsd]);
 }
