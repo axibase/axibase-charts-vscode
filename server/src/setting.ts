@@ -83,6 +83,7 @@ export class Setting {
     public readonly script?: Script;
     public readonly section?: string;
     public readonly type: string = "";
+    public readonly widget?: string;
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
         this.enum = this.enum.map((v: string): string => v.toLowerCase());
