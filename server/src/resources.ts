@@ -24,7 +24,7 @@ function readDescriptions(): Map<string, string> {
     const content: string = readFileSync(descriptionsPath, "UTF-8");
     const map: Map<string, string> = new Map();
     // ## settingname\n\nsetting description[url](hello#html)\n
-    const regExp: RegExp = /\#\# ([a-z]+?)\n\n([^\s#][\S\s]+?)\n(?:\n(?=\#)|$)/g;
+    const regExp: RegExp = /\#\# ([a-z]+?)  \n  \n([^\s#][\S\s]+?)  (?=\n  (?:\n(?=\#)|$))/g;
     let match: RegExpExecArray | null = regExp.exec(content);
     while (match !== null) {
         const [, name, description] = match;
