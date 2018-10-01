@@ -5,7 +5,7 @@ import {
     request as http,
 } from "http";
 import { request as https, RequestOptions } from "https";
-import { join } from "path";
+import { join, basename } from "path";
 import { URL } from "url";
 import {
     commands,
@@ -107,11 +107,17 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
         }
     }));
     context.subscriptions.push(commands.registerCommand(`${languageId}.showPortal`, async (): Promise<void> => {
+        let tabLabel = "Preview Portal";
+        if (!window.activeTextEditor) {
+            return Promise.resolve();
+        }
+        const document: TextDocument = window.activeTextEditor.document;
+
+        if (document.uri) {
+            tabLabel = `Preview ${basename(document.uri.fsPath)}`;
+        }
+
         if (!provider) {
-            if (!window.activeTextEditor) {
-                return Promise.resolve();
-            }
-            const document: TextDocument = window.activeTextEditor.document;
             if (document.languageId !== languageId) {
                 return Promise.resolve();
             }
@@ -123,13 +129,14 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
 
                 return Promise.resolve();
             }
+
             provider = new AxibaseChartsProvider(details, document, context.asAbsolutePath);
 
             context.subscriptions.push(workspace.registerTextDocumentContentProvider("axibaseCharts", provider));
             provider.update();
         }
 
-        commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, "Portal");
+        commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, tabLabel);
     }));
     context.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent): Promise<void> => {
