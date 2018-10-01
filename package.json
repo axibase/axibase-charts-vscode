@@ -2,8 +2,8 @@
   "name": "axibasecharts-syntax",
   "displayName": "Axibase Charts",
   "description": "Axibase Charts syntax validation and highlighting extension",
-  "author": "Kirill Kamakin",
-  "version": "1.0.8",
+  "author": "Axibase DEV",
+  "version": "1.0.9",
   "license": "Apache-2.0",
   "icon": "images/icon.png",
   "repository": {
@@ -122,10 +122,10 @@
     "test:e2e": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
-    "@types/node": "^10.9.4",
     "@types/mocha": "^5.2.0",
+    "@types/node": "^10.11.2",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "typescript": "^3.1.1"
   },
   "dependencies": {
     "js-priority-queue": "^0.1.5"
