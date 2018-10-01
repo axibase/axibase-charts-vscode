@@ -83,6 +83,7 @@ export class Setting {
     public readonly script?: Script;
     public readonly section?: string;
     public readonly type: string = "";
+    public readonly widget?: string;
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
         this.enum = this.enum.map((v: string): string => v.toLowerCase());
@@ -97,6 +98,7 @@ export class Setting {
      * @param name name of the setting which is used by user
      */
     public checkType(value: string, range: Range, name: string, _widget?: string): Diagnostic | undefined {
+        // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions
         if (Setting.calculatedRegExp.test(value)) {
@@ -169,6 +171,46 @@ export class Setting {
             default: {
                 throw new Error(`${this.type} is not handled`);
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * Generates a string containing fully available information about the setting
+     */
+    public toString(): string {
+        // TODO: describe a script which is allowed as the setting value
+        if (this.description == null) {
+            return "";
+        }
+        let result: string = `${this.description}  \n\n`;
+        if (this.example != null && this.example !== "") {
+            result += `Example: ${this.displayName} = ${this.example}  \n`;
+        }
+        if (this.type != null && this.type !== "") {
+            result += `Type: ${this.type}  \n`;
+        }
+        if (this.defaultValue != null && this.defaultValue !== "") {
+            result += `Default value: ${this.defaultValue}  \n`;
+        }
+        if (this.enum == null && this.enum.length === 0) {
+            result += `Possible values: ${this.enum.join()}  \n`;
+        }
+        if (this.excludes != null && this.excludes.length !== 0) {
+            result += `Can not be specified with: ${this.excludes.join()}  \n`;
+        }
+        if (this.maxValue != null && this.maxValue !== Infinity) {
+            result += `Maximum: ${this.maxValue}  \n`;
+        }
+        if (this.minValue != null && this.minValue !== -Infinity) {
+            result += `Minimum: ${this.minValue}  \n`;
+        }
+        if (this.section != null && this.section !== "") {
+            result += `Allowed in section: ${this.section}  \n`;
+        }
+        if (this.widget != null && this.widget !== "") {
+            result += `Allowed in widget: ${this.widget}  \n`;
         }
 
         return result;

@@ -37,12 +37,12 @@ export class HoverProvider {
         const word: string = this.text.substring(range.start, range.end);
         const name: string = Setting.clearSetting(word);
         const setting: Setting | undefined = getSetting(name);
-        if (setting == null) {
+        if (setting == null || setting.description == null) {
             return null;
         }
 
         return {
-            contents: setting.description,
+            contents: setting.toString(),
             range: Range.create(this.offsetToPosition(range.start), this.offsetToPosition(range.end)),
         };
     }
