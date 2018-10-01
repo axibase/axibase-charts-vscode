@@ -99,17 +99,12 @@ export class JsDomCaller {
     /**
      * Calls corresponding processor for all found JavaScript statements 
      * in this.document to prepare diagnostic if required
-     * @param validateAll if `false`, validates var only
+     * @param validateAll if `false`, validates "var" only
      */
     private parseJsStatements(validateAll: boolean): void {
         for (; this.currentLineNumber < this.lines.length; this.currentLineNumber++) {
             const line: string = this.getCurrentLine();
             if (validateAll) {
-                this.match = /^\s*script/.exec(line);
-                if (this.match) {
-                    this.processScript();
-                    continue;
-                }
                 this.match = /^\s*import\s+(\S+)\s*=.+/.exec(line);
                 if (this.match) {
                     this.imports.push(this.match[1]);
@@ -131,6 +126,11 @@ export class JsDomCaller {
                     this.processOptions();
                     continue;
                 }
+            }
+            this.match = /^\s*script/.exec(line);
+            if (this.match) {
+                this.processScript(validateAll);
+                continue;
             }
             this.match = /^\s*var\s*\w+\s*=/.exec(line);
             if (this.match) {
@@ -173,7 +173,10 @@ export class JsDomCaller {
         this.queue.queue(statement);
     }
 
-    private processScript(): void {
+    /**
+     * @param validateScript if `false`, just skip script lines to ingnore "var" inside
+     */
+    private processScript(validateScript: boolean): void {
         let line: string | undefined = this.getCurrentLine();
         let content: string = "";
         let range: Range;
@@ -196,19 +199,21 @@ export class JsDomCaller {
                 character: line.length, line: this.currentLineNumber - 1,
             };
         }
-        let jsInOrbTags: RegExpMatchArray | null = content.match(/(\@\{)(.*)(?=\})/)
-        if (jsInOrbTags) {
-            content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
+        if (validateScript) {
+            let jsInOrbTags: RegExpMatchArray | null = content.match(/(\@\{)(.*)(?=\})/)
+            if (jsInOrbTags) {
+                content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
+            }
+            let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
+            let priority: number = 0;
+            if (userDefinedFunction) {
+                priority = JsDomCaller.priorityMap.get("script");
+            }
+            const statement: TextRange = new TextRange(`${content};\n`,
+                range, priority
+            );
+            this.queue.queue(statement);
         }
-        let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
-        let priority: number = 0;
-        if (userDefinedFunction) {
-            priority = JsDomCaller.priorityMap.get("script");
-        }
-        const statement: TextRange = new TextRange(`${content};\n`,
-            range, priority
-        );
-        this.queue.queue(statement);
     }
 
     private processValue(): void {
