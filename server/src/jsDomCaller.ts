@@ -1,8 +1,8 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic, deleteComments } from "./util";
-import PriorityQueue from "ts-priority-queue";
 import { DOMWindow, JSDOM } from "jsdom";
 import { TextRange } from "./textRange";
+const PriorityQueue = require("js-priority-queue");
 
 export class JsDomCaller {
 

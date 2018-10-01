@@ -128,6 +128,6 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "ts-priority-queue": "^0.1.1"
+    "js-priority-queue": "^0.1.5"
   }
 }
