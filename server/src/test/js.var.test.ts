@@ -81,7 +81,7 @@ endvar`,
 "abc"
 endvar`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(1, "var v = [".length)),
-                "Unexpected token }", DiagnosticSeverity.Warning,
+                "Unexpected token ;", DiagnosticSeverity.Warning,
             )]
         ),
         new Test(
