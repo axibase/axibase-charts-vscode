@@ -2,6 +2,9 @@ import { DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
+const deprecationMessage: string = `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
+    `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`
+
 suite("Freemarker templates", () => {
     new Test("Freemarker assign rises warning on open and close tags",
         `
@@ -12,12 +15,12 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(1, 4, 1, 32),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
             createDiagnostic(
                 Range.create(3, 4, 3, 14),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],
@@ -32,12 +35,12 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(1, 4, 1, 22),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
             createDiagnostic(
                 Range.create(3, 4, 3, 12),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],
@@ -52,12 +55,12 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(1, 4, 1, 19),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
             createDiagnostic(
                 Range.create(3, 4, 3, 10),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],
@@ -74,17 +77,17 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(1, 4, 1, 19),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
             createDiagnostic(
                 Range.create(3, 4, 3, 11),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
             createDiagnostic(
                 Range.create(5, 4, 5, 10),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],
@@ -98,7 +101,7 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(1, 4, 1, 22),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],
@@ -112,7 +115,7 @@ suite("Freemarker templates", () => {
         [
             createDiagnostic(
                 Range.create(2, 4, 2, 12),
-                "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
+                deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
         ],

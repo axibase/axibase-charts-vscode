@@ -20,11 +20,11 @@ Enclose the tag name in double quotes in case it contains special characters.
   "my column" = my value
 `;
 export const settingsWithWhitespaces: MessageFactoryMethod = (found: string): string =>
-    `The setting ${found} contains inner whitespaces. Remove spaces or replace spaces with hyphens.`;
+    `The setting "${found}" contains whitespaces.\nReplace spaces with hyphens.`;
 
 export const tagNameWithWhitespaces: MessageFactoryMethod = (found: string): string =>
     `The tag name ${found} contains whitespaces. Wrap it in double quotes.`;
 
 export const settingNameInTags: MessageFactoryMethod = (found: string): string =>
-`${found} is interpreted as a series tag and is sent to the server. Remove the setting from the [tags] section or ` +
-"enclose it double-quotes to suppress the warning.";
+`${found} is interpreted as a series tag and is sent to the\nserver. Move the setting outside of the [tags] section or\n` +
+"enclose in double-quotes to send it to the server without\na warning.";
