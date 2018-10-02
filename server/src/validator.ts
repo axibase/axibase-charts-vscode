@@ -381,6 +381,9 @@ export class Validator {
                 `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`,
                 DiagnosticSeverity.Information,
             ));
+            if (this.match = /(as\s*(\S+)>)/.exec(line)) {
+                this.addToStringArray(this.aliases);
+            }
         }
     }
 
@@ -528,13 +531,18 @@ export class Validator {
         const line: string = this.getCurrentLine();
         const regexp: RegExp = /value\((['"])(\S+?)\1\)/g;
         const deAliasPosition: number = 2;
-        this.match = regexp.exec(line);
-        while (this.match !== null) {
-            this.deAliases.push(new TextRange(this.match[deAliasPosition], Range.create(
-                this.currentLineNumber, this.match.index + "value('".length,
-                this.currentLineNumber, this.match.index + "value('".length + this.match[deAliasPosition].length,
+        let freemarkerExpr: RegExpExecArray | null;
+        let deAlias: string;
+        while ((this.match = regexp.exec(line)) !== null) {
+            deAlias = this.match[deAliasPosition];
+            if (freemarkerExpr = /(\$\{(\S+)\})/.exec(deAlias)) {
+                // extract "lpar" from value('${lpar}PX')
+                deAlias = freemarkerExpr[deAliasPosition];
+            }
+            this.deAliases.push(new TextRange(deAlias, Range.create(
+                this.currentLineNumber, line.indexOf(deAlias),
+                this.currentLineNumber, line.indexOf(deAlias) + deAlias.length,
             )));
-            this.match = regexp.exec(line);
         }
     }
 
