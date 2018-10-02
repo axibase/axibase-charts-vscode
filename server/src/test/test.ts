@@ -75,7 +75,7 @@ export class Test {
             assert.deepStrictEqual(new HoverProvider(this.document).provideHover(this.position), this.expected);
         });
     }
-    
+
     /**
      * Tests JsDomCaller (JavaScript statements, including var)
      */
