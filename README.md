@@ -40,6 +40,8 @@ Include VSCode and extension version when opening issues on Github.
 
 Build portals with [Axibase Charts](https://github.com/axibase/charts/blob/master/README.md).
 
+> Create files with the extension `.config`.
+
 To display available completions, press `Ctrl+Space` on PC or `⌃Space` on Mac.
 
   ![Completion list screenshot](./images/completion.png)
