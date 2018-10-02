@@ -127,4 +127,52 @@ suite("Freemarker templates", () => {
         `,
         [],
     ).validationTest();
+
+    new Test("De-alias doesn't raise an error",
+        `value = 0 <#list sid[1]?split(",") as lpar> + value('\$\{lpar\}:PX')</#list>`,
+        [createDiagnostic(
+            Range.create(0, 10, 0, 43),
+            deprecationMessage,
+            DiagnosticSeverity.Information,
+        )],
+    ).validationTest();
+
+    new Test("Alias doesn't exist, error",
+        `value = 0 <#list sid[1]?split(",") as lpar> + value('\${lpr}:PX')</#list>`,
+        [
+            createDiagnostic(
+                Range.create(0, 10, 0, 43),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(0, `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{`.length, 0,
+                    `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{lpr`.length),
+                "lpr is unknown.",
+                DiagnosticSeverity.Error,
+            )
+        ],
+    ).validationTest();
+
+    new Test("No issues except warning",
+    `<#list lpars as lpar>
+[widget]
+type = chart
+title = [$\{lpar[2]}] [CEC agent:- $\{lpar[0]}] [Frame:- \${lpar[1]}]
+timespan = 7 day    
+</#list>
+    `,
+    [
+        createDiagnostic(
+            Range.create(0, 0, 0, 21),
+            deprecationMessage,
+            DiagnosticSeverity.Information,
+        ),
+        createDiagnostic(
+            Range.create(5, 0, 5, 8),
+            deprecationMessage,
+            DiagnosticSeverity.Information,
+        )
+    ],
+).validationTest();
 });
