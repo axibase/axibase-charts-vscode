@@ -189,9 +189,9 @@ export class JsDomCaller {
                 content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
             }
             let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
-            let priority: number = PRIORITIES.LOW;
+            let priority: number = CheckPriority.Low;
             if (userDefinedFunction) {
-                priority = PRIORITIES.HIGH;
+                priority = CheckPriority.High;
             }
             const statement: TextRange = new TextRange(`${content};\n`,
                 range, priority

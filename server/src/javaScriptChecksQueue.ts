@@ -24,7 +24,7 @@ export class JavaScriptChecksQueue {
     }
 
     public queue(statement: TextRange) {
-        if (statement.priority === PRIORITIES.HIGH) {
+        if (statement.priority === CheckPriority.High) {
             this.primarilySettings.push(statement);
         } else {
             this.simpleSettings.push(statement);
