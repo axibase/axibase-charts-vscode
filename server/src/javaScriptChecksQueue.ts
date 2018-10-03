@@ -1,8 +1,7 @@
 import { TextRange } from "./textRange";
 
-export class PriorityQueue {
+export class JavaScriptChecksQueue {
 
-    private currentIndex: number = 0;
     /**
      * for example, window.roundToTen = ...
      */
@@ -14,25 +13,18 @@ export class PriorityQueue {
     private simpleSettings: TextRange[] = [];
 
     public dequeue(): TextRange {
-        let target: TextRange;
         if (this.hasElements()) {
-            if (this.primarilySettings.length !== 0 && (this.currentIndex < this.primarilySettings.length)) {
-                target = this.primarilySettings[this.currentIndex];
-            } else {
-                target = this.simpleSettings[this.currentIndex - this.primarilySettings.length];
-            }
-            this.currentIndex++;
-            return target;
+            return this.primarilySettings.shift() || this.simpleSettings.shift();
         }
         throw new Error("PriorityQueue is empty.");
     }
 
     public hasElements(): boolean {
-        return this.currentIndex !== (this.primarilySettings.length + this.simpleSettings.length);
+        return (this.primarilySettings.length !== 0) || (this.simpleSettings.length !== 0);
     }
 
     public queue(statement: TextRange) {
-        if (statement.priority === 2) {
+        if (statement.priority === PRIORITIES.HIGH) {
             this.primarilySettings.push(statement);
         } else {
             this.simpleSettings.push(statement);

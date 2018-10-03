@@ -2,19 +2,7 @@ import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic, deleteComments } from "./util";
 import { DOMWindow, JSDOM } from "jsdom";
 import { TextRange } from "./textRange";
-import { PriorityQueue } from "./priorityqueue";
-
-
-/**
- * Used in PriorityQueue to ensure that the udf is placed earlier than it's first call
- */
-const enum priorityMap {
-    script = 2,
-    var = 1,
-    value = 1,
-    options = 1,
-    replaceValue = 1
-}
+import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 
 export class JsDomCaller {
 
@@ -24,7 +12,7 @@ export class JsDomCaller {
     private readonly lines: string[];
     private match: RegExpExecArray | null | undefined;
     private toEvaluate: string = "";
-    private readonly queue: PriorityQueue = new PriorityQueue();
+    private readonly queue: JavaScriptChecksQueue = new JavaScriptChecksQueue();
 
     public constructor(text: string) {
         this.lines = deleteComments(text)
@@ -85,7 +73,6 @@ export class JsDomCaller {
         if (line === undefined) {
             throw new Error("this.currentLineNumber points to nowhere");
         }
-
         return line;
     }
 
@@ -148,7 +135,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), priorityMap.options
+            )
         );
         this.queue.queue(statement);
     }
@@ -165,7 +152,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), priorityMap.replaceValue
+            )
         );
         this.queue.queue(statement);
     }
@@ -202,9 +189,9 @@ export class JsDomCaller {
                 content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
             }
             let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
-            let priority: number = 0;
+            let priority: number = PRIORITIES.LOW;
             if (userDefinedFunction) {
-                priority = priorityMap.script;
+                priority = PRIORITIES.HIGH;
             }
             const statement: TextRange = new TextRange(`${content};\n`,
                 range, priority
@@ -232,7 +219,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), priorityMap.value
+            )
         );
         this.queue.queue(statement);
     }
@@ -263,8 +250,8 @@ export class JsDomCaller {
             }
         }
         const statement: TextRange = new TextRange(`${this.match[0]}(function(getTags, getSeries, getMetrics, getEntities, range)` +
-            `{ return ${content.substring(this.match[0].length)}; })(${this.generateCall(5, "new Function()")});\n`,
-            range, priorityMap.var
+            `{ return ${content.substring(this.match[0].length)}; })
+            (${this.generateCall(5, "new Function()")});\n`, range
         );
         this.queue.queue(statement);
     }

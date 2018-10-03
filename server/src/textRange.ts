@@ -66,7 +66,7 @@ export class TextRange {
     /**
      * Priority of the text, used in jsDomCaller: settings with higher priority are placed earlier in test js "file"
      */
-    public readonly priority: number = 0;
+    public readonly priority: number = PRIORITIES.LOW;
 
     /**
      * Position of the text
