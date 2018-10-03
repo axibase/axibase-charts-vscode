@@ -5,7 +5,7 @@ import {
     request as http,
 } from "http";
 import { request as https, RequestOptions } from "https";
-import { join, basename } from "path";
+import { join } from "path";
 import { URL } from "url";
 import {
     commands,
