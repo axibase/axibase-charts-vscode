@@ -9,7 +9,14 @@ export class Setting {
      * @returns cleared string
      */
     public static clearSetting: (str: string) => string = (str: string): string => str.toLowerCase()
-        .replace(/[^a-z]/g, "")
+        .replace(/[^a-z]/g, "");
+    /**
+     * Lowercases the value of setting
+     * @param str string to be cleared
+     * @returns cleared string
+     */
+    public static clearValue: (str: string) => string = (str: string): string => str.toLowerCase();
+
     private static readonly booleanKeywords: string[] = [
         "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
     ];

@@ -125,16 +125,15 @@ export class Validator {
             this.currentLineNumber++;
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber);
 
-            if (this.isKeywordEnd("script")) {
+            if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
+                // lines in multiline script and var sections will be cheked in jsDomCaller.processScript() and processVar()
                 continue;
             }
-            if (this.isKeywordEnd("csv")) {
+            if (this.isNotKeywordEnd("csv")) {
                 this.validateCsv();
             }
-            if (!this.areWeIn("var")) {
-                // lines in multiline var section will be cheked in jsDomCaller.processVar()
-                this.eachLine();
-            }
+
+            this.eachLine();
 
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
@@ -156,7 +155,7 @@ export class Validator {
      * Checks whether has the keyword ended or not
      * @param keyword keyword which is expected to end
      */
-    private isKeywordEnd(keyword: string): boolean {
+    private isNotKeywordEnd(keyword: string): boolean {
         return this.areWeIn(keyword) && (this.foundKeyword === undefined || this.foundKeyword.text !== `end${keyword}`);
     }
 
@@ -180,7 +179,7 @@ export class Validator {
             throw new Error("Trying to add new entry to settingValue map based on undefined");
         }
         const name: string = Setting.clearSetting(this.match[2]);
-        const value: string = Setting.clearSetting(this.match[3]);
+        const value: string = Setting.clearValue(this.match[3]);
         this.settingValues.set(name, value);
     }
 
@@ -491,7 +490,7 @@ export class Validator {
     private eachLine(): void {
         this.checkFreemarker();
         const line: string = this.getCurrentLine();
-        this.match = /(^[\t ]*\[)(\w+)\][\t ]*/.exec(line);
+        this.match = /(^[\t ]*\[)(\w+)\][\t ]*/.exec(line); // section declaration, for example, [widget]
         if (this.match !== null ||
             (line.trim().length === 0 && this.currentSection !== undefined && this.currentSection.text === "tags")
         ) {
@@ -500,7 +499,7 @@ export class Validator {
             }
             this.handleSection();
         } else {
-            this.match = /(^\s*)([a-z].*?[a-z])\s*=\s*(.+?)\s*$/.exec(line);
+            this.match = /(^\s*)([a-z].*?[a-z])\s*=\s*(.+?)\s*$/.exec(line); // for example, width-units = 6.2
             if (this.match !== null) {
                 this.checkSettingsWhitespaces();
                 this.handleSettings();
@@ -873,6 +872,46 @@ export class Validator {
             const table: Setting | undefined = getSetting("table");
             if (table !== undefined) {
                 this.requiredSettings.push([table]);
+            }
+        }
+
+        if (setting.name === "colors") {
+            let thresholdsValue: string = this.settingValues.get("thresholds");
+            let colorsValue: string = this.settingValues.get("colors");
+            if (thresholdsValue) {
+                if (colorsValue.split(",").length !== (thresholdsValue.split(",").length - 1)) {
+                    let message: string = `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`;
+                    this.result.push(createDiagnostic(Range.create(
+                        this.currentLineNumber, line.indexOf(colorsValue),
+                        this.currentLineNumber, line.indexOf(colorsValue) + colorsValue.length,
+                    ), message));
+                }
+            } else {
+                let message: string = `"thresholds" are required if "colors" are specified`;
+                this.result.push(createDiagnostic(Range.create(
+                    this.currentLineNumber, line.indexOf("colors"),
+                    this.currentLineNumber, line.indexOf("colors") + "colors".length,
+                ), message));
+            }
+        }
+
+        if (setting.name === "thresholds") {
+            const index = this.result.findIndex(x => x.message === `"thresholds" are required if "colors" are specified`);
+            if (index > -1) {
+                this.result.splice(index, 1);
+            }
+            let colorsValue: string = this.settingValues.get("colors");
+            let thresholdsValue: string = this.settingValues.get("thresholds");
+            if (colorsValue) {
+                if (colorsValue.split(",").length !== (thresholdsValue.split(",").length - 1)) {
+                    this.result.push(createDiagnostic(
+                        Range.create(
+                            this.currentLineNumber, line.indexOf(thresholdsValue),
+                            this.currentLineNumber, line.indexOf(thresholdsValue) + thresholdsValue.length,
+                        ),
+                        `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`,
+                    ));
+                }
             }
         }
 
