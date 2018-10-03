@@ -1069,6 +1069,8 @@ Not supported in all browsers.
 ## selectormode  
   
 Controls how pie segments react to click interaction. Possible Settings: highlight, expand. Highlight – double click highlights the selected pie segment, other segments are greyed out. Expand – double click expands the selected pie segment.  
+
+## series
   
 ## serieslabels  
   

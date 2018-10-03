@@ -5221,6 +5221,13 @@
             ]
         },
         {
+            "displayName": "series",
+            "widget": "graph",
+            "section": ["node", "link"],
+            "type": "string",
+            "example": "series-1"
+        },
+        {
             "displayName": "series-labels",
             "widget": "pie",
             "section": "series",
@@ -6663,7 +6670,6 @@
             "displayName": "style",
             "multiLine": true,
             "type": "string",
-            "multiLine": true,
             "example": "stroke-width: 4; color: green"
         },
         {

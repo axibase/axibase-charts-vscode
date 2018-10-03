@@ -13,11 +13,27 @@
         "description": "Portal configuration setting",
         "properties": {
           "section": {
-            "type": "string",
             "description": "[Optional] Deepest section, where the setting can be applied. Default is global",
-            "enum": [
-              "column", "configuration", "dropdown", "group", "keys", "link", "node", "option", "other", "placeholders",
-              "properties", "property", "series", "tag", "tags", "threshold", "widget"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "column", "configuration", "dropdown", "group", "keys", "link", "node", "option", "other", "placeholders",
+                  "properties", "property", "series", "tag", "tags", "threshold", "widget"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "column", "configuration", "dropdown", "group", "keys", "link", "node", "option", "other", "placeholders",
+                    "properties", "property", "series", "tag", "tags", "threshold", "widget"
+                  ]
+                }
+              }
             ]
           },
           "displayName": {

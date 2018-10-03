@@ -1980,6 +1980,11 @@
         "description": "selector-mode",
         "prefix": "selector-mode"
     },
+    "series": {
+        "body": "series = ${1}\n${0}",
+        "description": "series",
+        "prefix": "series"
+    },
     "series-labels": {
         "body": "series-labels = ${1:inside}\n${0}",
         "description": "series-labels",
