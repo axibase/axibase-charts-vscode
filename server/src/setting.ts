@@ -81,7 +81,7 @@ export class Setting {
     public readonly multiLine: boolean = false;
     public readonly name: string = "";
     public readonly script?: Script;
-    public readonly section?: string;
+    public readonly section?: string | string[];
     public readonly type: string = "";
     public readonly widget?: string;
     public constructor(setting?: Setting) {
@@ -206,7 +206,7 @@ export class Setting {
         if (this.minValue != null && this.minValue !== -Infinity) {
             result += `Minimum: ${this.minValue}  \n`;
         }
-        if (this.section != null && this.section !== "") {
+        if (this.section != null && this.section.length !== 0) {
             result += `Allowed in section: ${this.section}  \n`;
         }
         if (this.widget != null && this.widget !== "") {
