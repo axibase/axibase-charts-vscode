@@ -56,7 +56,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
-        documentSelector: [{ language: languageId, scheme: "file" }],
+        documentSelector: [{ language: languageId }],
         outputChannelName: "Axibase Charts",
         synchronize: {
             // Notify the server about file changes to ".clientrc files contain in the workspace
