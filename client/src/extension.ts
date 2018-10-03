@@ -107,17 +107,12 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
         }
     }));
     context.subscriptions.push(commands.registerCommand(`${languageId}.showPortal`, async (): Promise<void> => {
-        let tabLabel = "Preview Portal";
         if (!window.activeTextEditor) {
             return Promise.resolve();
         }
-        const document: TextDocument = window.activeTextEditor.document;
-
-        if (document.uri) {
-            tabLabel = `Preview ${basename(document.uri.fsPath)}`;
-        }
 
         if (!provider) {
+            const document: TextDocument = window.activeTextEditor.document;
             if (document.languageId !== languageId) {
                 return Promise.resolve();
             }
@@ -135,7 +130,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             context.subscriptions.push(workspace.registerTextDocumentContentProvider("axibaseCharts", provider));
             provider.update();
         }
-
+        const tabLabel = "Preview Portal";
         commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, tabLabel);
     }));
     context.subscriptions.push(
