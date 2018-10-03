@@ -3,6 +3,7 @@ import { createDiagnostic, deleteComments } from "./util";
 import { DOMWindow, JSDOM } from "jsdom";
 import { TextRange } from "./textRange";
 import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
+import { CheckPriority } from "./checkPriority";
 
 export class JsDomCaller {
 
