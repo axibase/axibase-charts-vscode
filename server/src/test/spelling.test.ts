@@ -19,24 +19,6 @@ suite("Spelling checks", () => {
             ],
         ),
         new Test(
-            "section eries",
-            `[eries]
-	starttime = 2018`,
-            [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[eries".length)),
-                unknownToken("eries"),
-            )],
-        ),
-        new Test(
-            "section starttime",
-            `[starttime]
-	starttime = 2018`,
-            [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[starttime".length)),
-                unknownToken("starttime"),
-            )],
-        ),
-        new Test(
             "tags ignored",
             `[tags]
 	startime = 2018`,
@@ -50,13 +32,10 @@ suite("Spelling checks", () => {
 	startime = 2018`,
             [
                 createDiagnostic(
-                    Range.create(Position.create(2, "[".length), Position.create(2, "[starttime".length)),
-                    unknownToken("starttime"),
-                ),
-                createDiagnostic(
                     Range.create(Position.create(3, "	".length), Position.create(3, " ".length + "startime".length)),
                     unknownToken("startime"),
-                )],
+                )
+            ],
         ),
         new Test(
             "tags ignoring finished with whitespace",

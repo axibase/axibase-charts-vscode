@@ -6,13 +6,14 @@ import {
     tagNameWithWhitespaces,
     unknownToken,
 } from "./messageUtil";
-import { possibleSections, requiredSectionSettingsMap } from "./resources";
+import { requiredSectionSettingsMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import {
     countCsvColumns, createDiagnostic, deleteComments,
     getSetting, isAnyInArray, isInMap, repetitionDiagnostic,
 } from "./util";
+import { SectionStack } from "./sectionStack";
 
 /**
  * Performs validation of a whole document line by line.
@@ -34,6 +35,10 @@ export class Validator {
      * TextRange containing name and position of the current section declaration
      */
     private currentSection?: TextRange;
+    /**
+     * Contains sections hierarchy from configuration
+     */
+    private readonly sectionStack: SectionStack = new SectionStack();
     /**
      * Array of settings declared in current section
      */
@@ -142,11 +147,13 @@ export class Validator {
 
                 this.switchKeyword();
             }
+
         }
 
         this.checkAliases();
         this.diagnosticForLeftKeywords();
-        this.checkPreviousSection();
+        this.checkRequredSettingsForSection();
+        this.setSectionToStack(null);
 
         return this.result;
     }
@@ -389,11 +396,15 @@ export class Validator {
     /**
      * Creates diagnostics if the current section does not contain required settings
      */
-    private checkPreviousSection(): void {
+    private checkRequredSettingsForSection(): void {
         if (this.currentSection === undefined) {
             return;
         }
-        const required: Setting[][] | undefined = requiredSectionSettingsMap.get(this.currentSection.text);
+        const sectionRequirements = requiredSectionSettingsMap.get(this.currentSection.text);
+        if (!sectionRequirements) {
+            return;
+        }
+        const required: Setting[][] | undefined = sectionRequirements.settings;
         if (required !== undefined) {
             this.requiredSettings = required.concat(this.requiredSettings);
         }
@@ -795,7 +806,7 @@ export class Validator {
      * Mostly empties arrays.
      */
     private handleSection(): void {
-        this.checkPreviousSection();
+        this.checkRequredSettingsForSection();
         this.addCurrentToParentSettings();
         if (this.match == null) {
             if (this.previousSection !== undefined) {
@@ -820,6 +831,25 @@ export class Validator {
             this.currentLineNumber, indent.length + name.length,
         ));
         this.parentSettings.delete(this.currentSection.text);
+        this.setSectionToStack(this.currentSection);
+    }
+
+    /**
+     * Attempts to add section to section stack, displays error if section
+     * is out ouf hierarchy, unknown or has unresolved section dependencies
+     * If section is null, finalizes section stack and return summary error
+     * @param section section to add or null
+     */
+    private setSectionToStack(section: TextRange | null): void {
+        let sectionStackError: Diagnostic | null;
+        if (section == null) {
+            sectionStackError = this.sectionStack.finalize();
+        } else {
+            sectionStackError = this.sectionStack.insertSection(this.currentSection);
+        };
+        if (sectionStackError) {
+            this.result.push(sectionStackError);
+        }
     }
 
     /**
@@ -1001,21 +1031,13 @@ export class Validator {
         }
         const indent: number = this.match[1].length;
         const word: string = this.match[2];
-        const dictionary: string[] = possibleSections;
         const range: Range = Range.create(
             Position.create(this.currentLineNumber, indent),
             Position.create(this.currentLineNumber, indent + word.length),
         );
 
-        if (!dictionary.includes(word)) {
-            this.result.push(createDiagnostic(
-                range,
-                unknownToken(word),
-            ));
-        } else {
-            if (word === "tag") {
-                this.result.push(createDiagnostic(range, deprecatedTagSection, DiagnosticSeverity.Warning));
-            }
+        if (word === "tag") {
+            this.result.push(createDiagnostic(range, deprecatedTagSection, DiagnosticSeverity.Warning));
         }
     }
 
