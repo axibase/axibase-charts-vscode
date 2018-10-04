@@ -724,10 +724,17 @@
             "displayName": "class",
             "type": "enum",
             "example": "terminal",
-            "enum": [
-                "terminal"
-            ],
-            "section": "widget"
+            "enum": [""],
+            "section": "widget",
+            "override": {
+                "[widget == 'console']": {
+                    "enum": ["terminal"]
+                    
+                },
+                "[widget == 'box']": {
+                    "enum": ["metro"]
+                }
+            }
         },
         {
             "displayName": "collapsible",

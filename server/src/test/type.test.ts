@@ -919,6 +919,23 @@ For example, 15 minute. Supported units:
   source =message`,
             [],
         ),
+        new Test(
+            "An error is raised if setting value is not valid in current scope",
+            `[configuration]
+[group]
+[widget]
+  type = console
+  class = terminal
+[widget]
+  type = box
+  class = terminal
+            `,
+            [
+                createDiagnostic(
+                    Range.create(7, "  ".length, 7, "  class".length), "class must be one of:\nmetro",
+                ),
+            ],
+        ),
     ];
 
     tests.forEach((test: Test): void => { test.validationTest(); });

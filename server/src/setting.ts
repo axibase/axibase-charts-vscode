@@ -2,6 +2,16 @@ import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { Script } from "./script";
 import { createDiagnostic } from "./util";
 
+export interface SettingScope {
+    widget: string;
+    section: string;
+}
+
+interface OverrideCacheEntry {
+    test(scope: SettingScope): boolean;
+    setting: Partial<Setting>;
+}
+
 export class Setting {
     /**
      * Lowercases the string and deletes non-alphabetic characters
@@ -91,10 +101,46 @@ export class Setting {
     public readonly section?: string | string[];
     public readonly type: string = "";
     public readonly widget?: string;
+    public readonly override?: { [scope: string]: Partial<Setting> };
+
+    private overrideCache: OverrideCacheEntry[] = [];
+
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
         this.enum = this.enum.map((v: string): string => v.toLowerCase());
         this.name = Setting.clearSetting(this.displayName);
+
+        if (this.override) {
+            for (const scope in this.override) {
+                if (this.override.hasOwnProperty(scope)) {
+                    this.overrideCache.push({
+                        setting: this.override[scope],
+                        test: this.getOverrideTest(scope),
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * Create an instance of setting with matching overrides applied.
+     * If no override can be applied returns this insatnce.
+     * @param scope Configuration scope where setting exist
+     */
+    public applyScope(scope: SettingScope): Setting {
+        if (this.override == null) {
+            return this;
+        }
+        let matchingOverrides = this.overrideCache
+            .filter((override) => override.test(scope))
+            .map((override) => override.setting);
+    
+        if (matchingOverrides.length > 0) {
+            let copy = Object.create(Setting.prototype);
+            return Object.assign(copy, this, ...matchingOverrides);
+        } else {
+            return this;
+        }
     }
 
     /**
@@ -221,5 +267,25 @@ export class Setting {
         }
 
         return result;
+    }
+
+    private getOverrideTest(scopeSrc: string): (scope: SettingScope) => boolean {
+        let scopeKeys: Array<keyof SettingScope> = ["widget", "section"];
+        let scopeSrcExtracted = /^\[(.*)\]$/.exec(scopeSrc);
+        if (scopeSrcExtracted == null) {
+            throw new Error("Wrong override scope format");
+        }
+        let source = `return !!(${scopeSrcExtracted[1]});`;
+        let compiledScope = new Function(scopeKeys.join(), source);
+
+        return (scope: SettingScope) => {
+            try {
+                let values = scopeKeys.map((key) => scope[key]);
+
+                return compiledScope.apply(void 0, values);
+            } catch (error) {
+                console.error(`In '${scopeSrc}' :: ${error}`);
+            }
+        };
     }
 }
