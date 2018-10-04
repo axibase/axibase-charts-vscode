@@ -2,20 +2,10 @@ import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic, deleteComments } from "./util";
 import { DOMWindow, JSDOM } from "jsdom";
 import { TextRange } from "./textRange";
-const PriorityQueue = require("js-priority-queue");
+import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
+import { CheckPriority } from "./checkPriority";
 
 export class JsDomCaller {
-
-    /**
-     * Used in PriorityQueue below to ensure that the udf is placed earlier than it's first call
-     */
-    private static readonly priorityMap: Map<string, number> = new Map([
-        ["script", 2],
-        ["var", 1],
-        ["value", 1],
-        ["options", 1],
-        ["replaceValue", 1]
-    ]);
 
     private currentLineNumber: number = 0;
     private importCounter: number = 0;
@@ -23,11 +13,7 @@ export class JsDomCaller {
     private readonly lines: string[];
     private match: RegExpExecArray | null | undefined;
     private toEvaluate: string = "";
-    private readonly queue = new PriorityQueue({
-        comparator: function (a: TextRange, b: TextRange) {
-            return b.priority - a.priority;
-        }
-    });
+    private readonly queue: JavaScriptChecksQueue = new JavaScriptChecksQueue();
 
     public constructor(text: string) {
         this.lines = deleteComments(text)
@@ -59,7 +45,7 @@ export class JsDomCaller {
         const dom: JSDOM = new JSDOM("<html></html>", { runScripts: "outside-only" });
         const window: DOMWindow = dom.window;
         let queueElement: TextRange;
-        while (this.queue.length !== 0) {
+        while (this.queue.hasElements()) {
             queueElement = this.queue.dequeue();
             this.toEvaluate = `${this.toEvaluate}${queueElement.text}`;
             try {
@@ -88,7 +74,6 @@ export class JsDomCaller {
         if (line === undefined) {
             throw new Error("this.currentLineNumber points to nowhere");
         }
-
         return line;
     }
 
@@ -151,7 +136,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), JsDomCaller.priorityMap.get("options")
+            )
         );
         this.queue.queue(statement);
     }
@@ -168,7 +153,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), JsDomCaller.priorityMap.get("replaceValue")
+            )
         );
         this.queue.queue(statement);
     }
@@ -205,9 +190,9 @@ export class JsDomCaller {
                 content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
             }
             let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
-            let priority: number = 0;
+            let priority: number = CheckPriority.Low;
             if (userDefinedFunction) {
-                priority = JsDomCaller.priorityMap.get("script");
+                priority = CheckPriority.High;
             }
             const statement: TextRange = new TextRange(`${content};\n`,
                 range, priority
@@ -235,7 +220,7 @@ export class JsDomCaller {
             Range.create(
                 this.currentLineNumber, matchStart,
                 this.currentLineNumber, matchStart + value.length,
-            ), JsDomCaller.priorityMap.get("value")
+            )
         );
         this.queue.queue(statement);
     }
@@ -266,8 +251,8 @@ export class JsDomCaller {
             }
         }
         const statement: TextRange = new TextRange(`${this.match[0]}(function(getTags, getSeries, getMetrics, getEntities, range)` +
-            `{ return ${content.substring(this.match[0].length)}; })(${this.generateCall(5, "new Function()")});\n`,
-            range, JsDomCaller.priorityMap.get("var")
+            `{ return ${content.substring(this.match[0].length)}; })
+            (${this.generateCall(5, "new Function()")});\n`, range
         );
         this.queue.queue(statement);
     }
