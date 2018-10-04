@@ -38,7 +38,7 @@ export class AxibaseChartsProvider implements TextDocumentContentProvider {
     private url!: string;
 
     public constructor(details: IConnectionDetails, document: TextDocument,
-                       absolutePath: (path: string) => string) {
+        absolutePath: (path: string) => string) {
         if (document.languageId !== languageId) {
             throw new Error("Incorrect language");
         }
@@ -147,10 +147,10 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 	</style>
 	<script>
 	    window.previewOptions = ${JSON.stringify({
-            jsessionid: this.jsessionid,
-            text: this.text,
-            url: this.url,
-        })};
+                jsessionid: this.jsessionid,
+                text: this.text,
+                url: this.url,
+            })};
 	</script>
 	<script src="${this.resource("portal_init.js")}"></script>
 	<script src="${this.extensionPath("resources/js/config_init.js")}"></script>
@@ -171,7 +171,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     /**
      * Adds the ATSD URL to the import statements
      * For example, `import fred = fred.js` becomes
-     * `import fred = https://nur.axibase.com/portal/resource/scripts/fred.js`
+     * `import fred = https://example.com/portal/resource/scripts/fred.js`
      */
     private replaceImports(): void {
         if (!this.text) {
