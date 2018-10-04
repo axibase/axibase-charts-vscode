@@ -1,6 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { Script } from "./script";
 import { createDiagnostic } from "./util";
+import { PossibleValue } from "./possibleValue";
 
 export interface SettingScope {
     widget: string;
@@ -30,13 +31,18 @@ export class Setting {
     private static readonly booleanKeywords: string[] = [
         "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
     ];
-    private static readonly intervalUnits: string[] = [
+
+    private static _intervalUnits: string[] = [
         "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
     ];
 
+    public static get intervalUnits(): string[] {
+        return Setting._intervalUnits;
+    }
+
     private static readonly booleanRegExp: RegExp = new RegExp(`^(?:${Setting.booleanKeywords.join("|")})$`);
 
-    private static readonly calendarKeywords: string[] = [
+    private static _calendarKeywords: string[] = [
         "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
         "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
         "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
@@ -44,6 +50,10 @@ export class Setting {
         "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
         "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
     ];
+
+    public static get calendarKeywords(): string[] {
+        return Setting._calendarKeywords;
+    }
 
     private static readonly calendarRegExp: RegExp = new RegExp(
         // current_day
@@ -86,7 +96,8 @@ export class Setting {
      * @returns true if the string is date expression, false otherwise
      */
     private static readonly isDate: (text: string) => boolean = (text: string): boolean =>
-        Setting.calendarRegExp.test(text) || Setting.localDateRegExp.test(text) || Setting.zonedDateRegExp.test(text)
+        Setting.calendarRegExp.test(text) || Setting.localDateRegExp.test(text) || Setting.zonedDateRegExp.test(text);
+
     public readonly defaultValue?: string | number | boolean;
     public readonly description: string = "";
     public readonly displayName: string = "";
@@ -101,6 +112,8 @@ export class Setting {
     public readonly section?: string | string[];
     public readonly type: string = "";
     public readonly widget?: string;
+    public readonly possibleValues?: PossibleValue[];
+
     public readonly override?: { [scope: string]: Partial<Setting> };
 
     private overrideCache: OverrideCacheEntry[] = [];
@@ -134,7 +147,7 @@ export class Setting {
         let matchingOverrides = this.overrideCache
             .filter((override) => override.test(scope))
             .map((override) => override.setting);
-    
+
         if (matchingOverrides.length > 0) {
             let copy = Object.create(Setting.prototype);
             return Object.assign(copy, this, ...matchingOverrides);

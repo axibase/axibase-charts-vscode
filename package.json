@@ -56,7 +56,8 @@
     "configurationDefaults": {
       "[axibasecharts]": {
         "editor.tabSize": 2,
-        "editor.insertSpaces": true
+        "editor.insertSpaces": true,
+        "editor.snippetSuggestions": "none"
       }
     },
     "languages": [

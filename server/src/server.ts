@@ -137,7 +137,9 @@ connection.onCompletion((params: CompletionParams): CompletionItem[] => {
     return completionProvider.getCompletionItems();
 });
 
-connection.onCompletionResolve((item: CompletionItem): CompletionItem => item);
+connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
+    return item;
+});
 
 // Make the text document manager listen on the connection
 documents.listen(connection);
