@@ -142,6 +142,9 @@ endif
      */
     private completeSetting(settingName: string): CompletionItem[] {
         let setting = getSetting(settingName);
+        if (!setting) {
+            return [];
+        }
         switch (setting.type) {
             case "string": {
                 let valueItems: CompletionItem[] = [];
