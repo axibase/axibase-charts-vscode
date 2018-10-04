@@ -91,6 +91,15 @@
               "description": "A setting, which is excluded"
             }
           },
+          "override": {
+            "patternProperties": {
+              "^\\[.+\\]$": {
+                "$ref": "#/properties/settings/items",
+                "required": []
+              }
+            },
+            "additionalProperties": false
+          },
           "script": {
             "description": "[Optional] Description of this script. Default is null",
             "type": "object",

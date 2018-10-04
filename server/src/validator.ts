@@ -605,7 +605,7 @@ export class Validator {
             return undefined;
         }
         const name: string = this.match[2];
-        const setting: Setting | undefined = getSetting(name);
+        let setting: Setting | undefined = getSetting(name);
         if (setting === undefined) {
             if (TextRange.KEYWORD_REGEXP.test(name)) {
                 return undefined;
@@ -629,6 +629,11 @@ export class Validator {
 
             return undefined;
         }
+
+        setting = setting.applyScope({
+            section: this.currentSection ? this.currentSection.text.trim() : "",
+            widget: this.currentWidget || "",
+        });
 
         return setting;
     }
