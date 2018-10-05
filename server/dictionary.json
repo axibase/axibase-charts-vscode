@@ -4973,8 +4973,8 @@
         },
         {
             "displayName": "refresh-interval",
-            "type": "integer",
-            "example": 120,
+            "type": "interval",
+            "example": "5 second",
             "section": "series"
         },
         {
