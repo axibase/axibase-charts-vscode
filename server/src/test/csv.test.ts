@@ -75,6 +75,13 @@ endcsv`,
 endcsv`,
             [],
         ),
+        new Test(
+            "Correct csv with not escaped whitespaces",
+            `csv countries = name, value1, value2
+USA, 63, 6 3
+endcsv`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
