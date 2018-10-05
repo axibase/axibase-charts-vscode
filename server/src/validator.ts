@@ -126,7 +126,10 @@ export class Validator {
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber);
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
-                // lines in multiline script and var sections will be cheked in jsDomCaller.processScript() and processVar()
+                /**
+                 *  lines in multiline script and var sections
+                 *  will be cheked in jsDomCaller.processScript() and processVar()
+                 */
                 continue;
             }
             if (this.isNotKeywordEnd("csv")) {
@@ -377,10 +380,12 @@ export class Validator {
                     this.currentLineNumber, this.match.index + this.match[0].length,
                 ),
                 `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
-                `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`,
+                `\nMigration examples are available at` +
+                `https://github.com/axibase/charts/blob/master/syntax/freemarker.md`,
                 DiagnosticSeverity.Information,
             ));
-            if (this.match = /(as\s*(\S+)>)/.exec(line)) {
+            this.match = /(as\s*(\S+)>)/.exec(line);
+            if (this.match) {
                 this.addToStringArray(this.aliases);
             }
         }
@@ -532,9 +537,11 @@ export class Validator {
         const deAliasPosition: number = 2;
         let freemarkerExpr: RegExpExecArray | null;
         let deAlias: string;
-        while ((this.match = regexp.exec(line)) !== null) {
+        this.match = regexp.exec(line);
+        while (this.match !== null) {
             deAlias = this.match[deAliasPosition];
-            if (freemarkerExpr = /(\$\{(\S+)\})/.exec(deAlias)) {
+            freemarkerExpr = /(\$\{(\S+)\})/.exec(deAlias);
+            if (freemarkerExpr) {
                 // extract "lpar" from value('${lpar}PX')
                 deAlias = freemarkerExpr[deAliasPosition];
             }
@@ -542,6 +549,7 @@ export class Validator {
                 this.currentLineNumber, line.indexOf(deAlias),
                 this.currentLineNumber, line.indexOf(deAlias) + deAlias.length,
             )));
+            this.match = regexp.exec(line);
         }
     }
 
@@ -895,7 +903,8 @@ export class Validator {
                 let colorsValue: string = this.settingValues.get("colors");
                 if (thresholdsValue) {
                     if (colorsValue.split(",").length !== (thresholdsValue.split(",").length - 1)) {
-                        let message: string = `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`;
+                        let message: string = `Number of colors (if specified) must be equal to\n` +
+                            `number of thresholds minus 1.`;
                         this.result.push(createDiagnostic(Range.create(
                             this.currentLineNumber, line.indexOf(colorsValue),
                             this.currentLineNumber, line.indexOf(colorsValue) + colorsValue.length,
@@ -915,7 +924,8 @@ export class Validator {
         if (setting.name === "thresholds") {
             let typeValue: string = this.settingValues.get("type");
             if (["gauge", "calendar", "treemap"].includes(typeValue)) {
-                const index = this.result.findIndex(x => x.message === `"thresholds" are required if "colors" are specified`);
+                const index = this.result.findIndex(x =>
+                    x.message === `"thresholds" are required if "colors" are specified`);
                 if (index > -1) {
                     this.result.splice(index, 1);
                 }
@@ -1098,9 +1108,7 @@ export class Validator {
             this.currentLineNumber, this.match[1].length,
             this.currentLineNumber, this.match[1].length + this.match[2].length,
         );
-        const diagnostic: Diagnostic | undefined = setting.checkType(
-            this.match[3], range, this.match[2], this.currentWidget,
-        );
+        const diagnostic: Diagnostic | undefined = setting.checkType(this.match[3], range, this.match[2]);
         if (diagnostic != null) {
             this.result.push(diagnostic);
         }

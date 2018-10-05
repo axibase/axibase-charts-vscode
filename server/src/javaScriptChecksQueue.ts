@@ -1,5 +1,5 @@
-import { TextRange } from "./textRange";
 import { CheckPriority } from "./checkPriority";
+import { TextRange } from "./textRange";
 
 export class JavaScriptChecksQueue {
 

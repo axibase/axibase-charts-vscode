@@ -8,8 +8,8 @@ export interface SettingScope {
 }
 
 interface OverrideCacheEntry {
-    test(scope: SettingScope): boolean;
     setting: Partial<Setting>;
+    test(scope: SettingScope): boolean;
 }
 
 export class Setting {
@@ -19,7 +19,7 @@ export class Setting {
      * @returns cleared string
      */
     public static clearSetting: (str: string) => string = (str: string): string => str.toLowerCase()
-        .replace(/[^a-z]/g, "");
+        .replace(/[^a-z]/g, "")
     /**
      * Lowercases the value of setting
      * @param str string to be cleared
@@ -134,7 +134,7 @@ export class Setting {
         let matchingOverrides = this.overrideCache
             .filter((override) => override.test(scope))
             .map((override) => override.setting);
-    
+
         if (matchingOverrides.length > 0) {
             let copy = Object.create(Setting.prototype);
             return Object.assign(copy, this, ...matchingOverrides);
@@ -150,7 +150,7 @@ export class Setting {
      * @param range where the error should be displayed
      * @param name name of the setting which is used by user
      */
-    public checkType(value: string, range: Range, name: string, _widget?: string): Diagnostic | undefined {
+    public checkType(value: string, range: Range, name: string): Diagnostic | undefined {
         // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions

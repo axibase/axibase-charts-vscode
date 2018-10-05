@@ -2,8 +2,8 @@ import * as assert from "assert";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
-import { Validator } from "../validator";
 import { JsDomCaller } from "../jsDomCaller";
+import { Validator } from "../validator";
 
 /**
  * Contains a test case and executes the test

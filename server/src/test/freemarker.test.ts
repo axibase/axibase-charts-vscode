@@ -2,8 +2,9 @@ import { DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
-const deprecationMessage: string = `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
-    `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`
+const deprecationMessage: string = `Freemarker expressions are deprecated.
+Use a native collection: list, csv table, var object.` +
+    `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`;
 
 suite("Freemarker templates", () => {
     new Test("Freemarker assign rises warning on open and close tags",
@@ -155,24 +156,24 @@ suite("Freemarker templates", () => {
     ).validationTest();
 
     new Test("No issues except warning",
-    `<#list lpars as lpar>
+        `<#list lpars as lpar>
 [widget]
 type = chart
 title = [$\{lpar[2]}] [CEC agent:- $\{lpar[0]}] [Frame:- \${lpar[1]}]
-timespan = 7 day    
+timespan = 7 day
 </#list>
     `,
-    [
-        createDiagnostic(
-            Range.create(0, 0, 0, 21),
-            deprecationMessage,
-            DiagnosticSeverity.Information,
-        ),
-        createDiagnostic(
-            Range.create(5, 0, 5, 8),
-            deprecationMessage,
-            DiagnosticSeverity.Information,
-        )
-    ],
-).validationTest();
+        [
+            createDiagnostic(
+                Range.create(0, 0, 0, 21),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(5, 0, 5, 8),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            )
+        ],
+    ).validationTest();
 });
