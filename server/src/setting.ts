@@ -32,17 +32,13 @@ export class Setting {
         "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
     ];
 
-    private static _intervalUnits: string[] = [
+    public static readonly intervalUnits: string[] = [
         "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
     ];
 
-    public static get intervalUnits(): string[] {
-        return Setting._intervalUnits;
-    }
-
     private static readonly booleanRegExp: RegExp = new RegExp(`^(?:${Setting.booleanKeywords.join("|")})$`);
 
-    private static _calendarKeywords: string[] = [
+    public static readonly calendarKeywords: string[] = [
         "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
         "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
         "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
@@ -50,10 +46,6 @@ export class Setting {
         "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
         "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
     ];
-
-    public static get calendarKeywords(): string[] {
-        return Setting._calendarKeywords;
-    }
 
     private static readonly calendarRegExp: RegExp = new RegExp(
         // current_day
@@ -137,7 +129,7 @@ export class Setting {
 
     /**
      * Create an instance of setting with matching overrides applied.
-     * If no override can be applied returns this insatnce.
+     * If no override can be applied returns this instanse.
      * @param scope Configuration scope where setting exist
      */
     public applyScope(scope: SettingScope): Setting {
