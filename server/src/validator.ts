@@ -380,7 +380,7 @@ export class Validator {
                     this.currentLineNumber, this.match.index + this.match[0].length,
                 ),
                 `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
-                `\nMigration examples are available at` +
+                `\nMigration examples are available at ` +
                 `https://github.com/axibase/charts/blob/master/syntax/freemarker.md`,
                 DiagnosticSeverity.Information,
             ));
