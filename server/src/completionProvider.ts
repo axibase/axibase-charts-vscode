@@ -156,19 +156,23 @@ endif
                 }
                 if (setting.script) {
                     setting.script.fields.forEach(field => {
-                        if (field.args) {
-                            let requiredArgs: Field[] = field.args.filter(a => a.required);
-                            let optionalArgs: Field[] = field.args.filter(a => !a.required);
-                            let requiredArgsString: string = `${requiredArgs.map(field => field.name).join(", ")}`;
-                            scriptItems.push(this.fillCompletionItem(`${field.name}(${requiredArgsString})`));
-                            let args: string = "";
-                            for (let arg of optionalArgs) {
-                                args = `${args !== "" ? args + ", " : ""}${arg.name}`;
-                                scriptItems.push(this.fillCompletionItem(`${field.name}(${requiredArgsString !== "" ?
-                                    requiredArgsString + ", " : ""}${args})`));
+                        if (field.type === "function") {
+                            if (field.args) {
+                                let requiredArgs: Field[] = field.args.filter(a => a.required);
+                                let optionalArgs: Field[] = field.args.filter(a => !a.required);
+                                let requiredArgsString: string = `${requiredArgs.map(field => field.name).join(", ")}`;
+                                scriptItems.push(this.fillCompletionItem(`${field.name}(${requiredArgsString})`));
+                                let args: string = "";
+                                for (let arg of optionalArgs) {
+                                    args = `${args !== "" ? args + ", " : ""}${arg.name}`;
+                                    scriptItems.push(this.fillCompletionItem(`${field.name}(${requiredArgsString !== "" ?
+                                        requiredArgsString + ", " : ""}${args})`));
+                                }
+                            } else {
+                                scriptItems.push(this.fillCompletionItem(`${field.name}()`));
                             }
                         } else {
-                            scriptItems.push(this.fillCompletionItem(`${field.name}()`));
+                            scriptItems.push(this.fillCompletionItem(`${field.name}`, `Type: ${field.type}`));
                         }
                     });
                 }
