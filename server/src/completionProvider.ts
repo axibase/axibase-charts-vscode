@@ -23,8 +23,8 @@ export class CompletionProvider {
      * Creates completion items
      */
     public getCompletionItems(): CompletionItem[] {
-        let match: RegExpExecArray | null;
-        if (match = /\s*(\S+)\s*=\s*/.exec(this.currentLine)) {
+        let match = /^\s*(\S+)\s*=\s*/.exec(this.currentLine);
+        if (match) {
             // completion requested at assign stage, i. e. type = <Ctrl + space>
             return this.completeSetting(match[1]);
         } else {
@@ -138,7 +138,7 @@ endif
     /**
      * Creates an array of completion items containing possible values for settings.
      * @param settingName name of the setting, for example "colors"
-     * @returns array containing snippets
+     * @returns array containing completions
      */
     private completeSetting(settingName: string): CompletionItem[] {
         let setting = getSetting(settingName);
@@ -147,6 +147,51 @@ endif
         }
         switch (setting.type) {
             case "string": {
+                return this.completeStringSetting(setting);
+            }
+            case "number":
+            case "integer":
+                if (setting.example) {
+                    return [this.fillCompletionItem(setting.example.toString())];
+                }
+                break;
+            case "boolean": {
+                return this.getItemsArray(["true", "false"]);
+            }
+            case "enum": {
+                return this.getItemsArray(setting.enum);
+            }
+            case "interval": {
+                return this.getItemsArray(Setting.intervalUnits);
+            }
+            case "date": {
+                return this.getItemsArray(Setting.calendarKeywords, new Date().toISOString());
+            }
+            default: {
+                return [];
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Creates an array of completion items containing snippets.
+     * @returns array containing snippets
+     */
+    private completeSnippets(): CompletionItem[] {
+        let items: CompletionItem[] = Object.keys(snippets).map(key => {
+            let insertText: string = (typeof snippets[key].body === 'string') ? snippets[key].body : snippets[key].body.join("\n");
+            return this.fillCompletionItem(insertText, snippets[key].description, key);
+        });
+        return items;
+    }
+
+    /**
+     * Creates an array of completion items containing possible values for settings with type = "string".
+     * @param setting the setting
+     * @returns array containing completions
+     */
+    private completeStringSetting(setting: Setting): CompletionItem[] {
                 let valueItems: CompletionItem[] = [];
                 let scriptItems: CompletionItem[] = [];
                 if (setting.possibleValues) {
@@ -176,70 +221,40 @@ endif
                         }
                     });
                 }
-                if (!setting.possibleValues && setting.example !== "") {
+        if (!setting.possibleValues && setting.example !== "") {
                     valueItems = [this.fillCompletionItem(setting.example.toString())]
                 }
                 return valueItems.concat(scriptItems);
             }
-            case "number":
-            case "integer":
-                if (setting.example) {
-                    return [this.fillCompletionItem(setting.example.toString())];
-                }
-                break;
-            case "boolean": {
-                return [this.fillCompletionItem("true"), this.fillCompletionItem("false")];
-            }
-            case "enum": {
-                return setting.enum.map(el => {
-                    return this.fillCompletionItem(el);
-                });
-            }
-            case "interval": {
-                return Setting.intervalUnits.map(el => {
-                    return this.fillCompletionItem(el);
-                });
-            }
-            case "date": {
-                return [this.fillCompletionItem(new Date().toISOString())].concat(Setting.calendarKeywords.map(el => {
-                    return this.fillCompletionItem(el);
-                }));
-            }
-            default: {
-                return [];
-            }
-        }
-        return [];
-    }
-
-    /**
-     * Creates an array of completion items containing snippets.
-     * @returns array containing snippets
-     */
-    private completeSnippets(): CompletionItem[] {
-        let items: CompletionItem[] = [];
-        Object.keys(snippets).forEach(function (key) {
-            let item: CompletionItem = CompletionItem.create(key);
-            item.detail = snippets[key].description;
-            item.insertText = (typeof snippets[key].body === 'string') ? snippets[key].body : snippets[key].body.join("\n");
-            item.insertTextFormat = InsertTextFormat.Snippet;
-            item.kind = CompletionItemKind.Keyword;
-            items.push(item);
-        });
-        return items;
-    }
 
     /**
      * Set fields for CompletionItem
-     * @param insertText text to be inserted with completion request
+     * @param insertText text to be inserted with completion request     * 
+     * @returns completion
      */
-    private fillCompletionItem(insertText: string, detailText?: string): CompletionItem {
-        let item: CompletionItem = CompletionItem.create(insertText);
-        item.insertTextFormat = InsertTextFormat.Snippet;
-        item.kind = CompletionItemKind.Keyword;
+    private fillCompletionItem(insertText: string, detailText?: string, name?: string): CompletionItem {
+        let item: CompletionItem = CompletionItem.create(name || insertText);
+            item.insertTextFormat = InsertTextFormat.Snippet;
+            item.kind = CompletionItemKind.Keyword;
         item.insertText = insertText;
         item.detail = detailText || insertText;
         return item;
+    }
+
+    /**
+     * Сonverts the source array to of completions
+     * @param processedArray the source array
+     * @param additionalStrings the strings to be processed and added to completions
+     * @returns completions
+     */
+    private getItemsArray(processedArray: string[], ...additionalStrings: string[]): CompletionItem[] {
+        let items: CompletionItem[] = processedArray.map(el => {
+            return this.fillCompletionItem(el);
+        });
+        for (let s of additionalStrings) {
+            items.push(this.fillCompletionItem(s));
+        }
+        return items;
     }
 
 }
