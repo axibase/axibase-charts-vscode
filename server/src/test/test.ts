@@ -4,6 +4,7 @@ import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { Validator } from "../validator";
 import { JsDomCaller } from "../jsDomCaller";
+import { CompletionProvider } from "../completionProvider";
 
 /**
  * Contains a test case and executes the test
@@ -12,7 +13,7 @@ export class Test {
     /**
      * The expected result of the target function
      */
-    private readonly expected: Diagnostic[] | TextEdit[] | Hover;
+    private readonly expected: Diagnostic[] | TextEdit[] | Hover | string[];
     /**
      * The name of the test. Displayed in tests list after the execution
      */
@@ -34,7 +35,7 @@ export class Test {
     public constructor(
         name: string,
         text: string,
-        expected: Diagnostic[] | TextEdit[] | Hover,
+        expected: Diagnostic[] | TextEdit[] | Hover | string[],
         options?: FormattingOptions,
         position?: Position,
     ) {
@@ -82,6 +83,18 @@ export class Test {
     public jsValidationTest(): void {
         test((this.name), () => {
             assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
+        });
+    }
+
+    /**
+     * Tests CompletionProvider
+     */
+    public completionTest(): void {
+        test((this.name), () => {
+            assert.deepStrictEqual(new CompletionProvider(this.document, this.position).getCompletionItems().map(i => {
+                return i.insertText;
+            }),
+                this.expected);
         });
     }
 }
