@@ -10,8 +10,7 @@
 			"args": ["--disable-extensions","--extensionDevelopmentPath=${workspaceRoot}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
-			"preLaunchTask": "npm: watch:client"
+			"outFiles": ["${workspaceRoot}/client/out/**/*.js"]
 		},
 		{
 			"type": "node",
