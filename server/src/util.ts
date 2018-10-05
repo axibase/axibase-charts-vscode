@@ -58,7 +58,7 @@ export function countCsvColumns(line: string): number {
     if (line.length === 0) {
         return 0;
     }
-    const regex: RegExp = /(['"]).+\1|[^,"']+/g;
+    const regex: RegExp = /(['"]).+\1|(\w)[^,"']+/g;
     let counter: number = 0;
     while (regex.exec(line) !== null) {
         counter++;

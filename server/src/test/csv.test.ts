@@ -70,16 +70,17 @@ endcsv`,
         new Test(
             "Correct csv with escaped whitespaces and commas",
             `csv countries = name, value1, value2
-   Russia, "6,5", 63
-   USA, 63, "6 3"
-endcsv`,
+                Russia, "6,5", 63
+                USA, 63, "6 3"
+            endcsv`,
             [],
         ),
         new Test(
             "Correct csv with not escaped whitespaces",
-            `csv countries = name, value1, value2
-USA, 63, 6 3
-endcsv`,
+            `csv index =
+                president,inauguration
+                Gerald Ford, 1974
+            endcsv`,
             [],
         ),
     ];
