@@ -5,7 +5,7 @@ import { TextRange } from "./textRange";
 import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 import { CheckPriority } from "./checkPriority";
 
-export class JsDomCaller {
+export class JavaScriptValidator {
 
     private currentLineNumber: number = 0;
     private importCounter: number = 0;
@@ -74,6 +74,7 @@ export class JsDomCaller {
         if (line === undefined) {
             throw new Error("this.currentLineNumber points to nowhere");
         }
+
         return line;
     }
 
@@ -111,9 +112,24 @@ export class JsDomCaller {
                     this.processOptions();
                     continue;
                 }
+                this.match = /^\s*csv\s*(\w*)\s*/.exec(line);
+                if (this.match) {
+                    const statement: TextRange = new TextRange(`var ${this.match[1]}=[];`,
+                        Range.create(
+                            this.currentLineNumber, this.match.index,
+                            this.currentLineNumber, this.match.index + this.match.length,
+                        ), CheckPriority.High
+                    );
+                    this.queue.queue(statement);
+                    continue;
+                }
             }
             this.match = /^\s*script/.exec(line);
             if (this.match) {
+                /**
+                 * passes through script lines neither validateAll is true or false
+                 * to prevent var checks inside the script setting
+                 */
                 this.processScript(validateAll);
                 continue;
             }

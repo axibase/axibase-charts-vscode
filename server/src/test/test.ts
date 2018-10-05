@@ -3,7 +3,7 @@ import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit 
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { Validator } from "../validator";
-import { JsDomCaller } from "../jsDomCaller";
+import { JavaScriptValidator } from "../javaScriptValidator";
 
 /**
  * Contains a test case and executes the test
@@ -81,7 +81,7 @@ export class Test {
      */
     public jsValidationTest(): void {
         test((this.name), () => {
-            assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
+            assert.deepStrictEqual(new JavaScriptValidator(this.text).validate(true), this.expected);
         });
     }
 }

@@ -22,7 +22,7 @@ endscript`,
         ),
         new Test(
             "Correct function declaration and call",
-            `script 
+            `script
             window.numberToDate = function (n) {
             var di = Math.round(n*1)+"";
             return new Date(di.substring(0,4), di.substring(4,6), di.substring(6,8), di.substring(8,10), di.substring(10,12), di.substring(12,14));
@@ -40,6 +40,25 @@ endscript`,
                return utc.substring(0, 4) + utc.substring(5, 7) + utc.substring(8, 10) + utc.substring(11, 13) + utc.substring(14, 16) + utc.substring(17, 19);
             };
           endscript`,
+            [],
+        ),
+        new Test(
+            "Correct csv reference",
+            `csv index =
+            president,inauguration
+            GeraldFord, 1974
+          endcsv
+          
+          script
+            window.indexMap = (function () {
+            var map = {};
+            var idx = @{JSON.stringify(index)};
+            for (var i = 0; i < idx.length; i++) {
+              map[idx[i].president] = idx[i].inauguration;
+              }
+              return map;
+              })()
+            endscript`,
             [],
         ),
         new Test(
