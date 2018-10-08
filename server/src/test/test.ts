@@ -2,8 +2,24 @@ import * as assert from "assert";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
-import { Validator } from "../validator";
 import { JavaScriptValidator } from "../javaScriptValidator";
+import { SectionStack } from "../sectionStack";
+import { TextRange } from "../textRange";
+import { Validator } from "../validator";
+
+/**
+ * Stub section validator to allow incomplete configs in tests
+ */
+// tslint:disable-next-line:no-object-literal-type-assertion
+const sectionStackStub: SectionStack  = {
+    insertSection(_section: TextRange): Diagnostic | null {
+        return null;
+    },
+
+    finalize(): Diagnostic | null {
+        return null;
+    }
+} as SectionStack;
 
 /**
  * Contains a test case and executes the test
@@ -63,7 +79,9 @@ export class Test {
      */
     public validationTest(): void {
         test((this.name), () => {
-            assert.deepStrictEqual(new Validator(this.text).lineByLine(), this.expected);
+            let validator = new Validator(this.text);
+            Object.assign(validator, { sectionStack: sectionStackStub });
+            assert.deepStrictEqual(validator.lineByLine(), this.expected);
         });
     }
 

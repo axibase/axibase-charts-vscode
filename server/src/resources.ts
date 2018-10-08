@@ -68,27 +68,54 @@ function createSettingsMap(): Map<string, Setting> {
 
 export const settingsMap: Map<string, Setting> = createSettingsMap();
 
+interface SectionRequirements {
+    settings?: Setting[][];
+    sections?: string[][];
+}
+
 /**
  * Map of required settings for each section and their "aliases".
  * For instance, `series` requires `entity`, but `entities` is also allowed.
  * Additionally, `series` requires `metric`, but `table` with `attribute` is also ok
  */
-export const requiredSectionSettingsMap: Map<string, Setting[][]> = new Map([
-    ["series", [
-        [
-            settingsMap.get("entity")!, settingsMap.get("value")!,
-            settingsMap.get("entities")!, settingsMap.get("entitygroup")!,
-            settingsMap.get("entityexpression")!,
+export const requiredSectionSettingsMap = new Map<string, SectionRequirements>([
+    ["configuration", {
+        sections: [
+            ["group"],
         ],
-        [
-            settingsMap.get("metric")!, settingsMap.get("value")!,
-            settingsMap.get("table")!, settingsMap.get("attribute")!,
+    }],
+    ["series", {
+        settings: [
+            [
+                settingsMap.get("entity")!, settingsMap.get("value")!,
+                settingsMap.get("entities")!, settingsMap.get("entitygroup")!,
+                settingsMap.get("entityexpression")!,
+            ],
+            [
+                settingsMap.get("metric")!, settingsMap.get("value")!,
+                settingsMap.get("table")!, settingsMap.get("attribute")!,
+            ],
         ],
-    ]],
-    ["widget", [[settingsMap.get("type")!],
-    ]],
-    ["dropdown", [[settingsMap.get("onchange")!, settingsMap.get("changefield")!],
-    ]],
+    }],
+    ["group", {
+        sections: [
+            ["widget"],
+        ],
+    }],
+    ["widget", {
+        sections: [
+            ["series"],
+            ["column"],
+        ],
+        settings: [
+            [settingsMap.get("type")!],
+        ],
+    }],
+    ["dropdown", {
+        settings: [
+            [settingsMap.get("onchange")!, settingsMap.get("changefield")!],
+        ],
+    }],
 ]);
 
 /**
@@ -120,10 +147,26 @@ export function getParents(section: string): string[] {
     return parents;
 }
 
-/**
- * Array of all possible sections
- */
-export const possibleSections: string[] = [
-    "column", "configuration", "dropdown", "group", "keys", "link", "node", "option", "other", "placeholders",
-    "properties", "property", "series", "tag", "tags", "threshold", "widget",
-];
+export const sectionDepthMap: {[section: string]: number} = {
+    "configuration": 0,
+
+    "group": 1,
+
+    "widget": 2,
+
+    "column": 3,
+    "dropdown": 3,
+    "link": 3,
+    "node": 3,
+    "other": 3,
+    "placeholders": 3,
+    "property": 3,
+    "series": 3,
+    "threshold": 3,
+
+    "keys": 4,
+    "option": 4,
+    "properties": 4,
+    "tag": 4,
+    "tags": 4,
+};
