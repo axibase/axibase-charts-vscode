@@ -2,9 +2,8 @@ import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument,
 } from "vscode-languageserver";
 import { Field } from "./field";
-import { Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
-import { PossibleValue } from "./possibleValue";
+import { Setting } from "./setting";
 const snippets = require('../../snippets/snippets.json');
 
 /**
@@ -200,7 +199,7 @@ endif
         let valueItems: CompletionItem[] = [];
         let scriptItems: CompletionItem[] = [];
         if (setting.possibleValues) {
-            valueItems = setting.possibleValues.map((v: PossibleValue) => this.fillCompletionItem(v.value, v.detail));
+            valueItems = setting.possibleValues.map(v => this.fillCompletionItem(v.value, v.detail));
         }
         if (setting.script) {
             setting.script.fields.forEach((field: Field) => {

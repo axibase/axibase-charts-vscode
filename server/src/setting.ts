@@ -19,8 +19,8 @@ export class Setting {
      * @param str string to be cleared
      * @returns cleared string
      */
-    public static clearSetting: (str: string) => string = (str: string): string => str.toLowerCase()
-        .replace(/[^a-z]/g, "");
+    public static clearSetting: (str: string) => string = (str: string): string =>
+        str.toLowerCase().replace(/[^a-z]/g, "");
     /**
      * Lowercases the value of setting
      * @param str string to be cleared
