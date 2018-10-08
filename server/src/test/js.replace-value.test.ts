@@ -1,4 +1,4 @@
-import { Position, Range, DiagnosticSeverity } from "vscode-languageserver";
+import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -13,7 +13,8 @@ suite("[JS] replace-value tests", () => {
             "Incorrect function call",
             `replace-value = Math.lg10(value)`,
             [createDiagnostic(
-                Range.create(Position.create(0, "replace-value = ".length), Position.create(0, "replace-value = Math.lg10(value)".length)),
+                Range.create(Position.create(0, "replace-value = ".length),
+                 Position.create(0, "replace-value = Math.lg10(value)".length)),
                 "Math.lg10 is not a function", DiagnosticSeverity.Warning,
             )],
         )

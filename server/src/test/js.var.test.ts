@@ -1,4 +1,4 @@
-import { Position, Range, DiagnosticSeverity } from "vscode-languageserver";
+import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
