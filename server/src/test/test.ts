@@ -1,18 +1,18 @@
 import * as assert from "assert";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
+import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
 import { SectionStack } from "../sectionStack";
 import { TextRange } from "../textRange";
 import { Validator } from "../validator";
-import { CompletionProvider } from "../completionProvider";
 
 /**
  * Stub section validator to allow incomplete configs in tests
  */
 // tslint:disable-next-line:no-object-literal-type-assertion
-const sectionStackStub: SectionStack  = {
+const sectionStackStub: SectionStack = {
     insertSection(_section: TextRange): Diagnostic | null {
         return null;
     },
@@ -96,7 +96,7 @@ export class Test {
     }
 
     /**
-     * Tests JsDomCaller (JavaScript statements, including var)
+     * Tests JavaScriptValidator (JavaScript statements, including var)
      */
     public jsValidationTest(): void {
         test((this.name), () => {
@@ -109,10 +109,9 @@ export class Test {
      */
     public completionTest(): void {
         test((this.name), () => {
-            assert.deepStrictEqual(new CompletionProvider(this.document, this.position).getCompletionItems().map(i => {
-                return i.insertText;
-            }),
-                this.expected);
+            const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
+            const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+            assert.deepStrictEqual(current, this.expected);
         });
     }
 }
