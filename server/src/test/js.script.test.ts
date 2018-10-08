@@ -1,4 +1,4 @@
-import { Position, Range, DiagnosticSeverity } from "vscode-languageserver";
+import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -25,7 +25,8 @@ endscript`,
             `script
             window.numberToDate = function (n) {
             var di = Math.round(n*1)+"";
-            return new Date(di.substring(0,4), di.substring(4,6), di.substring(6,8), di.substring(8,10), di.substring(10,12), di.substring(12,14));
+            return new Date(di.substring(0,4), di.substring(4,6),` +
+            `di.substring(6,8), di.substring(8,10), di.substring(10,12), di.substring(12,14));
             };
           endscript
           replace-value = numberToDate(value)`,
@@ -37,7 +38,8 @@ endscript`,
             script
             window.dateToNumber = function (ms) {
                var utc = new Date(ms).toISOString();
-               return utc.substring(0, 4) + utc.substring(5, 7) + utc.substring(8, 10) + utc.substring(11, 13) + utc.substring(14, 16) + utc.substring(17, 19);
+               return utc.substring(0, 4) + utc.substring(5, 7) + utc.substring(8, 10)` +
+            ` + utc.substring(11, 13) + utc.substring(14, 16) + utc.substring(17, 19);
             };
           endscript`,
             [],
@@ -65,7 +67,8 @@ endscript`,
             "Incorrect one-line script",
             `script = console.og()`,
             [createDiagnostic(
-                Range.create(Position.create(0, "script = ".length), Position.create(0, "script = console.og()".length)),
+                Range.create(Position.create(0, "script = ".length),
+                    Position.create(0, "script = console.og()".length)),
                 "console.og is not a function", DiagnosticSeverity.Warning,
             )],
         ),

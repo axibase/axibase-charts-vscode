@@ -1,4 +1,4 @@
-import { Position, Range, DiagnosticSeverity } from "vscode-languageserver";
+import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -32,14 +32,14 @@ suite("Thresholds and colors tests", () => {
             "Correct: number of \"colors\" != number of \"thresholds\" - 1  for chart (\"thresholds\" have no effect)",
             `[widget]
                type = chart
-               colors = green    
+               colors = green
                thresholds = 0, 60, 80, 100`,
             [],
         ),
         new Test(
             "Correct: number of \"thresholds\" != number of \"colors\" - 1  for chart (\"thresholds\" have no effect)",
             `[widget]
-               type = chart    
+               type = chart
                thresholds = 0, 60, 80, 100
                colors = green`,
             [],
@@ -51,8 +51,10 @@ type = gauge
 thresholds = 0, 40, 60, 80, 100
 colors = green, orange, red`,
             [createDiagnostic(
-                Range.create(Position.create(3, "colors = ".length), Position.create(3, "colors = green, orange, red".length)),
-                "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.", DiagnosticSeverity.Error,
+                Range.create(Position.create(3, "colors = ".length),
+                    Position.create(3, "colors = green, orange, red".length)),
+                "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
+                DiagnosticSeverity.Error,
             )],
         ),
         new Test(
@@ -62,8 +64,10 @@ type = calendar
 colors = green, orange, red
 thresholds = 0, 40, 60, 80, 100`,
             [createDiagnostic(
-                Range.create(Position.create(3, "thresholds = ".length), Position.create(3, "thresholds = 0, 40, 60, 80, 100".length)),
-                "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.", DiagnosticSeverity.Error,
+                Range.create(Position.create(3, "thresholds = ".length),
+                    Position.create(3, "thresholds = 0, 40, 60, 80, 100".length)),
+                "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
+                DiagnosticSeverity.Error,
             )],
         ),
         new Test(

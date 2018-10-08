@@ -90,7 +90,7 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const validator: Validator = new Validator(text);
         const jsValidator: JavaScriptValidator = new JavaScriptValidator(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
-        const jsDiagnostics: Diagnostic[] = jsValidator.validate(settings.validateFunctions || true);
+        const jsDiagnostics: Diagnostic[] = jsValidator.validate(settings.validateFunctions);
 
         // Send the computed diagnostics to VSCode.
         // connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });

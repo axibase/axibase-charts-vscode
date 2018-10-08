@@ -7,8 +7,10 @@ import {
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
-const errorMessage: (setting: string) => string = (setting: string): string => `${setting} is interpreted as a series tag and is sent to the\nserver. ` +
-    `Move the setting outside of the [tags] section or\nenclose in double-quotes to send it to the server without\na warning.`;
+const errorMessage: (setting: string) => string = (setting: string): string =>
+    `${setting} is interpreted as a series tag and is sent to the\nserver. ` +
+    `Move the setting outside of the [tags] section or
+enclose in double-quotes to send it to the server without\na warning.`;
 
 suite("Warn about setting interpreted as a tag", () => {
     const tests: Test[] = [
