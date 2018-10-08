@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
+import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
@@ -11,7 +12,7 @@ import { Validator } from "../validator";
  * Stub section validator to allow incomplete configs in tests
  */
 // tslint:disable-next-line:no-object-literal-type-assertion
-const sectionStackStub: SectionStack  = {
+const sectionStackStub: SectionStack = {
     insertSection(_section: TextRange): Diagnostic | null {
         return null;
     },
@@ -28,7 +29,7 @@ export class Test {
     /**
      * The expected result of the target function
      */
-    private readonly expected: Diagnostic[] | TextEdit[] | Hover;
+    private readonly expected: Diagnostic[] | TextEdit[] | Hover | string[];
     /**
      * The name of the test. Displayed in tests list after the execution
      */
@@ -50,7 +51,7 @@ export class Test {
     public constructor(
         name: string,
         text: string,
-        expected: Diagnostic[] | TextEdit[] | Hover,
+        expected: Diagnostic[] | TextEdit[] | Hover | string[],
         options?: FormattingOptions,
         position?: Position,
     ) {
@@ -95,11 +96,22 @@ export class Test {
     }
 
     /**
-     * Tests JsDomCaller (JavaScript statements, including var)
+     * Tests JavaScriptValidator (JavaScript statements, including var)
      */
     public jsValidationTest(): void {
         test((this.name), () => {
             assert.deepStrictEqual(new JavaScriptValidator(this.text).validate(true), this.expected);
+        });
+    }
+
+    /**
+     * Tests CompletionProvider
+     */
+    public completionTest(): void {
+        test((this.name), () => {
+            const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
+            const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+            assert.deepStrictEqual(current, this.expected);
         });
     }
 }
