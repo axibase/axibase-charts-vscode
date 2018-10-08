@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
-import { JsDomCaller } from "../jsDomCaller";
+import { JavaScriptValidator } from "../javaScriptValidator";
 import { Validator } from "../validator";
 
 /**
@@ -81,7 +81,7 @@ export class Test {
      */
     public jsValidationTest(): void {
         test((this.name), () => {
-            assert.deepStrictEqual(new JsDomCaller(this.text).validate(true), this.expected);
+            assert.deepStrictEqual(new JavaScriptValidator(this.text).validate(true), this.expected);
         });
     }
 }

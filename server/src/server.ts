@@ -7,7 +7,7 @@ import {
 import { CompletionProvider } from "./completionProvider";
 import { Formatter } from "./formatter";
 import { HoverProvider } from "./hoverProvider";
-import { JsDomCaller } from "./jsDomCaller";
+import { JavaScriptValidator } from "./javaScriptValidator";
 import { Validator } from "./validator";
 
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
@@ -88,10 +88,10 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const settings: IServerSettings = await getDocumentSettings(textDocument.uri);
         const text: string = textDocument.getText();
         const validator: Validator = new Validator(text);
-        const jsDomCaller: JsDomCaller = new JsDomCaller(text);
+        const jsValidator: JavaScriptValidator = new JavaScriptValidator(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
 
-        jsDomCaller.validate(settings.validateFunctions).forEach((element: Diagnostic) => {
+        jsValidator.validate(settings.validateFunctions).forEach((element: Diagnostic) => {
             diagnostics.push(element);
         });
 

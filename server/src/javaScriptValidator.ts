@@ -1,11 +1,11 @@
-import { DOMWindow, JSDOM } from "jsdom";
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
-import { CheckPriority } from "./checkPriority";
-import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
-import { TextRange } from "./textRange";
 import { createDiagnostic, deleteComments } from "./util";
+import { DOMWindow, JSDOM } from "jsdom";
+import { TextRange } from "./textRange";
+import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
+import { CheckPriority } from "./checkPriority";
 
-export class JsDomCaller {
+export class JavaScriptValidator {
 
     private currentLineNumber: number = 0;
     private importCounter: number = 0;
@@ -21,8 +21,22 @@ export class JsDomCaller {
     }
 
     /**
+    * Generates a list of arguments with same name to use in a function call
+    * @param amount number of arguments
+    * @param name arguments name
+    * @returns string containing array of `amount` `name`s
+    */
+    private generateCall(amount: number, name: string): string {
+        const names: string = Array(amount)
+            .fill(name)
+            .join();
+
+        return `${names}`;
+    }
+
+    /**
      * Evaluates all found JavaScript statements in this.document
-     * @param validateAll if `false`, validates var only
+     * @param validateAll if `false`, validates var only 
      * @returns diagnostic for each invalid statement
      */
     public validate(validateAll: boolean): Diagnostic[] {
@@ -55,25 +69,12 @@ export class JsDomCaller {
         return result;
     }
 
-    /**
-     * Generates a list of arguments with same name to use in a function call
-     * @param amount number of arguments
-     * @param name arguments name
-     * @returns string containing array of `amount` `name`s
-     */
-    private generateCall(amount: number, name: string): string {
-        const names: string = Array(amount)
-            .fill(name)
-            .join();
-
-        return `${names}`;
-    }
-
     private getCurrentLine(): string {
         const line: string | undefined = this.getLine(this.currentLineNumber);
         if (line === undefined) {
             throw new Error("this.currentLineNumber points to nowhere");
         }
+
         return line;
     }
 
@@ -82,7 +83,7 @@ export class JsDomCaller {
     }
 
     /**
-     * Calls corresponding processor for all found JavaScript statements
+     * Calls corresponding processor for all found JavaScript statements 
      * in this.document to prepare diagnostic if required
      * @param validateAll if `false`, validates "var" only
      */
@@ -111,9 +112,24 @@ export class JsDomCaller {
                     this.processOptions();
                     continue;
                 }
+                this.match = /^\s*csv\s*(\w*)\s*/.exec(line);
+                if (this.match) {
+                    const statement: TextRange = new TextRange(`var ${this.match[1]}=[];`,
+                        Range.create(
+                            this.currentLineNumber, this.match.index,
+                            this.currentLineNumber, this.match.index + this.match.length,
+                        ), CheckPriority.High
+                    );
+                    this.queue.queue(statement);
+                    continue;
+                }
             }
             this.match = /^\s*script/.exec(line);
             if (this.match) {
+                /**
+                 * passes through script lines neither validateAll is true or false
+                 * to prevent var checks inside the script setting
+                 */
                 this.processScript(validateAll);
                 continue;
             }
@@ -130,8 +146,7 @@ export class JsDomCaller {
         }
         const matchStart: number = this.match[1].length;
         const value: string = this.match[2];
-        const statement: TextRange = new TextRange(`replaceValue=(function(requestMetricsSeriesValues,` +
-            `requestEntitiesMetricsValues,
+        const statement: TextRange = new TextRange(`replaceValue=(function(requestMetricsSeriesValues,requestEntitiesMetricsValues,
         requestPropertiesValues,requestMetricsSeriesOptions,requestEntitiesMetricsOptions,requestPropertiesOptions)` +
             `{ return ${value}; })(${this.generateCall(6, "new Function()")});\n`,
             Range.create(
@@ -170,17 +185,15 @@ export class JsDomCaller {
             end: { character: line.length, line: this.currentLineNumber },
             start: { character: 0, line: this.currentLineNumber + 1 },
         };
-        this.match = /script\s*=\s*(\S+[\s\S]*)$/.exec(line);
-        if (this.match) {
+        if (this.match = /script\s*=\s*(\S+[\s\S]*)$/.exec(line)) {
             // one-line script
             content = this.match[1];
             range.start = { character: line.indexOf(content), line: this.currentLineNumber };
-        } else {
+        }
+        else {
             // multi-line script
-            line = this.getLine(++this.currentLineNumber);
-            while (line && !/\bendscript\b/.test(line)) {
+            while ((line = this.getLine(++this.currentLineNumber)) && !/\bendscript\b/.test(line)) {
                 content += `${line}\n`;
-                line = this.getLine(++this.currentLineNumber);
             }
             line = this.getLine(this.currentLineNumber - 1);
             range.end = {
@@ -188,9 +201,9 @@ export class JsDomCaller {
             };
         }
         if (validateScript) {
-            let jsInOrbTags = content.match(/(\@\{)(.*)(?=\})/);
+            let jsInOrbTags: RegExpMatchArray | null = content.match(/(\@\{)(.*)(?=\})/)
             if (jsInOrbTags) {
-                content = content.replace(/\@\{.+\}/, jsInOrbTags[2]);
+                content = content.replace(/\@\{.+\}/, jsInOrbTags[2])
             }
             let userDefinedFunction: RegExpMatchArray | null = content.match(/window\.(\w+)\s*=\s*function/);
             let priority: number = CheckPriority.Low;
@@ -217,8 +230,7 @@ export class JsDomCaller {
         min_value_time,max_value_time,count,threshold_count,threshold_percent,
         threshold_duration,time,bottom,top,meta,entityTag,metricTag,median,
         average,minimum,maximum,getValueWithOffset,getValueForDate,getMaximumValue,series,metric,entity,tags
-        ${this.imports.length > 0 ? "," + this.imports : ""}){ return ${value}; })(` +
-            `${this.generateCall(36, "new Function()")},` +
+        ${this.imports.length > 0 ? "," + this.imports : ""}){ return ${value}; })(${this.generateCall(36, "new Function()")},` +
             `${this.generateCall(1, "[]")},` +
             `${this.generateCall(this.importCounter + 3, "{}")});\n`,
             Range.create(
@@ -241,23 +253,20 @@ export class JsDomCaller {
             end: { character: line.length, line: this.currentLineNumber },
             start: { character: 0, line: this.currentLineNumber },
         };
-        let openBrackets = line.match(/((\s*[\[\{\(]\s*)+)/g);
-        let closeBrackets = line.match(/((\s*[\]\}\)]\s*)+)/g);
+        let openBrackets: RegExpMatchArray | null = line.match(/((\s*[\[\{\(]\s*)+)/g);
+        let closeBrackets: RegExpMatchArray | null = line.match(/((\s*[\]\}\)]\s*)+)/g);
         if (openBrackets) {
             if (closeBrackets && openBrackets.map(s => s.trim()).join("").length !==
                 closeBrackets.map(s => s.trim()).join("").length
                 || closeBrackets === null) {
                 // multiline var
-                line = this.getLine(++this.currentLineNumber);
-                while (line && !/\bendvar\b/.test(line)) {
+                while ((line = this.getLine(++this.currentLineNumber)) && !/\bendvar\b/.test(line)) {
                     content += `${line} \n`;
-                    line = this.getLine(++this.currentLineNumber);
                 }
                 range.end.line = this.currentLineNumber - 1;
             }
         }
-        const statement = new TextRange(`${this.match[0]}` +
-            `(function(getTags, getSeries, getMetrics, getEntities, range)` +
+        const statement: TextRange = new TextRange(`${this.match[0]}(function(getTags, getSeries, getMetrics, getEntities, range)` +
             `{ return ${content.substring(this.match[0].length)}; })
             (${this.generateCall(5, "new Function()")});\n`, range
         );
