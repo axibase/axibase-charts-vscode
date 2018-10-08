@@ -45,6 +45,25 @@ endscript`,
             [],
         ),
         new Test(
+            "Correct csv reference",
+            `csv index =
+            president,inauguration
+            GeraldFord, 1974
+          endcsv
+          
+          script
+            window.indexMap = (function () {
+            var map = {};
+            var idx = @{JSON.stringify(index)};
+            for (var i = 0; i < idx.length; i++) {
+              map[idx[i].president] = idx[i].inauguration;
+              }
+              return map;
+              })()
+            endscript`,
+            [],
+        ),
+        new Test(
             "Incorrect one-line script",
             `script = console.og()`,
             [createDiagnostic(

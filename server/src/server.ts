@@ -90,14 +90,11 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const validator: Validator = new Validator(text);
         const jsValidator: JavaScriptValidator = new JavaScriptValidator(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
-
-        jsValidator.validate(settings.validateFunctions).forEach((element: Diagnostic) => {
-            diagnostics.push(element);
-        });
+        const jsDiagnostics: Diagnostic[] = jsValidator.validate(settings.validateFunctions);
 
         // Send the computed diagnostics to VSCode.
         // connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-        connection.sendNotification("charts-diagnostic", [textDocument.uri, diagnostics]);
+        connection.sendNotification("charts-diagnostic", [textDocument.uri, diagnostics.concat(jsDiagnostics)]);
     };
 
 connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {

@@ -19,7 +19,7 @@ suite("Should diagnostics", () => {
         await window.showTextDocument(document);
         await sleep(4000);
         const actualDiagnostic: Diagnostic[] = languages.getDiagnostics(docUri);
-        strictEqual(actualDiagnostic.length, 1, "Incorrect number of messages for file");
+        strictEqual(actualDiagnostic.length, 2, "Incorrect number of messages for file");
         await commands.executeCommand("workbench.action.closeActiveEditor");
     });
 
