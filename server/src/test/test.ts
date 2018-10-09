@@ -5,22 +5,25 @@ import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
 import { SectionStack } from "../sectionStack";
-import { TextRange } from "../textRange";
 import { Validator } from "../validator";
 
 /**
  * Stub section validator to allow incomplete configs in tests
  */
 // tslint:disable-next-line:no-object-literal-type-assertion
-const sectionStackStub: SectionStack = {
-    insertSection(_section: TextRange): Diagnostic | null {
+const sectionStackStub: SectionStack  = {
+    insertSection(): Diagnostic | null {
         return null;
     },
 
     finalize(): Diagnostic | null {
         return null;
-    }
-} as SectionStack;
+    },
+
+    setSectionRequirements() {
+        /* void */
+    },
+} as any as SectionStack;
 
 /**
  * Contains a test case and executes the test

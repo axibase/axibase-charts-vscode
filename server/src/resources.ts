@@ -105,7 +105,6 @@ export const requiredSectionSettingsMap = new Map<string, SectionRequirements>([
     ["widget", {
         sections: [
             ["series"],
-            ["column"],
         ],
         settings: [
             [settingsMap.get("type")!],
@@ -114,6 +113,25 @@ export const requiredSectionSettingsMap = new Map<string, SectionRequirements>([
     ["dropdown", {
         settings: [
             [settingsMap.get("onchange")!, settingsMap.get("changefield")!],
+        ],
+    }],
+]);
+
+export const widgetRequirementsByType: Map<string, SectionRequirements> = new Map([
+    ["console", {
+        sections: [],
+    }],
+    ["page", {
+        sections: [],
+    }],
+    ["property", {
+        sections: [
+            ["property"],
+        ],
+    }],
+    ["graph", {
+        sections: [
+            ["series", "node", "link"]
         ],
     }],
 ]);

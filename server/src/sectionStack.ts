@@ -1,6 +1,7 @@
+import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { requiredSectionSettingsMap, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
-import { sectionDepthMap, requiredSectionSettingsMap } from "./resources";
-import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { createDiagnostic } from "./util";
 
 interface DependencyResolveInfo {
     resolvedCount: number;
@@ -13,12 +14,17 @@ class SectionStackNode {
     public constructor(public range: TextRange) {
         const deps = requiredSectionSettingsMap.get(this.name);
         if (deps && deps.sections) {
-            for (const option of deps.sections) {
-                this.dependencies.push({
-                    resolvedCount: 0,
-                    unresolved: option.slice(),
-                });
-            }
+            this.setRequiredSections(deps.sections);
+        }
+    }
+
+    public setRequiredSections(sections: string[][]) {
+        this.dependencies.splice(0, this.dependencies.length);
+        for (const option of sections) {
+            this.dependencies.push({
+                resolvedCount: 0,
+                unresolved: option.slice(),
+            });
         }
     }
 
@@ -81,29 +87,41 @@ class SectionStackNode {
     }
 }
 
+/**
+ * A null object to prevent multiple errors on missing root section
+ */
+const DummySectionStackNode: SectionStackNode & {[Symbol.toStringTag]: string} = {
+    dependencies: [],
+    dependenciesResolved: true,
+    name: "",
+    range: new TextRange("", Range.create(Position.create(0, 0), Position.create(0, 0))),
+    unresolved: [],
+
+    resolveDependency() { /* void */ },
+    setRequiredSections() { /* void */},
+    [Symbol.toStringTag]: "DummySectionStackNode",
+};
+
 // tslint:disable-next-line:max-classes-per-file
 export class SectionStack {
     private stack: SectionStackNode[] = [];
 
     public insertSection(section: TextRange): Diagnostic | null {
         const sectionName: string = section.text;
-        let depth: number = 0;
-        try {
-            depth = this.checkAndGetDepth(sectionName);
-        } catch (err) {
-            return this.createErrorDignostic(section, (err as Error).message);
-        }
-
-        let error: Diagnostic | null = null;
+        let [depth, error] = this.checkAndGetDepth(section);
         if (depth < this.stack.length) {
             if (depth === 0) {
                 // We are attempting to declare [configuration] twice
-                return this.createErrorDignostic(section, `Unexpected section [${sectionName}].`);
+                return this.createErrorDiagnostic(section, `Unexpected section [${sectionName}].`);
             }
 
             // Pop stack, check dependencies of popped resolved
             error = this.checkDependenciesResolved(depth);
             this.stack.splice(depth, this.stack.length - depth);
+        }
+
+        for (let i = this.stack.length; i < depth; i++) {
+            this.stack.push(DummySectionStackNode);
         }
 
         for (const entry of this.stack) {
@@ -116,11 +134,20 @@ export class SectionStack {
     }
 
     public finalize(): Diagnostic {
-        return this.checkDependenciesResolved(0);
+        let err =  this.checkDependenciesResolved(0);
+        this.stack = [];
+        return err;
     }
 
-    private createErrorDignostic(section: TextRange, message: string): Diagnostic {
-        return Diagnostic.create(
+    public setSectionRequirements(targetSection: string, sections: string[][]) {
+        let target = this.stack.find(s => s.name === targetSection);
+        if (target) {
+            target.setRequiredSections(sections);
+        }
+    }
+
+    private createErrorDiagnostic(section: TextRange, message: string): Diagnostic {
+        return createDiagnostic(
             section.range,
             message,
             DiagnosticSeverity.Error,
@@ -142,19 +169,22 @@ export class SectionStack {
                     message = `Required section ${unresolved.join(", ")} is not declared.`;
                 }
 
-                return this.createErrorDignostic(section.range, message);
+                return this.createErrorDiagnostic(section.range, message);
             }
         }
 
         return null;
     }
 
-    private checkAndGetDepth(section: string): number {
+    private checkAndGetDepth(sectionRange: TextRange): [number, Diagnostic | null] {
+        const section = sectionRange.text;
         const expectedDepth: number = this.stack.length;
         const actualDepth: number = sectionDepthMap[section];
 
+        let error: Diagnostic = null;
+
         if (actualDepth == null) {
-            throw new Error(`Unknown section [${section}].`);
+            error = this.createErrorDiagnostic(sectionRange, `Unknown section [${section}].`);
         } else if (actualDepth > expectedDepth) {
             let errorMessage = `Unexpected section [${section}]. `;
             let expectedSections: string[] = Object.entries(sectionDepthMap)
@@ -166,9 +196,9 @@ export class SectionStack {
             } else {
                 errorMessage += `Expected ${expectedSections[0]}.`;
             }
-            throw new Error(errorMessage);
+            error = this.createErrorDiagnostic(sectionRange, errorMessage);
         }
 
-        return actualDepth;
+        return [actualDepth, error];
     }
 }
