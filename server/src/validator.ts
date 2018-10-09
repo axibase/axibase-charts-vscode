@@ -927,52 +927,11 @@ export class Validator {
         }
 
         if (setting.name === "colors") {
-            let typeValue: string = this.settingValues.get("type");
-            if (["gauge", "calendar", "treemap"].includes(typeValue)) {
-                let thresholdsValue: string = this.settingValues.get("thresholds");
-                let colorsValue: string = this.settingValues.get("colors");
-                if (thresholdsValue) {
-                    if (colorsValue.split(",").length !== (thresholdsValue.split(",").length - 1)) {
-                        let message: string = `Number of colors (if specified) must be equal to\n` +
-                            `number of thresholds minus 1.`;
-                        this.result.push(createDiagnostic(Range.create(
-                            this.currentLineNumber, line.indexOf(colorsValue),
-                            this.currentLineNumber, line.indexOf(colorsValue) + colorsValue.length,
-                        ), message));
-                    }
-                } else {
-                    let message: string = `"thresholds" are required if "colors" are specified`;
-                    this.result.push(createDiagnostic(Range.create(
-                        this.currentLineNumber, line.indexOf("colors"),
-                        this.currentLineNumber, line.indexOf("colors") + "colors".length,
-                    ), message));
-                }
-
-            }
+            this.checkColorsMatchTreshold(true, false);
         }
 
         if (setting.name === "thresholds") {
-            let typeValue: string = this.settingValues.get("type");
-            if (["gauge", "calendar", "treemap"].includes(typeValue)) {
-                const index = this.result.findIndex(x =>
-                    x.message === `"thresholds" are required if "colors" are specified`);
-                if (index > -1) {
-                    this.result.splice(index, 1);
-                }
-                let colorsValue: string = this.settingValues.get("colors");
-                let thresholdsValue: string = this.settingValues.get("thresholds");
-                if (colorsValue) {
-                    if (colorsValue.split(",").length !== (thresholdsValue.split(",").length - 1)) {
-                        this.result.push(createDiagnostic(
-                            Range.create(
-                                this.currentLineNumber, line.indexOf(thresholdsValue),
-                                this.currentLineNumber, line.indexOf(thresholdsValue) + thresholdsValue.length,
-                            ),
-                            `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`,
-                        ));
-                    }
-                }
-            }
+            this.checkColorsMatchTreshold(false, true);
         }
 
         if (setting.name === "type") {
@@ -994,6 +953,40 @@ export class Validator {
             this.addToStringArray(this.aliases);
         }
         this.findDeAliases();
+    }
+
+    /**
+     *  Check the relationship between thresholds and colors:
+     *  in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
+     */
+    private checkColorsMatchTreshold(atColorsString: boolean, atTresholdString: boolean) {
+        const line: string = this.getCurrentLine();
+        let typeValue: string = this.settingValues.get("type");
+        if (["gauge", "calendar", "treemap"].includes(typeValue)) {
+            let thresholdsValue: string = this.settingValues.get("thresholds");
+            let colorsValue: string = this.settingValues.get("colors");
+            if (atTresholdString && colorsValue || atColorsString && thresholdsValue) {
+                if (colorsValue.split(/[^\d],[^\d]/g).length !== (thresholdsValue.split(",").length - 1)) {
+                    let value = line.split("=")[1].trim();
+                    this.result.push(createDiagnostic(Range.create(
+                        this.currentLineNumber, line.indexOf(value),
+                        this.currentLineNumber, line.indexOf(value) + value.length,
+                    ), `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`));
+                }
+            } else if (atColorsString) {
+                this.result.push(createDiagnostic(Range.create(
+                    this.currentLineNumber, line.indexOf("colors"),
+                    this.currentLineNumber, line.indexOf("colors") + "colors".length,
+                ), `"thresholds" are required if "colors" are specified`));
+            }
+            if (atTresholdString) {
+                const index = this.result.findIndex(x =>
+                    x.message === `"thresholds" are required if "colors" are specified`);
+                if (index > -1) {
+                    this.result.splice(index, 1);
+                }
+            }
+        }
     }
 
     /**

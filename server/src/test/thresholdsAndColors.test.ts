@@ -21,6 +21,14 @@ suite("Thresholds and colors tests", () => {
             [],
         ),
         new Test(
+            "Correct: colors declared as rgb",
+            `[widget]
+               type = gauge
+               thresholds = 0, 10, 20, 30
+	           colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)`,
+            [],
+        ),
+        new Test(
             "Correct: \"colors\" declared without \"thresholds\" for bar",
             `[widget]
                type = bar
