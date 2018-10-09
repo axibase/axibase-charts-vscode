@@ -1,19 +1,10 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import {
-    deprecatedTagSection,
-    settingNameInTags,
-    settingsWithWhitespaces,
-    tagNameWithWhitespaces,
-    unknownToken,
-} from "./messageUtil";
-import { requiredSectionSettingsMap } from "./resources";
+import { deprecatedTagSection, settingNameInTags, settingsWithWhitespaces, tagNameWithWhitespaces, unknownToken } from "./messageUtil";
+import { requiredSectionSettingsMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
-import {
-    countCsvColumns, createDiagnostic, deleteComments,
-    getSetting, isAnyInArray, isInMap, repetitionDiagnostic,
-} from "./util";
+import { countCsvColumns, createDiagnostic, deleteComments, getSetting, isAnyInArray, isInMap, repetitionDiagnostic } from "./util";
 
 /**
  * Performs validation of a whole document line by line.
@@ -936,6 +927,10 @@ export class Validator {
 
         if (setting.name === "type") {
             this.currentWidget = this.match[3];
+            let reqs = widgetRequirementsByType.get(this.currentWidget);
+            if (reqs && reqs.sections) {
+                this.sectionStack.setSectionRequirements("widget", reqs.sections);
+            }
         }
 
         if (!setting.multiLine) {
