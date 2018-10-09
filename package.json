@@ -2,8 +2,8 @@
   "name": "axibasecharts-syntax",
   "displayName": "Axibase Charts",
   "description": "Axibase Charts syntax validation and highlighting extension",
-  "author": "Kirill Kamakin",
-  "version": "1.0.8",
+  "author": "Axibase DEV",
+  "version": "1.0.9",
   "license": "Apache-2.0",
   "icon": "images/icon.png",
   "repository": {
@@ -20,7 +20,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Default configuration",
+      "title": "Axibase Charts",
       "properties": {
         "axibaseCharts.validateFunctions": {
           "type": "boolean",
@@ -56,7 +56,8 @@
     "configurationDefaults": {
       "[axibasecharts]": {
         "editor.tabSize": 2,
-        "editor.insertSpaces": true
+        "editor.insertSpaces": true,
+        "editor.snippetSuggestions": "none"
       }
     },
     "languages": [
@@ -122,9 +123,9 @@
     "test:e2e": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
-    "@types/node": "^10.9.4",
     "@types/mocha": "^5.2.0",
+    "@types/node": "^10.11.2",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "typescript": "^3.1.1"
   }
 }

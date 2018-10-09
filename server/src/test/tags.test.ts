@@ -7,9 +7,10 @@ import {
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
-const errorMessage: (setting: string) => string = (setting: string): string => `${setting} is interpreted as a` +
-    " series tag and is sent to the server. Remove the setting from the [tags] section or enclose it" +
-    " double-quotes to suppress the warning.";
+const errorMessage: (setting: string) => string = (setting: string): string =>
+    `${setting} is interpreted as a series tag and is sent to the\nserver. ` +
+    `Move the setting outside of the [tags] section or
+enclose in double-quotes to send it to the server without\na warning.`;
 
 suite("Warn about setting interpreted as a tag", () => {
     const tests: Test[] = [
@@ -20,7 +21,7 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "starttime".length)),
-                DiagnosticSeverity.Information, errorMessage("starttime"),
+                errorMessage("starttime"), DiagnosticSeverity.Information,
             )],
         ),
         new Test(
@@ -37,8 +38,21 @@ suite("Warn about setting interpreted as a tag", () => {
 	startime = 30 minute`,
             [createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "stArt-time".length)),
-                DiagnosticSeverity.Information, errorMessage("start-time"),
+                errorMessage("start-time"), DiagnosticSeverity.Information,
             )],
+        ),
+        new Test(
+            "Error is not raised if the setting is not allowed in the widget",
+            `[widget]
+  type = box
+  entity = test
+  metric = cpu_busy
+  [series]
+    display = false
+    [tags]
+      Disk_Name = *
+      Parent = *`,
+            [],
         ),
     ];
 
@@ -51,51 +65,51 @@ suite("Warn about setting interpreted as a tag", () => {
 suite("Warn about deprecated [tag] section", () => {
     const expectedDiagnostic: Diagnostic = createDiagnostic(
         Range.create(Position.create(0, 1),
-                     Position.create(0, 4)),
-        DiagnosticSeverity.Warning, deprecatedTagSection,
+            Position.create(0, 4)),
+        deprecatedTagSection, DiagnosticSeverity.Warning,
     );
     [
         new Test("Deprecated [tag]",
-                 `[tag]
+            `[tag]
                     name = a
                     value = b
-            `,   [expectedDiagnostic]),
+            `, [expectedDiagnostic]),
     ].forEach((test: Test) => test.validationTest());
 });
 
 suite("Warn about tag keys with whitespaces that not wrapped in double quotes", () => {
     const expectedDiagnostic: Diagnostic =
         createDiagnostic(Range.create(Position.create(1, 2),
-                                      Position.create(1, 11)),
-                         DiagnosticSeverity.Warning,
-                         tagNameWithWhitespaces("two words"));
+            Position.create(1, 11)),
+            tagNameWithWhitespaces("two words"),
+            DiagnosticSeverity.Warning);
     [
         new Test("Tag not wrapped in double-quote",
-                 `[tags]
+            `[tags]
   two words  = a
   "two words" = b
-            `,   [expectedDiagnostic]),
+            `, [expectedDiagnostic]),
     ].forEach((test: Test) => test.validationTest());
 });
 
 suite("Information about settingName in tags", () => {
     const expectedDiagnostic: Diagnostic =
         createDiagnostic(Range.create(Position.create(1, 0),
-                                      Position.create(1, 5)),
-                         DiagnosticSeverity.Information,
-                         settingNameInTags("value"));
+            Position.create(1, 5)),
+            settingNameInTags("value"),
+            DiagnosticSeverity.Information);
     [
         new Test("setting as tag value in [tag] section",
-                 `[tags]
+            `[tags]
 value = key`,
-                 [expectedDiagnostic]),
+            [expectedDiagnostic]),
         new Test("setting name is correct for tag section",
-                 `[tag]
+            `[tag]
 value = correct`,
-                 [ createDiagnostic(
-                     Range.create(Position.create(0, 1),
-                                  Position.create(0, 4)),
-                     DiagnosticSeverity.Warning, deprecatedTagSection,
-                 )]),
+            [createDiagnostic(
+                Range.create(Position.create(0, 1),
+                    Position.create(0, 4)),
+                deprecatedTagSection, DiagnosticSeverity.Warning,
+            )]),
     ].forEach((test: Test) => test.validationTest());
 });

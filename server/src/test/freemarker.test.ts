@@ -1,150 +1,179 @@
 import { DiagnosticSeverity, Range } from "vscode-languageserver";
-import { unknownToken } from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
-suite("FreeMarker unknown variables", () => {
-    const tests: Test[] = [
-        new Test(
-            "Correct usage",
-            `<#assign lpars = [
-   ["abc:KUX","abc"]
-  ,["cde:KUX","cde"]
-]>
+const deprecationMessage: string = `Freemarker expressions are deprecated.
+Use a native collection: list, csv table, var object.` +
+    `\nMigration examples are available at https://github.com/axibase/charts/blob/master/syntax/freemarker.md`;
 
-<#list lpars as lpar>
+suite("Freemarker templates", () => {
+    new Test("Freemarker assign rises warning on open and close tags",
+        `
+    <#assign foo= ['bar', baz']>
+    entity = e
+    </#assign>
+        `,
+        [
+            createDiagnostic(
+                Range.create(1, 4, 1, 32),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(3, 4, 3, 14),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
 
-[group]
+    new Test("Freemarker list rises warning on open and close tags",
+        `
+    <#list foo as bar>
+    entity = e
+    </#list>
+        `,
+        [
+            createDiagnostic(
+                Range.create(1, 4, 1, 22),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(3, 4, 3, 12),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
+
+    new Test("Freemarker if rises warning on open and close tags",
+        `
+    <#if condition>
+    entity = e
+    </#if>
+        `,
+        [
+            createDiagnostic(
+                Range.create(1, 4, 1, 19),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(3, 4, 3, 10),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
+
+    new Test("Freemarker if-else rises warning on all tags",
+        `
+    <#if condition>
+    entity = e
+    <#else>
+    metric=c
+    </#if>
+        `,
+        [
+            createDiagnostic(
+                Range.create(1, 4, 1, 19),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(3, 4, 3, 11),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(5, 4, 5, 10),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
+
+    new Test("Freemarker list rises warning on open tag only",
+        `
+    <#list foo as bar>
+    entity = e
+        `,
+        [
+            createDiagnostic(
+                Range.create(1, 4, 1, 22),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
+
+    new Test("Freemarker list rises warning on close tag only",
+        `
+    entity = e
+    </#list>
+        `,
+        [
+            createDiagnostic(
+                Range.create(2, 4, 2, 12),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+        ],
+    ).validationTest();
+
+    new Test("Freemarker does not rise warning on variable interpolation",
+        `
+        entity = \${entity1235}
+        `,
+        [],
+    ).validationTest();
+
+    new Test("De-alias doesn't raise an error",
+        `value = 0 <#list sid[1]?split(",") as lpar> + value('\$\{lpar\}:PX')</#list>`,
+        [createDiagnostic(
+            Range.create(0, 10, 0, 43),
+            deprecationMessage,
+            DiagnosticSeverity.Information,
+        )],
+    ).validationTest();
+
+    new Test("Alias doesn't exist, error",
+        `value = 0 <#list sid[1]?split(",") as lpar> + value('\${lpr}:PX')</#list>`,
+        [
+            createDiagnostic(
+                Range.create(0, 10, 0, 43),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(0, `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{`.length, 0,
+                    `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{lpr`.length),
+                "lpr is unknown.",
+                DiagnosticSeverity.Error,
+            )
+        ],
+    ).validationTest();
+
+    new Test("No issues except warning",
+        `<#list lpars as lpar>
 [widget]
-    type = gauge
-    title = \${lpar[1]}
-    
-<#assign cpus = getTags("nmon.cpu.idle%", "example", "id") >
-<#list cpus as id >
-    [series]
-        entity = example
-        metric = \${100 * id}
-</#list>`,
-            [
-                createDiagnostic(
-                    Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(12, 0, 12, "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(13, 0, 13, "<#list".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-            ],
-        ),
-        new Test(
-            "Undeclared entity usage",
-            `<#assign lpars = [
-   ["abc:KUX","abc"]
-  ,["cde:KUX","cde"]
-]>
-
-<#list lpars as lpar>
-
-[group]
-[widget]
-    type = gauge
-    title = \${entity}`,
-            [
-                createDiagnostic(
-                    Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-            ],
-        ),
-        new Test(
-            "Misspelt variable name",
-            `<#assign lpars = [
-   ["abc:KUX","abc"]
-  ,["cde:KUX","cde"]
-]>
-
-<#list lpars as lpar>
-
-[group]
-[widget]
-    type = gauge
-    title = \${lbar[1]}
-    label = \${100 * lbar}`,
-            [
-                createDiagnostic(
-                    Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(10, "    title = \${".length, 10, "    title = \${".length + "lbar".length),
-                    DiagnosticSeverity.Error,
-                    unknownToken("lbar"),
-                ),
-                createDiagnostic(
-                    Range.create(11, "    label = \${100 * ".length, 11, "    label = \${100 * ".length + "lbar".length),
-                    DiagnosticSeverity.Error,
-                    unknownToken("lbar"),
-                ),
-            ],
-        ),
-        new Test(
-            "Misspelt array name",
-            `<#assign lpars = [
-   ["abc:KUX","abc"]
-  ,["cde:KUX","cde"]
-]>
-
-<#list lbars as lpar>
-
-[group]
-[widget]
-    type = gauge
-    title = \${lpar[1]}`,
-            [
-                createDiagnostic(
-                    Range.create(0, 0, 0, "<#assign".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(5, 0, 5, "<#list".length),
-                    DiagnosticSeverity.Information,
-                    "Freemarker expressions are deprecated. Use a native collection: list, csv table, var object.",
-                ),
-                createDiagnostic(
-                    Range.create(5, "<#list ".length, 5, "<#list ".length + "lbars".length),
-                    DiagnosticSeverity.Error,
-                    unknownToken("lbars"),
-                ),
-            ],
-        ),
-    ];
-
-    for (const test of tests) {
-        test.validationTest();
-    }
+type = chart
+title = [$\{lpar[2]}] [CEC agent:- $\{lpar[0]}] [Frame:- \${lpar[1]}]
+timespan = 7 day
+</#list>
+    `,
+        [
+            createDiagnostic(
+                Range.create(0, 0, 0, 21),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            ),
+            createDiagnostic(
+                Range.create(5, 0, 5, 8),
+                deprecationMessage,
+                DiagnosticSeverity.Information,
+            )
+        ],
+    ).validationTest();
 });

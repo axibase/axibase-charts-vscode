@@ -1,5 +1,4 @@
-/* tslint:disable:no-magic-numbers */
-import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -31,11 +30,11 @@ encsv`,
             [
                 createDiagnostic(
                     Range.create(Position.create(3, 0), Position.create(3, "encsv".length)),
-                    DiagnosticSeverity.Error, "Expected 3 columns, but found 1",
+                    "Expected 3 columns, but found 1",
                 ),
                 createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
-                    DiagnosticSeverity.Error, "csv has no matching endcsv",
+                    "csv has no matching endcsv",
                 ),
             ],
         ),
@@ -49,11 +48,11 @@ encsv`,
             [
                 createDiagnostic(
                     Range.create(Position.create(4, 0), Position.create(4, "encsv".length)),
-                    DiagnosticSeverity.Error, "Expected 3 columns, but found 1",
+                    "Expected 3 columns, but found 1",
                 ),
                 createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
-                    DiagnosticSeverity.Error, "csv has no matching endcsv",
+                    "csv has no matching endcsv",
                 ),
             ],
         ),
@@ -65,15 +64,23 @@ encsv`,
 endcsv`,
             [createDiagnostic(
                 Range.create(Position.create(2, 0), Position.create(2, "   Russia, 65, 63\n".length)),
-                DiagnosticSeverity.Error, "Expected 3 columns, but found 4",
+                "Expected 3 columns, but found 4",
             )],
         ),
         new Test(
             "Correct csv with escaped whitespaces and commas",
             `csv countries = name, value1, value2
-   Russia, "6,5", 63
-   USA, 63, "6 3"
-endcsv`,
+                Russia, "6,5", 63
+                USA, 63, "6 3"
+            endcsv`,
+            [],
+        ),
+        new Test(
+            "Correct csv with not escaped whitespaces",
+            `csv index =
+                president,inauguration
+                Gerald Ford, 1974
+            endcsv`,
             [],
         ),
     ];

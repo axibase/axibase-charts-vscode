@@ -1,4 +1,5 @@
 import { Position, Range } from "vscode-languageserver";
+import { CheckPriority } from "./checkPriority";
 
 /**
  * Contains the text and the position of the text
@@ -64,6 +65,11 @@ export class TextRange {
     }
 
     /**
+     * Priority of the text, used in jsDomCaller: settings with higher priority are placed earlier in test js "file"
+     */
+    public readonly priority: number = CheckPriority.Low;
+
+    /**
      * Position of the text
      */
     public readonly range: Range;
@@ -72,8 +78,10 @@ export class TextRange {
      * Text at this position
      */
     public readonly text: string;
-    public constructor(text: string, range: Range) {
+
+    public constructor(text: string, range: Range, priority?: number) {
         this.range = range;
         this.text = text;
+        this.priority = priority;
     }
 }

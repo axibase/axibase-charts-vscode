@@ -1,4 +1,3 @@
-/* tslint:disable:no-magic-numbers */
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { settingsWithWhitespaces, unknownToken } from "../messageUtil";
 import { createDiagnostic } from "../util";
@@ -14,28 +13,10 @@ suite("Spelling checks", () => {
             [
                 createDiagnostic(
                     Range.create(Position.create(2, "	".length), Position.create(2, "	startime".length)),
-                    DiagnosticSeverity.Error, unknownToken("startime"),
+                    unknownToken("startime"),
                 ),
 
             ],
-        ),
-        new Test(
-            "section eries",
-            `[eries]
-	starttime = 2018`,
-            [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[eries".length)),
-                DiagnosticSeverity.Error, unknownToken("eries"),
-            )],
-        ),
-        new Test(
-            "section starttime",
-            `[starttime]
-	starttime = 2018`,
-            [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[starttime".length)),
-                DiagnosticSeverity.Error, unknownToken("starttime"),
-            )],
         ),
         new Test(
             "tags ignored",
@@ -51,13 +32,10 @@ suite("Spelling checks", () => {
 	startime = 2018`,
             [
                 createDiagnostic(
-                    Range.create(Position.create(2, "[".length), Position.create(2, "[starttime".length)),
-                    DiagnosticSeverity.Error, unknownToken("starttime"),
-                ),
-                createDiagnostic(
                     Range.create(Position.create(3, "	".length), Position.create(3, " ".length + "startime".length)),
-                    DiagnosticSeverity.Error, unknownToken("startime"),
-                )],
+                    unknownToken("startime"),
+                )
+            ],
         ),
         new Test(
             "tags ignoring finished with whitespace",
@@ -70,7 +48,7 @@ suite("Spelling checks", () => {
   startime = 2018`,
             [createDiagnostic(
                 Range.create(Position.create(6, "  ".length), Position.create(6, "  ".length + "startime".length)),
-                DiagnosticSeverity.Error, unknownToken("startime"),
+                unknownToken("startime"),
             )],
         ),
         new Test(
@@ -104,7 +82,7 @@ type = chart`,
   ed = 0`,
             [createDiagnostic(
                 Range.create(Position.create(3, "  ".length), Position.create(3, "  ".length + "ad".length)),
-                DiagnosticSeverity.Error, unknownToken("ad"),
+                unknownToken("ad"),
             )],
         ),
         new Test(
@@ -122,19 +100,8 @@ entity = nurswgvml006
 metric = cpu_iowait`,
             [createDiagnostic(
                 Range.create(0, "[".length, 0, "[".length + "series".length),
-                DiagnosticSeverity.Error, "Section tag is unclosed",
+                "Section tag is unclosed",
             )],
-        ),
-        new Test(
-            "timezone test",
-            `[configuration]
-  timezone = \${timezone}`,
-            [
-                createDiagnostic(
-                    Range.create(1, "  timezone = \${".length, 1, "  timezone = \${".length + "timezone".length),
-                    DiagnosticSeverity.Error, unknownToken("timezone"),
-                ),
-            ],
         ),
     ];
 
@@ -150,7 +117,7 @@ suite("Warn about setting that contains whitespaces", () => {
         Range.create(
             Position.create(2, 0),
             Position.create(2, settingsName.length)),
-        DiagnosticSeverity.Warning, settingsWithWhitespaces(settingsName));
+        settingsWithWhitespaces(settingsName), DiagnosticSeverity.Warning);
     [
         new Test("should warn about setting with whitespaces",
                  `[configuration]

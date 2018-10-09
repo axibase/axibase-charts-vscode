@@ -1,7 +1,29 @@
 import * as assert from "assert";
-import { Diagnostic, FormattingOptions, TextEdit } from "vscode-languageserver";
+import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
+import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
+import { HoverProvider } from "../hoverProvider";
+import { JavaScriptValidator } from "../javaScriptValidator";
+import { SectionStack } from "../sectionStack";
 import { Validator } from "../validator";
+
+/**
+ * Stub section validator to allow incomplete configs in tests
+ */
+// tslint:disable-next-line:no-object-literal-type-assertion
+const sectionStackStub: SectionStack  = {
+    insertSection(): Diagnostic | null {
+        return null;
+    },
+
+    finalize(): Diagnostic | null {
+        return null;
+    },
+
+    setSectionRequirements() {
+        /* void */
+    },
+} as any as SectionStack;
 
 /**
  * Contains a test case and executes the test
@@ -10,7 +32,7 @@ export class Test {
     /**
      * The expected result of the target function
      */
-    private readonly expected: Diagnostic[] | TextEdit[];
+    private readonly expected: Diagnostic[] | TextEdit[] | Hover | string[];
     /**
      * The name of the test. Displayed in tests list after the execution
      */
@@ -18,17 +40,30 @@ export class Test {
     /**
      * Formatting options used in Formatter tests
      */
-    private readonly options: FormattingOptions | undefined;
+    private readonly options?: FormattingOptions;
+    /**
+     * Position of Hover used in hover tests
+     */
+    private readonly position?: Position;
     /**
      * Text of the test document
      */
     private readonly text: string;
+    private readonly document: TextDocument;
 
-    public constructor(name: string, text: string, expected: Diagnostic[] | TextEdit[], options?: FormattingOptions) {
+    public constructor(
+        name: string,
+        text: string,
+        expected: Diagnostic[] | TextEdit[] | Hover | string[],
+        options?: FormattingOptions,
+        position?: Position,
+    ) {
         this.name = name;
         this.text = text;
         this.expected = expected;
         this.options = options;
+        this.position = position;
+        this.document = TextDocument.create("test", "axibasecharts", 1, text);
     }
 
     /**
@@ -48,7 +83,38 @@ export class Test {
      */
     public validationTest(): void {
         test((this.name), () => {
-            assert.deepStrictEqual(new Validator(this.text).lineByLine(), this.expected);
+            let validator = new Validator(this.text);
+            Object.assign(validator, { sectionStack: sectionStackStub });
+            assert.deepStrictEqual(validator.lineByLine(), this.expected);
+        });
+    }
+
+    /**
+     * Tests Hover
+     */
+    public hoverTest(): void {
+        test((this.name), () => {
+            assert.deepStrictEqual(new HoverProvider(this.document).provideHover(this.position), this.expected);
+        });
+    }
+
+    /**
+     * Tests JavaScriptValidator (JavaScript statements, including var)
+     */
+    public jsValidationTest(): void {
+        test((this.name), () => {
+            assert.deepStrictEqual(new JavaScriptValidator(this.text).validate(true), this.expected);
+        });
+    }
+
+    /**
+     * Tests CompletionProvider
+     */
+    public completionTest(): void {
+        test((this.name), () => {
+            const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
+            const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+            assert.deepStrictEqual(current, this.expected);
         });
     }
 }

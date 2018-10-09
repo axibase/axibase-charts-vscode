@@ -13,11 +13,57 @@
         "description": "Portal configuration setting",
         "properties": {
           "section": {
-            "type": "string",
             "description": "[Optional] Deepest section, where the setting can be applied. Default is global",
-            "enum": [
-              "column", "configuration", "dropdown", "group", "keys", "link", "node", "option", "other", "placeholders",
-              "properties", "property", "series", "tag", "tags", "threshold", "widget"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "column",
+                  "configuration",
+                  "dropdown",
+                  "group",
+                  "keys",
+                  "link",
+                  "node",
+                  "option",
+                  "other",
+                  "placeholders",
+                  "properties",
+                  "property",
+                  "series",
+                  "tag",
+                  "tags",
+                  "threshold",
+                  "widget"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "column",
+                    "configuration",
+                    "dropdown",
+                    "group",
+                    "keys",
+                    "link",
+                    "node",
+                    "option",
+                    "other",
+                    "placeholders",
+                    "properties",
+                    "property",
+                    "series",
+                    "tag",
+                    "tags",
+                    "threshold",
+                    "widget"
+                  ]
+                }
+              }
             ]
           },
           "displayName": {
@@ -28,16 +74,30 @@
             "type": "string",
             "description": "The type of the setting",
             "enum": [
-              "boolean", "string", "enum", "number", "interval", "date", "integer"
+              "boolean",
+              "string",
+              "enum",
+              "number",
+              "interval",
+              "date",
+              "integer"
             ]
           },
           "defaultValue": {
             "description": "Default setting value",
-            "type": ["string", "number", "boolean"]
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
           },
           "example": {
             "description": "Example value",
-            "type": ["string", "number", "boolean"]
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
           },
           "minValue": {
             "description": "[Optional] Minimal value constraint. Default is 'no constraint'",
@@ -61,8 +121,20 @@
             "description": "[Optional] Which widget accepts the setting. Default is 'all'",
             "type": "string",
             "enum": [
-              "gauge", "chart", "bar", "histogram", "box", "calendar", "treemap", "pie",
-              "graph", "text", "page", "console", "table", "property"
+              "gauge",
+              "chart",
+              "bar",
+              "histogram",
+              "box",
+              "calendar",
+              "treemap",
+              "pie",
+              "graph",
+              "text",
+              "page",
+              "console",
+              "table",
+              "property"
             ]
           },
           "excludes": {
@@ -73,6 +145,25 @@
             "items": {
               "type": "string",
               "description": "A setting, which is excluded"
+            }
+          },
+          "override": {
+            "patternProperties": {
+              "^\\[.+\\]$": {
+                "$ref": "#/properties/settings/items",
+                "required": []
+              }
+            },
+            "additionalProperties": false
+          },
+          "possibleValues": {
+            "description": "[Optional] Unique objects containing values which can be assigned to the setting with 'string' type and descriptions for these values",
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "description": "Contains value and description fields"
             }
           },
           "script": {
@@ -90,7 +181,13 @@
                       "description": "The type of the inline JavaScript argument",
                       "type": "string",
                       "enum": [
-                        "array", "boolean", "integer", "number", "object", "string", "function"
+                        "array",
+                        "boolean",
+                        "integer",
+                        "number",
+                        "object",
+                        "string",
+                        "function"
                       ]
                     },
                     "nullable": {
@@ -112,7 +209,15 @@
                             "type": "string",
                             "description": "The type of this argument",
                             "enum": [
-                              "array", "boolean", "integer", "number", "function", "string", "interval", "date", "object"
+                              "array",
+                              "boolean",
+                              "integer",
+                              "number",
+                              "function",
+                              "string",
+                              "interval",
+                              "date",
+                              "object"
                             ]
                           },
                           "name": {
@@ -125,7 +230,8 @@
                           }
                         },
                         "required": [
-                          "type", "name"
+                          "type",
+                          "name"
                         ]
                       },
                       "uniqueItems": true
@@ -137,7 +243,13 @@
                 "description": "The value returned by this script",
                 "type": "string",
                 "enum": [
-                  "boolean", "number", "string", "void", "integer", "interval", "date"
+                  "boolean",
+                  "number",
+                  "string",
+                  "void",
+                  "integer",
+                  "interval",
+                  "date"
                 ]
               }
             },
@@ -147,7 +259,9 @@
           }
         },
         "required": [
-          "displayName", "type", "example"
+          "displayName",
+          "type",
+          "example"
         ]
       },
       "minItems": 1,

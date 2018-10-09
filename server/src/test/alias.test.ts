@@ -1,5 +1,4 @@
-/* tslint:disable:no-magic-numbers */
-import { DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Range } from "vscode-languageserver";
 import { unknownToken } from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
@@ -30,7 +29,7 @@ suite("Incorrect dealias tests", () => {
   value = value('s2') * 2`,
             [createDiagnostic(
                 Range.create(7, "  value = value('".length, 7, "  value = value('".length + "s2".length),
-                DiagnosticSeverity.Error, unknownToken("s2"),
+                unknownToken("s2"),
             )],
         ),
         new Test(
@@ -62,11 +61,11 @@ suite("Incorrect dealias tests", () => {
             [
                 createDiagnostic(
                     Range.create(7, "  value = value('".length, 7, "  value = value('".length + "s2".length),
-                    DiagnosticSeverity.Error, unknownToken("s2"),
+                    unknownToken("s2"),
                 ),
                 createDiagnostic(
                     Range.create(11, "  value = value('".length, 11, "  value = value('".length + "s3".length),
-                    DiagnosticSeverity.Error, unknownToken("s3"),
+                    unknownToken("s3"),
                 )],
         ),
         new Test(
@@ -109,7 +108,7 @@ suite("Incorrect dealias tests", () => {
   value = value('s2') * 2`,
             [createDiagnostic(
                 Range.create(11, "  value = value('".length, 11, "  value = value('".length + "s3".length),
-                DiagnosticSeverity.Error, unknownToken("s3"),
+                unknownToken("s3"),
             )],
         ),
         new Test(
@@ -162,7 +161,7 @@ suite("Incorrect dealias tests", () => {
   entity = srv`,
             [createDiagnostic(
                 Range.create(11, "  value = value('".length, 11, "  value = value('".length + "sc".length),
-                DiagnosticSeverity.Error, unknownToken("sc"),
+                unknownToken("sc"),
             )],
         ),
         new Test(

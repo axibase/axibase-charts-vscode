@@ -1,25 +1,12 @@
 {
-    "extends": "tslint:all",
+    "defaultSeverity": "warning",
+    "extends": "tslint:recommended",
     "rules": {
-        "no-inferrable-types": false,
-        "no-implicit-dependencies": [
-            true,
-            "dev"
-        ],
-        "comment-format": false,
-        "no-magic-numbers": false,
-        "member-ordering": false,
-        "no-non-null-assertion": false,
-        "newline-per-chained-call": false,
-        "only-arrow-functions": false,
-        "triple-equals": [true, "allow-null-check"],
-        "no-null-keyword": false
-    },
-    "jsRules": {
-        "max-line-length": {
-            "options": [
-                120
-            ]
-        }
+        "prefer-const": false,
+        "arrow-parens": false,
+        "trailing-comma": false,
+        "no-console": false,
+        "interface-name": false,
+        "object-literal-key-quotes": false
     }
 }

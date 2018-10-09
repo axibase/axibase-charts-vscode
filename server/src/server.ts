@@ -1,12 +1,13 @@
 import {
     ClientCapabilities, CompletionItem, CompletionParams, createConnection, Diagnostic,
     DidChangeConfigurationNotification, DidChangeConfigurationParams,
-    DocumentFormattingParams, IConnection, InitializeParams, ProposedFeatures,
-    TextDocument, TextDocumentChangeEvent, TextDocuments, TextEdit,
+    DocumentFormattingParams, Hover, IConnection, InitializeParams,
+    ProposedFeatures, TextDocument, TextDocumentChangeEvent, TextDocumentPositionParams, TextDocuments, TextEdit,
 } from "vscode-languageserver";
 import { CompletionProvider } from "./completionProvider";
 import { Formatter } from "./formatter";
-import { JsDomCaller } from "./jsDomCaller";
+import { HoverProvider } from "./hoverProvider";
+import { JavaScriptValidator } from "./javaScriptValidator";
 import { Validator } from "./validator";
 
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
@@ -29,6 +30,7 @@ connection.onInitialize((params: InitializeParams) => {
         capabilities: {
             completionProvider: { resolveProvider: true },
             documentFormattingProvider: true,
+            hoverProvider: true,
             textDocumentSync: documents.syncKind,
         },
     };
@@ -39,6 +41,12 @@ connection.onInitialized(() => {
         // Register for all configuration changes.
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
+});
+
+connection.onHover((params: TextDocumentPositionParams): Hover => {
+    const document: TextDocument = documents.get(params.textDocument.uri);
+
+    return new HoverProvider(document).provideHover(params.position);
 });
 
 interface IServerSettings {
@@ -80,18 +88,13 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
         const settings: IServerSettings = await getDocumentSettings(textDocument.uri);
         const text: string = textDocument.getText();
         const validator: Validator = new Validator(text);
-        const jsDomCaller: JsDomCaller = new JsDomCaller(text);
+        const jsValidator: JavaScriptValidator = new JavaScriptValidator(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
-
-        if (settings.validateFunctions) {
-            jsDomCaller.validate().forEach((element: Diagnostic) => {
-                diagnostics.push(element);
-            });
-        }
+        const jsDiagnostics: Diagnostic[] = jsValidator.validate(settings.validateFunctions);
 
         // Send the computed diagnostics to VSCode.
         // connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-        connection.sendNotification("charts-diagnostic", [textDocument.uri, diagnostics]);
+        connection.sendNotification("charts-diagnostic", [textDocument.uri, diagnostics.concat(jsDiagnostics)]);
     };
 
 connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
