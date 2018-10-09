@@ -1,24 +1,45 @@
 import {
-    CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument,
+    CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
-import { deleteComments, deleteScripts } from "./util";
+import { Field } from "./field";
+import { settingsMap } from "./resources";
+import { Setting } from "./setting";
+import { deleteComments, deleteScripts, getSetting } from "./util";
+export const snippets = require("../../snippets/snippets.json");
+
+export interface ItemFields {
+    insertTextFormat?: InsertTextFormat;
+    kind?: CompletionItemKind;
+    insertText: string;
+    detail?: string;
+    name?: string;
+}
 
 /**
  * Provides dynamic completion items.
  */
 export class CompletionProvider {
     private readonly text: string;
+    private readonly currentLine: string;
 
     public constructor(textDocument: TextDocument, position: Position) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
         this.text = deleteScripts(deleteComments(text));
+        this.currentLine = this.text.split("\n")[position.line];
     }
 
     /**
      * Creates completion items
      */
     public getCompletionItems(): CompletionItem[] {
-        return [this.completeFor()].concat(this.completeIf());
+        let match = /^\s*(\S+)\s*=\s*/.exec(this.currentLine);
+        if (match) {
+            // completion requested at assign stage, i. e. type = <Ctrl + space>
+            return this.completeSettingValue(match[1]);
+        } else {
+            // completion requested at start of line (supposed that line is empty)
+            return this.completeSnippets().concat(this.completeIf(), this.completeFor(), this.completeSettingName());
+        }
     }
 
     /**
@@ -117,9 +138,169 @@ endif
 
         return [ifString, ifNumber, ifElseIf].map((completion: CompletionItem): CompletionItem => {
             completion.insertTextFormat = InsertTextFormat.Snippet;
-            completion.kind = CompletionItemKind.Keyword;
+            completion.kind = CompletionItemKind.Snippet;
 
             return completion;
         });
     }
+
+    /**
+     * Creates an array of completion items containing setting names.
+     * @returns array containing snippets
+     */
+    private completeSettingName(): CompletionItem[] {
+        const items: CompletionItem[] = [];
+        for (let [, value] of settingsMap) {
+            items.push(this.fillCompletionItem({
+                detail: `${value.description ? value.description + "\n" : ""}Example: ${value.example}`,
+                insertText: `${value.displayName} = `,
+                kind: CompletionItemKind.Field,
+                name: value.displayName
+            }));
+        }
+        return items;
+    }
+    /**
+     * Creates an array of completion items containing possible values for settings.
+     * @param settingName name of the setting, for example "colors"
+     * @returns array containing completions
+     */
+    private completeSettingValue(settingName: string): CompletionItem[] {
+        const setting = getSetting(settingName);
+        if (!setting) {
+            return [];
+        }
+        switch (setting.type) {
+            case "string": {
+                return this.completeStringSettingValue(setting);
+            }
+            case "number":
+            case "integer":
+                if (setting.example) {
+                    return [this.fillCompletionItem({ insertText: setting.example.toString() })];
+                }
+                break;
+            case "boolean": {
+                return this.getItemsArray(["true", "false"]);
+            }
+            case "enum": {
+                return this.getItemsArray(setting.enum);
+            }
+            case "interval": {
+                return this.getItemsArray(Setting.intervalUnits);
+            }
+            case "date": {
+                return this.getItemsArray(Setting.calendarKeywords, new Date().toISOString());
+            }
+            default: {
+                return [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Creates an array of completion items containing snippets.
+     * @returns array containing snippets
+     */
+    private completeSnippets(): CompletionItem[] {
+        const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
+            const insertText: string =
+                (typeof snippets[key].body === "string") ? snippets[key].body : snippets[key].body.join("\n");
+
+            return this.fillCompletionItem({
+                insertText, detail: snippets[key].description,
+                name: key, insertTextFormat:
+                    InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
+            });
+        });
+
+        return items;
+    }
+
+    /**
+     * Creates an array of completion items containing possible values for settings with type = "string".
+     * @param setting the setting
+     * @returns array containing completions
+     */
+    private completeStringSettingValue(setting: Setting): CompletionItem[] {
+        let valueItems: CompletionItem[] = [];
+        let scriptItems: CompletionItem[] = [];
+        if (setting.possibleValues) {
+            valueItems = setting.possibleValues.map(v =>
+                this.fillCompletionItem({ insertText: v.value, detail: v.detail }));
+        }
+        if (setting.script) {
+            setting.script.fields.forEach((field: Field) => {
+                if (field.type === "function") {
+                    let itemFields: ItemFields = { insertText: "", kind: CompletionItemKind.Function };
+                    if (field.args) {
+                        let requiredArgs: Field[] = field.args.filter(a => a.required);
+                        let optionalArgs: Field[] = field.args.filter(a => !a.required);
+                        let requiredArgsString: string = `${requiredArgs.map(field => field.name).join(", ")}`;
+                        itemFields.insertText = `${field.name}${requiredArgsString !== "" ?
+                            "(" + requiredArgsString + ")" : ""}`;
+                        scriptItems.push(this.fillCompletionItem(itemFields));
+                        let args: string = "";
+                        for (let arg of optionalArgs) {
+                            args = `${args !== "" ? args + ", " : ""}${arg.name}`;
+                            itemFields.insertText = `${field.name}(${requiredArgsString !== "" ?
+                                requiredArgsString + ", " : ""}${args})`;
+                            scriptItems.push(this.fillCompletionItem(itemFields));
+                        }
+                    } else {
+                        itemFields.insertText = field.name;
+                        scriptItems.push(this.fillCompletionItem(itemFields));
+                    }
+                } else {
+                    scriptItems.push(this.fillCompletionItem({
+                        insertText: field.name,
+                        detail: `Type: ${field.type}`
+                    }));
+                }
+            });
+        }
+        if (!setting.possibleValues && setting.example !== "") {
+            valueItems = [this.fillCompletionItem({
+                insertText: setting.example.toString(),
+                kind: CompletionItemKind.Field
+            })];
+        }
+
+        return valueItems.concat(scriptItems);
+    }
+
+    /**
+     * Set fields for CompletionItem
+     * @param insertText text to be inserted with completion request
+     * @returns completion
+     */
+    private fillCompletionItem(itemFields: ItemFields): CompletionItem {
+        let item: CompletionItem = CompletionItem.create(itemFields.name || itemFields.insertText);
+        item.insertTextFormat = itemFields.insertTextFormat || InsertTextFormat.PlainText;
+        item.kind = itemFields.kind || CompletionItemKind.Value;
+        item.insertText = itemFields.insertText;
+        item.detail = itemFields.detail || itemFields.insertText;
+        item.sortText = item.kind.toString();
+
+        return item;
+    }
+
+    /**
+     * Сonverts the source array to array of completions
+     * @param processedArray the source array
+     * @param additionalStrings the strings to be processed and added to completions
+     * @returns completions
+     */
+    private getItemsArray(processedArray: string[], ...additionalStrings: string[]): CompletionItem[] {
+
+        let items: CompletionItem[] = processedArray.map(el => this.fillCompletionItem({ insertText: el }));
+        for (let s of additionalStrings) {
+            items.push(this.fillCompletionItem({ insertText: s }));
+        }
+
+        return items;
+    }
+
 }

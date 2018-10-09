@@ -764,7 +764,9 @@
             "enum": [
                 "blue",
                 "red",
-                "black"
+                "black",
+                "green",
+                "yellow"
             ]
         },
         {
@@ -842,6 +844,68 @@
             "displayName": "day-format",
             "type": "string",
             "example": "%y/%m/%d",
+            "possibleValues": [
+                {
+                    "value": "%a",
+                    "detail": "Three-letter abbreviated day name, for example: Sun, Mon, Tue, Wed, Thu, Fri, Sat."
+                },
+                {
+                    "value": "%aa",
+                    "detail": "Two-letter abbreviated day name, for example: Su, Mo, Tu, We, Th, Fr, Sa."
+                },
+                {
+                    "value": "%A",
+                    "detail": "Full day name."
+                },
+                {
+                    "value": "%b",
+                    "detail": "Abbreviated month name."
+                },
+                {
+                    "value": "%B",
+                    "detail": "Full month name."
+                },
+                {
+                    "value": "%d",
+                    "detail": "Zero-padded day of the month as a decimal number [01,31]."
+                },
+                {
+                    "value": "%e",
+                    "detail": "Space-padded day of the month as a decimal number [ 1,31]. Equivalent to %_d."
+                },
+                {
+                    "value": "%j",
+                    "detail": "Day of the year as a decimal number [001,366]."
+                },
+                {
+                    "value": "%m",
+                    "detail": "Month as a decimal number [01,12]."
+                },
+                {
+                    "value": "%U",
+                    "detail": "Week number of the year as a decimal number [00,53]. Sunday is the first day of the week."
+                },
+                {
+                    "value": "%w",
+                    "detail": "Weekday as a decimal number [0(Sunday),6]."
+                },
+                {
+                    "value": "%W",
+                    "detail": "Week number of the year as a decimal number [00,53]. Monday is the first day of the week."
+                },
+                {
+                    "value": "%x",
+                    "detail": "Date, as %m/%d/%Y."
+                },
+                {
+                    "value": "%y",
+                    "detail": "Year without century as a decimal number [00,99]."
+                },
+                {
+                    "value": "%Y",
+                    "detail": "Year with century as a decimal number."
+                }
+            ],
             "section": "widget"
         },
         {
@@ -2058,6 +2122,32 @@
             "displayName": "format",
             "type": "string",
             "example": "kilobytes",
+            "possibleValues": [
+                {
+                    "value": "bytes"
+                },
+                {
+                    "value": "kilobytes"
+                },
+                {
+                    "value": "megawatt"
+                },
+                {
+                    "value": "kilowatthour"
+                },
+                {
+                    "value": "hertz"
+                },
+                {
+                    "value": "kilojoule"
+                },
+                {
+                    "value": "million watt"
+                },
+                {
+                    "value": "thousands"
+                }
+            ],
             "section": "widget",
             "script": {
                 "returnValue": "string",
@@ -5225,7 +5315,10 @@
         {
             "displayName": "series",
             "widget": "graph",
-            "section": ["node", "link"],
+            "section": [
+                "node",
+                "link"
+            ],
             "type": "string",
             "example": "series-1"
         },
@@ -7661,7 +7754,63 @@
         {
             "displayName": "type",
             "type": "string",
-            "example": "chart"
+            "example": "chart",
+            "possibleValues": [
+                {
+                    "value": "chart",
+                    "detail": "Time Charts display series values\nat successive time intervals, showing one or more series, each assigned to the left or right value axis and scaled independently.\nTime Charts load data for\na specified time interval and update the chart with incremental values as new data is received."
+                },
+                {
+                    "value": "gauge",
+                    "detail": "Gauge Chart displays last series value on a gauge with colored threshold ranges. If the gauge widget contains multiple series, it displays the sum of the series values."
+                },
+                {
+                    "value": "treemap",
+                    "detail": "Treemap displays each series as a rectangle, sized according to the size setting and colored according to the magnitude of deviation of the series value from the threshold."
+                },
+                {
+                    "value": "bar",
+                    "detail": "Bar Charts group series into columns and displays them as horizontal or vertical bars."
+                },
+                {
+                    "value": "calendar",
+                    "detail": "The Calendar Chart displays deviation of aggregated series values for each calendar period from the specified threshold. Series values within each period are aggregated with a statistical function, avg by default, and the aggregated period value is then assigned a certain color which reflects the magnitude of the deviation."
+                },
+                {
+                    "value": "histogram",
+                    "detail": "Histogram charts visualize data distribution."
+                },
+                {
+                    "value": "box",
+                    "detail": "The Box Chart displays the minimum and maximum values, the median, and two percentiles in a given period of time for each series."
+                },
+                {
+                    "value": "pie",
+                    "detail": "Pie Chart illustrates numerical proportions between series values and their total value."
+                },
+                {
+                    "value": "graph",
+                    "detail": "The graph widget displays the topology and relationships of servers, virtual machines, and managers alongside corresponding status."
+                },
+                {
+                    "value": "text"
+                },
+                {
+                    "value": "page"
+                },
+                {
+                    "value": "console",
+                    "detail": "The Alert Console displays a continuously updated list of open alerts or messages in tabular format."
+                },
+                {
+                    "value": "table",
+                    "detail": "Use Streaming Table widget to display a table of metric values. By default, it contains four columns: entity, metric, time, and value."
+                },
+                {
+                    "value": "property",
+                    "detail": "The Property Table Widget displays properties collected for the entity in tabular format."
+                }
+            ]
         },
         {
             "displayName": "unscale",

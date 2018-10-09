@@ -7,13 +7,13 @@ import {
     unknownToken,
 } from "./messageUtil";
 import { requiredSectionSettingsMap } from "./resources";
+import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import {
     countCsvColumns, createDiagnostic, deleteComments,
     getSetting, isAnyInArray, isInMap, repetitionDiagnostic,
 } from "./util";
-import { SectionStack } from "./sectionStack";
 
 /**
  * Performs validation of a whole document line by line.
@@ -133,7 +133,7 @@ export class Validator {
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
                 /**
                  *  lines in multiline script and var sections
-                 *  will be cheked in jsDomCaller.processScript() and processVar()
+                 *  will be cheked in JavaScriptValidator.processScript() and processVar()
                  */
                 continue;
             }

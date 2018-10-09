@@ -1,4 +1,5 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { PossibleValue } from "./possibleValue";
 import { Script } from "./script";
 import { createDiagnostic } from "./util";
 
@@ -18,8 +19,9 @@ export class Setting {
      * @param str string to be cleared
      * @returns cleared string
      */
-    public static clearSetting: (str: string) => string = (str: string): string => str.toLowerCase()
-        .replace(/[^a-z]/g, "")
+    public static clearSetting: (str: string) => string = (str: string): string =>
+        str.toLowerCase().replace(/[^a-z]/g, "");
+
     /**
      * Lowercases the value of setting
      * @param str string to be cleared
@@ -30,13 +32,14 @@ export class Setting {
     private static readonly booleanKeywords: string[] = [
         "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
     ];
-    private static readonly intervalUnits: string[] = [
+
+    public static readonly intervalUnits: string[] = [
         "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
     ];
 
     private static readonly booleanRegExp: RegExp = new RegExp(`^(?:${Setting.booleanKeywords.join("|")})$`);
 
-    private static readonly calendarKeywords: string[] = [
+    public static readonly calendarKeywords: string[] = [
         "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
         "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
         "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
@@ -86,7 +89,8 @@ export class Setting {
      * @returns true if the string is date expression, false otherwise
      */
     private static readonly isDate: (text: string) => boolean = (text: string): boolean =>
-        Setting.calendarRegExp.test(text) || Setting.localDateRegExp.test(text) || Setting.zonedDateRegExp.test(text)
+        Setting.calendarRegExp.test(text) || Setting.localDateRegExp.test(text) || Setting.zonedDateRegExp.test(text);
+
     public readonly defaultValue?: string | number | boolean;
     public readonly description: string = "";
     public readonly displayName: string = "";
@@ -101,6 +105,8 @@ export class Setting {
     public readonly section?: string | string[];
     public readonly type: string = "";
     public readonly widget?: string;
+    public readonly possibleValues?: PossibleValue[];
+
     public readonly override?: { [scope: string]: Partial<Setting> };
 
     private overrideCache: OverrideCacheEntry[] = [];
@@ -124,7 +130,7 @@ export class Setting {
 
     /**
      * Create an instance of setting with matching overrides applied.
-     * If no override can be applied returns this insatnce.
+     * If no override can be applied returns this instanse.
      * @param scope Configuration scope where setting exist
      */
     public applyScope(scope: SettingScope): Setting {

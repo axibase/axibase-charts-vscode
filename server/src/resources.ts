@@ -7,7 +7,7 @@ interface IDictionary { $schema: string; settings: Setting[]; }
  * Reads dictionary from "dictionary.json" file
  * @returns array of settings from the file
  */
-const readSettings: () => Setting[] = (): Setting[] => {
+function readSettings(): Setting[] {
     const dictionaryFilePath: string = join(__dirname, "..", "dictionary.json");
     const jsonContent: string = readFileSync(dictionaryFilePath, "UTF-8");
     const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
@@ -147,7 +147,7 @@ export function getParents(section: string): string[] {
     return parents;
 }
 
-export const sectionDepthMap: {[section: string]: number} = {
+export const sectionDepthMap: { [section: string]: number } = {
     "configuration": 0,
 
     "group": 1,
