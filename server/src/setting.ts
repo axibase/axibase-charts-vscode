@@ -152,7 +152,6 @@ export class Setting {
     /**
      * Checks the type of the setting and creates a corresponding diagnostic
      * @param value value which is assigned to the setting
-     * @param widget widget where the setting is declared (none if no widget is found)
      * @param range where the error should be displayed
      * @param name name of the setting which is used by user
      */
@@ -198,7 +197,10 @@ export class Setting {
                 const index: number = this.enum.findIndex((option: string): boolean =>
                     new RegExp(`^${option}$`, "i").test(value),
                 );
-                if (index < 0) {
+                // Empty enum means that the setting is not allowed
+                if (this.enum.length === 0) {
+                    result = createDiagnostic(range, `${name} setting is not allowed here.`);
+                } else if (index < 0) {
                     const enumList: string = this.enum.join(";\n")
                         .replace(/percentile\(.+/, "percentile_{num};");
                     result = createDiagnostic(range, `${name} must be one of:\n${enumList}`);

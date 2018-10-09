@@ -387,7 +387,7 @@ Double-click modifies `expand` setting interactively.
   
 ## expandpanels  
   
-Display control panels in the top left or right corners in Time and Bar charts.  
+Display control panels in the top left or right corners in Time chart.  
   
 ## expandtags  
   

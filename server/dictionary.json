@@ -729,7 +729,7 @@
             "override": {
                 "[widget == 'console']": {
                     "enum": ["terminal"]
-                    
+
                 },
                 "[widget == 'box']": {
                     "enum": ["metro"]
@@ -2043,14 +2043,33 @@
             "displayName": "expand-panels",
             "type": "enum",
             "example": "all",
-            "defaultValue": "hover",
-            "enum": [
-                "all",
-                "hover",
-                "true",
-                "false"
-            ],
-            "section": "widget"
+            "defaultValue": "compact",
+            "enum": [],
+            "section": "widget",
+            "override": {
+              "[widget == 'chart']": {
+                "enum": [
+                  "true",
+                  "all",
+                  "default",
+                  "auto",
+                  "compact",
+                  "false",
+                  "none"
+                ]
+              },
+              "[section == 'configuration']": {
+                "enum": [
+                  "true",
+                  "all",
+                  "default",
+                  "auto",
+                  "compact",
+                  "false",
+                  "none"
+                ]
+              }
+            }
         },
         {
             "displayName": "expand-tags",
