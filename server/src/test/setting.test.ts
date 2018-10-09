@@ -64,13 +64,13 @@ Configuration: ${config}`);
         });
     });
 
-    test("should not allow the setting for not chart or bar widget", () => {
+    test("should not allow the setting for not chart widget", () => {
         const config = `[configuration]
                 entity = a
                 metric = a
             [group]
             [widget]
-        type = tree
+        type = bar
         expand-panels = compact
         [series]`;
         const validator = new Validator(config);

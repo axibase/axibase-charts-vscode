@@ -1994,17 +1994,6 @@
                   "none"
                 ]
               },
-              "[widget == 'bar']": {
-                "enum": [
-                  "true",
-                  "all",
-                  "default",
-                  "auto",
-                  "compact",
-                  "false",
-                  "none"
-                ]
-              },
               "[section == 'configuration']": {
                 "enum": [
                   "true",
