@@ -3,7 +3,7 @@ import {
 } from "vscode-languageserver";
 import { Field } from "./field";
 import { settingsMap } from "./resources";
-import { Setting } from "./setting";
+import { calendarKeywords, intervalUnits, Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
 
@@ -187,10 +187,10 @@ endif
                 return this.getItemsArray(setting.enum);
             }
             case "interval": {
-                return this.getItemsArray(Setting.intervalUnits);
+                return this.getItemsArray(intervalUnits, ...setting.enum);
             }
             case "date": {
-                return this.getItemsArray(Setting.calendarKeywords, new Date().toISOString());
+                return this.getItemsArray(calendarKeywords, new Date().toISOString());
             }
             default: {
                 return [];
