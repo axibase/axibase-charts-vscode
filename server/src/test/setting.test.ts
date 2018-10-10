@@ -4,7 +4,7 @@ import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 suite("Validator for expand-panels setting", () => {
-    const possibleValues = ["all", "true", "compact", "default", "auto", "none", "false"];
+    const possibleValues = ["all", "auto", "compact", "default", "false", "none", "true"];
     const incorrectValues = ["fals", "no", "notcompact"];
 
     possibleValues.forEach(settingValue => {
@@ -55,7 +55,7 @@ Configuration: ${config}`);
             const actualDiagnostics = validator.lineByLine();
             const expectedDiagnostic = createDiagnostic(
                 Range.create(Position.create(6, 8), Position.create(6, 21)),
-                "expand-panels must be one of:\ntrue;\nall;\ndefault;\nauto;\ncompact;\nfalse;\nnone",
+                `expand-panels must be one of:\n * ${possibleValues.join("\n * ")}`,
                 DiagnosticSeverity.Error
             );
             deepStrictEqual(actualDiagnostics, [expectedDiagnostic],

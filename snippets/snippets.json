@@ -1,5 +1,5 @@
 {
-    "Configuration": {
+    "configuration": {
         "prefix": "configuration",
         "body": [
             "[configuration]",

@@ -13,6 +13,71 @@ interface OverrideCacheEntry {
     test(scope: SettingScope): boolean;
 }
 
+export const intervalUnits: string[] = [
+    "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
+];
+
+export const calendarKeywords: string[] = [
+    "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
+    "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
+    "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
+    "next_vacation_day", "next_week", "next_working_day", "next_year", "now", "previous_day", "previous_hour",
+    "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
+    "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
+];
+const booleanKeywords: string[] = [
+    "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
+];
+
+const booleanRegExp: RegExp = new RegExp(`^(?:${booleanKeywords.join("|")})$`);
+
+const calendarRegExp: RegExp = new RegExp(
+    // current_day
+    `^(?:${calendarKeywords.join("|")})` +
+    // + 5 * minute
+    `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${intervalUnits.join("|")}))?$`,
+);
+
+const integerRegExp: RegExp = /^[-+]?\d+$/;
+
+const intervalRegExp: RegExp = new RegExp(
+    // -5 month, +3 day, .3 year, 2.3 week, all
+    `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${intervalUnits.join("|")}))|all)$`,
+);
+
+const localDateRegExp: RegExp = new RegExp(
+    // 2018-12-31
+    "^(?:19[7-9]|[2-9]\\d\\d)\\d(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01])" +
+    // 01:13:46.123, 11:26:52
+    "(?: (?:[01]\\d|2[0-4]):(?:[0-5][0-9])(?::(?:[0-5][0-9]))?(?:\\.\\d{1,9})?)?)?)?$",
+);
+
+// 1, 5.2, 0.3, .9, -8, -0.5, +1.4
+const numberRegExp: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
+
+const zonedDateRegExp: RegExp = new RegExp(
+    // 2018-12-31
+    "^(?:19[7-9]|[2-9]\\d\\d)\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])" +
+    // T12:34:46.123, T23:56:18
+    "[tT](?:[01]\\d|2[0-4]):(?:[0-5][0-9]):(?:[0-5][0-9])(?:\\.\\d{1,9})?" +
+    // Z, +0400, -05:00
+    "(?:[zZ]|[+-](?:[01]\\d|2[0-4]):?(?:[0-5][0-9]))$",
+);
+
+const calculatedRegExp: RegExp = /[@$]\{.+\}/;
+
+/**
+ * Tests the provided string with regular expressions
+ * @param text the target string
+ * @returns true if the string is date expression, false otherwise
+ */
+function isDate(text: string): boolean {
+    return calendarRegExp.test(text) || localDateRegExp.test(text) || zonedDateRegExp.test(text)
+}
+
+/**
+ * Holds the description of a setting and corresponding methods
+ */
 export class Setting {
     /**
      * Lowercases the string and deletes non-alphabetic characters
@@ -20,7 +85,7 @@ export class Setting {
      * @returns cleared string
      */
     public static clearSetting: (str: string) => string = (str: string): string =>
-        str.toLowerCase().replace(/[^a-z]/g, "");
+        str.toLowerCase().replace(/[^a-z]/g, "")
 
     /**
      * Lowercases the value of setting
@@ -29,80 +94,57 @@ export class Setting {
      */
     public static clearValue: (str: string) => string = (str: string): string => str.toLowerCase();
 
-    private static readonly booleanKeywords: string[] = [
-        "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
-    ];
-
-    public static readonly intervalUnits: string[] = [
-        "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
-    ];
-
-    private static readonly booleanRegExp: RegExp = new RegExp(`^(?:${Setting.booleanKeywords.join("|")})$`);
-
-    public static readonly calendarKeywords: string[] = [
-        "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
-        "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
-        "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
-        "next_vacation_day", "next_week", "next_working_day", "next_year", "now", "previous_day", "previous_hour",
-        "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
-        "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
-    ];
-
-    private static readonly calendarRegExp: RegExp = new RegExp(
-        // current_day
-        `^(?:${Setting.calendarKeywords.join("|")})` +
-        // + 5 * minute
-        `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${Setting.intervalUnits.join("|")}))?$`,
-    );
-
-    private static readonly integerRegExp: RegExp = /^[-+]?\d+$/;
-
-    private static readonly intervalRegExp: RegExp = new RegExp(
-        // -5 month, +3 day, .3 year, 2.3 week, all
-        `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${Setting.intervalUnits.join("|")}))|all)$`,
-    );
-
-    private static readonly localDateRegExp: RegExp = new RegExp(
-        // 2018-12-31
-        "^(?:19[7-9]|[2-9]\\d\\d)\\d(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01])" +
-        // 01:13:46.123, 11:26:52
-        "(?: (?:[01]\\d|2[0-4]):(?:[0-5][0-9])(?::(?:[0-5][0-9]))?(?:\\.\\d{1,9})?)?)?)?$",
-    );
-
-    // 1, 5.2, 0.3, .9, -8, -0.5, +1.4
-    private static readonly numberRegExp: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
-
-    private static readonly zonedDateRegExp: RegExp = new RegExp(
-        // 2018-12-31
-        "^(?:19[7-9]|[2-9]\\d\\d)\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])" +
-        // T12:34:46.123, T23:56:18
-        "[tT](?:[01]\\d|2[0-4]):(?:[0-5][0-9]):(?:[0-5][0-9])(?:\\.\\d{1,9})?" +
-        // Z, +0400, -05:00
-        "(?:[zZ]|[+-](?:[01]\\d|2[0-4]):?(?:[0-5][0-9]))$",
-    );
-
-    private static readonly calculatedRegExp: RegExp = /[@$]\{.+\}/;
-
-    /**
-     * Tests the provided string with regular expressions
-     * @param text the target string
-     * @returns true if the string is date expression, false otherwise
-     */
-    private static readonly isDate: (text: string) => boolean = (text: string): boolean =>
-        Setting.calendarRegExp.test(text) || Setting.localDateRegExp.test(text) || Setting.zonedDateRegExp.test(text);
-
     public readonly defaultValue?: string | number | boolean;
+    /**
+     * A brief description for the setting
+     */
     public readonly description: string = "";
+    /**
+     * User-friendly setting name like 'refresh-interval'
+     */
     public readonly displayName: string = "";
+    /**
+     * Array containing all possible values. RegExp is supported
+     */
     public readonly enum: string[] = [];
+    /**
+     * Example value for the setting. Should not equal to the default value
+     */
     public readonly example: string | number | boolean = "";
+    /**
+     * The settings in this array must not be declared simultaneously with the current
+     */
     public readonly excludes: string[] = [];
+    /**
+     * The maximum allowed value for the setting
+     */
     public readonly maxValue: number = Infinity;
+    /**
+     * The minimum allowed value for the setting
+     */
     public readonly minValue: number = -Infinity;
+    /**
+     * Is the setting allowed to be repeated
+     */
     public readonly multiLine: boolean = false;
+    /**
+     * Inner setting name. Lower-cased, without any symbols except alphabetical.
+     * For example, "refreshinterval"
+     */
     public readonly name: string = "";
+    /**
+     * Holds the description of the setting if it is a script
+     */
     public readonly script?: Script;
+    /**
+     * The section, where the setting is applicable.
+     * For example, "widget" or "series".
+     */
     public readonly section?: string | string[];
+    /**
+     * The type of the setting.
+     * Possible values: string, number, integer, boolean, enum, interval, date
+     */
     public readonly type: string = "";
     public readonly widget?: string;
     public readonly possibleValues?: PossibleValue[];
@@ -159,7 +201,7 @@ export class Setting {
         // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions
-        if (Setting.calculatedRegExp.test(value)) {
+        if (calculatedRegExp.test(value)) {
             return result;
         }
         switch (this.type) {
@@ -170,7 +212,7 @@ export class Setting {
                 break;
             }
             case "number": {
-                if (!Setting.numberRegExp.test(value)) {
+                if (!numberRegExp.test(value)) {
                     result = createDiagnostic(
                         range, `${name} should be a real (floating-point) number. For example, ${this.example}`,
                     );
@@ -178,7 +220,7 @@ export class Setting {
                 break;
             }
             case "integer": {
-                if (!Setting.integerRegExp.test(value)) {
+                if (!integerRegExp.test(value)) {
                     result = createDiagnostic(
                         range, `${name} should be an integer number. For example, ${this.example}`,
                     );
@@ -186,7 +228,7 @@ export class Setting {
                 break;
             }
             case "boolean": {
-                if (!Setting.booleanRegExp.test(value)) {
+                if (!booleanRegExp.test(value)) {
                     result = createDiagnostic(
                         range, `${name} should be a boolean value. For example, ${this.example}`,
                     );
@@ -194,23 +236,21 @@ export class Setting {
                 break;
             }
             case "enum": {
-                const index: number = this.enum.findIndex((option: string): boolean =>
-                    new RegExp(`^${option}$`, "i").test(value),
-                );
+                const index: number = this.findIndexInEnum(value);
                 // Empty enum means that the setting is not allowed
                 if (this.enum.length === 0) {
                     result = createDiagnostic(range, `${name} setting is not allowed here.`);
                 } else if (index < 0) {
-                    const enumList: string = this.enum.join(";\n")
-                        .replace(/percentile\(.+/, "percentile_{num};");
-                    result = createDiagnostic(range, `${name} must be one of:\n${enumList}`);
+                    const enumList: string = this.enum.sort().join("\n * ")
+                        .replace(/percentile\(.+/, "percentile_{num}");
+                    result = createDiagnostic(range, `${name} must be one of:\n * ${enumList}`);
                 }
                 break;
             }
             case "interval": {
-                if (!Setting.intervalRegExp.test(value)) {
-                    const message: string =
-                        `.\nFor example, ${this.example}. Supported units:\n * ${Setting.intervalUnits.join("\n * ")}`;
+                if (!intervalRegExp.test(value)) {
+                    const message =
+                        `.\nFor example, ${this.example}. Supported units:\n * ${intervalUnits.join("\n * ")}`;
                     if (this.name === "updateinterval" && /^\d+$/.test(value)) {
                         result = createDiagnostic(
                             range,
@@ -218,13 +258,24 @@ export class Setting {
                             DiagnosticSeverity.Warning,
                         );
                     } else {
-                        result = createDiagnostic(range, `${name} should be set as \`count unit\`${message}`);
+                        /**
+                         * Check other allowed non-interval values
+                         * (for example, period, summarize-period, group-period supports "auto")
+                         */
+                        if (this.enum.length > 0) {
+                            if (this.findIndexInEnum(value) < 0) {
+                                result = createDiagnostic(range,
+                                    `Use ${this.enum.sort().join(", ")} or \`count unit\` format${message}`);
+                            }
+                        } else {
+                            result = createDiagnostic(range, `${name} should be set as \`count unit\`${message}`);
+                        }
                     }
                 }
                 break;
             }
             case "date": {
-                if (!Setting.isDate(value)) {
+                if (!isDate(value)) {
                     result = createDiagnostic(range, `${name} should be a date. For example, ${this.example}`);
                 }
                 break;
@@ -275,6 +326,13 @@ export class Setting {
         }
 
         return result;
+    }
+
+    private findIndexInEnum(value: string) {
+        const index: number = this.enum.findIndex((option: string): boolean =>
+            new RegExp(`^${option}$`, "i").test(value),
+        );
+        return index;
     }
 
     private getOverrideTest(scopeSrc: string): (scope: SettingScope) => boolean {

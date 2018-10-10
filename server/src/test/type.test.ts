@@ -2,19 +2,45 @@ import { DiagnosticSeverity, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
-function intervalError(name: string, example: string): string {
+function intervalError_1(name: string, example: string): string {
     return `${name} should be set as \`count unit\`.
-For example, ${example}. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`;
+For example, ${example}. Supported units:\n * nanosecond\n * millisecond\n * second
+ * minute\n * hour\n * day\n * week\n * month\n * quarter\n * year`;
+}
+
+function intervalError_2(): string {
+    return `Specifying the interval in seconds is deprecated.
+Use \`count unit\` format.
+For example, 5 minute. Supported units:\n * nanosecond\n * millisecond\n * second
+ * minute\n * hour\n * day\n * week\n * month\n * quarter\n * year`;
+}
+
+function intervalError_3(): string {
+    return `Use auto or \`count unit\` format.
+For example, 15 minute. Supported units:\n * nanosecond\n * millisecond\n * second
+ * minute\n * hour\n * day\n * week\n * month\n * quarter\n * year`;
+}
+
+function satisticsError_1(name: string): string {
+    return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * first\n * last\n * max
+ * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
+ * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
+}
+
+function satisticsError_2(name: string): string {
+    return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * first
+ * last\n * max\n * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
+ * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
+}
+
+function satisticsError_3(name: string): string {
+    return `${name} must be one of:\n * avg\n * count\n * last\n * max\n * median\n * min\n * percentile_{num}\n * sum`;
+}
+
+function satisticsError_4(name: string): string {
+    return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * detail
+ * first\n * last\n * max\n * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
+ * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
 }
 
 suite("Type check tests", () => {
@@ -186,19 +212,19 @@ suite("Type check tests", () => {
             [
                 createDiagnostic(
                     Range.create(1, "  ".length, 1, "  bottom-axis".length),
-                    "bottom-axis must be one of:\nnone;\npercentiles;\nvalues",
+                    "bottom-axis must be one of:\n * none\n * percentiles\n * values",
                 ),
                 createDiagnostic(
                     Range.create(2, "  ".length, 2, "  buttons".length),
-                    "buttons must be one of:\nmenu;\nupdate",
+                    "buttons must be one of:\n * menu\n * update",
                 ),
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  case".length),
-                    "case must be one of:\nupper;\nlower",
+                    "case must be one of:\n * lower\n * upper",
                 ),
                 createDiagnostic(
                     Range.create(4, "  ".length, 4, "  counter-position".length),
-                    "counter-position must be one of:\nnone;\ntop;\nbottom",
+                    "counter-position must be one of:\n * bottom\n * none\n * top",
                 ),
             ],
         ),
@@ -409,44 +435,37 @@ suite("Type check tests", () => {
 [configuration]
   disconnect-interval = . year
 [configuration]
+  disconnect-interval = auto
+[configuration]
   update-interval = 10`,
             [
                 createDiagnostic(
                     Range.create(1, "  ".length, 1, "  disconnect-interval".length),
-                    intervalError("disconnect-interval", "1 minute"),
+                    intervalError_1("disconnect-interval", "1 minute"),
                 ),
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  disconnect-interval".length),
-                    intervalError("disconnect-interval", "1 minute"),
+                    intervalError_1("disconnect-interval", "1 minute"),
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  disconnect-interval".length),
-                    intervalError("disconnect-interval", "1 minute"),
+                    intervalError_1("disconnect-interval", "1 minute"),
                 ),
                 createDiagnostic(
                     Range.create(7, "  ".length, 7, "  disconnect-interval".length),
-                    intervalError("disconnect-interval", "1 minute"),
+                    intervalError_1("disconnect-interval", "1 minute"),
                 ),
                 createDiagnostic(
                     Range.create(9, "  ".length, 9, "  disconnect-interval".length),
-                    intervalError("disconnect-interval", "1 minute"),
+                    intervalError_1("disconnect-interval", "1 minute"),
                 ),
                 createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  update-interval".length),
-                    `Specifying the interval in seconds is deprecated.
-Use \`count unit\` format.
-For example, 5 minute. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`,
-                    DiagnosticSeverity.Warning,
+                    Range.create(11, "  ".length, 11, "  disconnect-interval".length),
+                    intervalError_1("disconnect-interval", "1 minute"),
+                ),
+                createDiagnostic(
+                    Range.create(13, "  ".length, 13, "  update-interval".length),
+                    intervalError_2(), DiagnosticSeverity.Warning,
                 ),
             ],
         ),
@@ -478,27 +497,7 @@ For example, 5 minute. Supported units:
             [
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    `statistic must be one of:
-count;
-detail;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_4("statistic"),
                 ),
             ],
         ),
@@ -547,171 +546,46 @@ threshold_percent`,
             [
                 createDiagnostic(
                     Range.create(1, "  ".length, 1, "  ".length + "group-statistic".length),
-                    `group-statistic must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_2("group-statistic"),
                 ),
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    `statistic must be one of:
-count;
-detail;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_4("statistic"),
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  ".length + "statistics".length),
-                    `statistics must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_1("statistics"),
                 ),
                 createDiagnostic(
                     Range.create(7, "  ".length, 7, "  ".length + "summarize-statistic".length),
-                    `summarize-statistic must be one of:
-avg;
-max;
-min;
-sum;
-count;
-last;
-percentile_{num};
-median`,
+                    satisticsError_3("summarize-statistic"),
                 ),
                 createDiagnostic(
                     Range.create(9, "  ".length, 9, "  ".length + "group-statistic".length),
-                    `group-statistic must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_2("group-statistic"),
                 ),
                 createDiagnostic(
                     Range.create(11, "  ".length, 11, "  ".length + "group-statistic".length),
-                    `group-statistic must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_2("group-statistic"),
                 ),
                 createDiagnostic(
                     Range.create(13, "  ".length, 13, "  ".length + "summarize-statistic".length),
-                    `summarize-statistic must be one of:
-avg;
-max;
-min;
-sum;
-count;
-last;
-percentile_{num};
-median`,
+                    satisticsError_3("summarize-statistic"),
                 ),
                 createDiagnostic(
                     Range.create(15, "  ".length, 15, "  ".length + "statistics".length),
-                    `statistics must be one of:
-count;
-min;
-max;
-sum;
-avg;
-percentile_{num};
-median;
-standard_deviation;
-first;
-last;
-delta;
-counter;
-wtavg;
-wavg;
-min_value_time;
-max_value_time;
-threshold_count;
-threshold_duration;
-threshold_percent`,
+                    satisticsError_1("statistics"),
                 ),
             ],
         ),
         new Test(
-            "Spaces before and after the sign are absent",
+            "Allow auto interval for period, summarize-period, group-period",
+            `[configuration]
+  period = auto
+  summarize-period = auto
+  group-period = auto`,
+            [],
+        ), new Test("Spaces before and after the sign are absent",
             `[configuration]
   add-meta=not-a-boolean-value
   zoom-svg=not-a-number-value
@@ -738,21 +612,10 @@ threshold_percent`,
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  period".length),
-                    `period should be set as \`count unit\`.
-For example, 15 minute. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`,
+                    intervalError_3(),
                 ),
                 createDiagnostic(
-                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\n * alert\n * message",
                 ),
             ],
         ),
@@ -784,21 +647,10 @@ For example, 15 minute. Supported units:
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  period".length),
-                    `period should be set as \`count unit\`.
-For example, 15 minute. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`,
+                    intervalError_3(),
                 ),
                 createDiagnostic(
-                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\n * alert\n * message",
                 ),
             ],
         ),
@@ -830,21 +682,10 @@ For example, 15 minute. Supported units:
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  period".length),
-                    `period should be set as \`count unit\`.
-For example, 15 minute. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`,
+                    intervalError_3(),
                 ),
                 createDiagnostic(
-                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\n * alert\n * message",
                 ),
             ],
         ),
@@ -876,21 +717,10 @@ For example, 15 minute. Supported units:
                 ),
                 createDiagnostic(
                     Range.create(5, "  ".length, 5, "  period".length),
-                    `period should be set as \`count unit\`.
-For example, 15 minute. Supported units:
- * nanosecond
- * millisecond
- * second
- * minute
- * hour
- * day
- * week
- * month
- * quarter
- * year`,
+                    intervalError_3(),
                 ),
                 createDiagnostic(
-                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\nmessage;\nalert",
+                    Range.create(6, "  ".length, 6, "  source".length), "source must be one of:\n * alert\n * message",
                 ),
             ],
         ),
@@ -932,7 +762,7 @@ For example, 15 minute. Supported units:
             `,
             [
                 createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  class".length), "class must be one of:\nmetro",
+                    Range.create(7, "  ".length, 7, "  class".length), "class must be one of:\n * metro",
                 ),
             ],
         ),

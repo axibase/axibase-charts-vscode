@@ -724,15 +724,20 @@
             "displayName": "class",
             "type": "enum",
             "example": "terminal",
-            "enum": [""],
+            "enum": [
+                ""
+            ],
             "section": "widget",
             "override": {
                 "[widget == 'console']": {
-                    "enum": ["terminal"]
-
+                    "enum": [
+                        "terminal"
+                    ]
                 },
                 "[widget == 'box']": {
-                    "enum": ["metro"]
+                    "enum": [
+                        "metro"
+                    ]
                 }
             }
         },
@@ -2047,28 +2052,28 @@
             "enum": [],
             "section": "widget",
             "override": {
-              "[widget == 'chart']": {
-                "enum": [
-                  "true",
-                  "all",
-                  "default",
-                  "auto",
-                  "compact",
-                  "false",
-                  "none"
-                ]
-              },
-              "[section == 'configuration']": {
-                "enum": [
-                  "true",
-                  "all",
-                  "default",
-                  "auto",
-                  "compact",
-                  "false",
-                  "none"
-                ]
-              }
+                "[widget == 'chart']": {
+                    "enum": [
+                        "true",
+                        "all",
+                        "default",
+                        "auto",
+                        "compact",
+                        "false",
+                        "none"
+                    ]
+                },
+                "[section == 'configuration']": {
+                    "enum": [
+                        "true",
+                        "all",
+                        "default",
+                        "auto",
+                        "compact",
+                        "false",
+                        "none"
+                    ]
+                }
             }
         },
         {
@@ -2556,7 +2561,10 @@
             "displayName": "group-period",
             "type": "interval",
             "section": "series",
-            "example": "1 month"
+            "example": "1 month",
+            "enum": [
+                "auto"
+            ]
         },
         {
             "displayName": "group-statistic",
@@ -4958,7 +4966,10 @@
             "displayName": "period",
             "type": "interval",
             "example": "15 minute",
-            "section": "series"
+            "section": "series",
+            "enum": [
+                "auto"
+            ]
         },
         {
             "displayName": "periods",
@@ -6789,7 +6800,10 @@
         {
             "displayName": "summarize-period",
             "type": "interval",
-            "example": "1 hour"
+            "example": "1 hour",
+            "enum": [
+                "auto"
+            ]
         },
         {
             "displayName": "summarize-statistic",
