@@ -25,7 +25,8 @@ export class CompletionProvider {
     public constructor(textDocument: TextDocument, position: Position) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
         this.text = deleteScripts(deleteComments(text));
-        this.currentLine = this.text.split("\n")[position.line];
+        let textList = this.text.split("\n");
+        this.currentLine = textList[textList.length - 1];
     }
 
     /**

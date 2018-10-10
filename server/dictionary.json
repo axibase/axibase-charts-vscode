@@ -4763,7 +4763,7 @@
             "displayName": "on-change",
             "section": "dropdown",
             "type": "string",
-            "multiLine": true,
+            "multiLine": false,
             "example": "widget.post.queries[0].type = this.value; widget.reload();",
             "script": {
                 "returnValue": "void",
@@ -6862,6 +6862,11 @@
             "maxValue": 1,
             "defaultValue": 0.9,
             "example": 0.8
+        },
+        {
+            "displayName": "text",
+            "type": "string",
+            "example": "Option 3"
         },
         {
             "displayName": "thresholds",

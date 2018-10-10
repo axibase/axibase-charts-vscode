@@ -22,7 +22,7 @@ export class JavaScriptValidator {
 
     /**
      * Evaluates all found JavaScript statements in this.document
-     * @param validateAll if `false`, validates var only 
+     * @param validateAll if `false`, validates var only
      * @returns diagnostic for each invalid statement
      */
     public validate(validateAll: boolean): Diagnostic[] {
@@ -83,7 +83,7 @@ export class JavaScriptValidator {
     }
 
     /**
-     * Calls corresponding processor for all found JavaScript statements 
+     * Calls corresponding processor for all found JavaScript statements
      * in this.document to prepare diagnostic if required
      * @param validateAll if `false`, validates "var" only
      */
