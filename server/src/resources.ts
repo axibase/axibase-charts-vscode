@@ -174,6 +174,7 @@ export const sectionDepthMap: { [section: string]: number } = {
 
     "column": 3,
     "dropdown": 3,
+    "keys": 3,
     "link": 3,
     "node": 3,
     "other": 3,
@@ -182,9 +183,16 @@ export const sectionDepthMap: { [section: string]: number } = {
     "series": 3,
     "threshold": 3,
 
-    "keys": 4,
     "option": 4,
     "properties": 4,
     "tag": 4,
     "tags": 4,
 };
+
+/**
+ * Contains names of sections which can appear at depth `1..max_depth`, where
+ * `max_depth` is a value from `sectionDepthMap`
+ */
+export const inheritableSections: Set<string> = new Set([
+    "keys",
+]);

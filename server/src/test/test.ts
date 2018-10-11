@@ -12,18 +12,16 @@ import { Validator } from "../validator";
  */
 // tslint:disable-next-line:no-object-literal-type-assertion
 const sectionStackStub: SectionStack  = {
-    insertSection(): Diagnostic | null {
-        return null;
-    },
-
-    finalize(): Diagnostic | null {
-        return null;
-    },
-
-    setSectionRequirements() {
-        /* void */
-    },
-} as any as SectionStack;
+    stack: [],
+    finalize(): null { return null; },
+    getCurrentSetting(): null { return null; },
+    getSectionRange(): null { return null; },
+    getSectionSettings() { return new Map(); },
+    insertCurrentSetting() { /* void */},
+    insertSection(): null {  return null;  },
+    requireSections() { /* void */},
+    setSectionRequirements() { /* void */ },
+} as any;
 
 /**
  * Contains a test case and executes the test
