@@ -195,6 +195,20 @@ endfor`,
             FormattingOptions.create(2, true),
         ),
         new Test(
+            "Align series setting declared after [tags] and empty line",
+            `[series]
+  entity = server
+  metric = cpu_busy
+  [tags]
+    startime = 2018
+
+starttime = 2018`,
+            [
+                TextEdit.insert(Position.create(6, 0), "  "),
+            ],
+            FormattingOptions.create(2, true),
+        ),
+        new Test(
             "Removes an extra space between setting name and equals sign",
             `[configuration]
   entity  = cpu_busy`,

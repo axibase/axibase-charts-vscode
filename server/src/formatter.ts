@@ -10,7 +10,7 @@ export class Formatter {
     /**
      * Current section name
      */
-    private current?: string;
+    private currentSection?: string;
     /**
      * Currently used indent
      */
@@ -70,12 +70,16 @@ export class Formatter {
         this.currentLine = -1;
         for (const line of this.lines) {
             this.currentLine++;
-            if (this.isSection() || isEmpty(line)) {
-                if (this.isSection()) {
-                    this.calculateIndent();
-                    this.checkIndent();
-                    this.increaseIndent();
+            if (isEmpty(line)) {
+                if (this.currentSection === "tags") {
+                    this.currentSection = "series";
+                    this.decreaseIndent();
                 }
+                continue;
+            } else if (this.isSectionDeclaration()) {
+                this.calculateIndent();
+                this.checkIndent();
+                this.increaseIndent();
                 continue;
             } else {
                 this.checkEquals();
@@ -126,8 +130,8 @@ export class Formatter {
         if (!this.match) {
             throw new Error("this.match or/and this.current is not defined in calculateIndent");
         }
-        this.previous = this.current;
-        [, , this.current] = this.match;
+        this.previous = this.currentSection;
+        [, , this.currentSection] = this.match;
         if (/\[(?:group|configuration)\]/i.test(this.getCurrentLine())) {
             this.setIndent("");
 
@@ -226,14 +230,14 @@ export class Formatter {
      * @returns true if the current section is nested in the previous section
      */
     private isNested(): boolean {
-        if (this.current === undefined) {
+        if (this.currentSection === undefined) {
             throw new Error("Current or previous section is not defined, but we're trying to check nested");
         }
         if (this.previous === undefined) {
             return false;
         }
 
-        return getParents(this.current)
+        return getParents(this.currentSection)
             .includes(this.previous);
     }
 
@@ -241,18 +245,18 @@ export class Formatter {
      * @returns true if current and previous section must be placed on the same indent level
      */
     private isSameLevel(): boolean {
-        return (this.previous === undefined) || (this.current === this.previous) ||
-            (this.current === "group" && this.previous === "configuration") ||
-            (this.current === "link" && this.previous === "node") ||
-            (this.current === "series" && this.previous === "link") ||
-            (this.current === "link" && this.previous === "series") ||
-            (this.current === "node" && this.previous === "link");
+        return (this.previous === undefined) || (this.currentSection === this.previous) ||
+            (this.currentSection === "group" && this.previous === "configuration") ||
+            (this.currentSection === "link" && this.previous === "node") ||
+            (this.currentSection === "series" && this.previous === "link") ||
+            (this.currentSection === "link" && this.previous === "series") ||
+            (this.currentSection === "node" && this.previous === "link");
     }
 
     /**
      * @returns true, if current line is section declaration
      */
-    private isSection(): boolean {
+    private isSectionDeclaration(): boolean {
         this.match = /(^\s*)\[([a-z]+)\]/.exec(this.getCurrentLine());
 
         return this.match !== null;
@@ -263,7 +267,7 @@ export class Formatter {
      * @param line the target line
      */
     private removeExtraSpaces(line: string): void {
-        const match: RegExpExecArray | null = /(\s+)$/.exec(line);
+        const match: RegExpExecArray | null = / (\s +) $ /.exec(line);
         if (match) {
             this.edits.push(TextEdit.replace(
                 Range.create(this.currentLine, line.length - match[1].length, this.currentLine, line.length), "",
