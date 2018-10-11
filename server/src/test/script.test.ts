@@ -81,7 +81,7 @@ script =			c = widget`,
             ],
         ),
         new Test(
-            "InCorrect empty one-line script = ",
+            "Incorrect empty one-line script = ",
             "script = ",
             [createDiagnostic(Range.create(0, 0, 0, "script".length), `script can not be empty`)],
         ),
