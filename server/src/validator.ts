@@ -515,10 +515,14 @@ export class Validator {
     private eachLine(): void {
         this.checkFreemarker();
         const line: string = this.getCurrentLine();
-        this.match = /(^[\t ]*\[)(\w+)\][\t ]*/.exec(line); // section declaration, for example, [widget]
-        if (this.match !== null ||
-            (line.trim().length === 0 && this.currentSection !== undefined && this.currentSection.text === "tags")
-        ) {
+        this.match = /(^[\t ]*\[)(\w+)\][\t ]*/.exec(line);
+        if ( // Section declaration, for example, [widget]
+            this.match !== null ||
+            /**
+             * We are in [tags] section and current line is empty - [tags] section has finished
+             */
+            (line.trim().length === 0 && this.currentSection !== undefined && this.currentSection.text === "tags")) {
+            // We met start of the next section, that means that current section has finished
             if (this.match !== null) {
                 this.spellingCheck();
             }
@@ -526,7 +530,7 @@ export class Validator {
         } else {
             this.match = /(^\s*)([a-z].*?[a-z])\s*=\s*(.*?)\s*$/.exec(line);
             if (this.match !== null) {
-                // setting declaration, for example, width-units = 6.2
+                // Setting declaration, for example, width-units = 6.2
                 this.checkSettingsWhitespaces();
                 this.handleSettings();
                 if (this.areWeIn("for")) {
@@ -859,7 +863,7 @@ export class Validator {
             return;
         }
         const line: string = this.getCurrentLine();
-        if (this.currentSection === undefined || !/(?:tag|key)s?/.test(this.currentSection.text)) {
+        if (this.currentSection === undefined || !/(?:tag|key|properties)s?/.test(this.currentSection.text)) {
             this.handleRegularSetting();
         } else if (/(?:tag|key)s?/.test(this.currentSection.text) &&
             // We are in tags/keys section
@@ -986,6 +990,7 @@ export class Validator {
 
     /**
      * Check if settings or tag key contains whitespace and warn about it.
+     * Ignore any settings in [properties] section.
      */
     private checkSettingsWhitespaces(): void {
         const line: string = this.lines[this.currentLineNumber];
@@ -1004,7 +1009,7 @@ export class Validator {
                             range, tagNameWithWhitespaces(settingName), DiagnosticSeverity.Warning,
                         ));
                     }
-                } else {
+                } else if (this.currentSection.text !== "properties") {
                     this.result.push(createDiagnostic(
                         range, settingsWithWhitespaces(settingName), DiagnosticSeverity.Warning,
                     ));
