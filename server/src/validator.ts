@@ -524,8 +524,9 @@ export class Validator {
             }
             this.handleSection();
         } else {
-            this.match = /(^\s*)([a-z].*?[a-z])\s*=\s*(.+?)\s*$/.exec(line); // for example, width-units = 6.2
+            this.match = /(^\s*)([a-z].*?[a-z])\s*=\s*(.*?)\s*$/.exec(line);
             if (this.match !== null) {
+                // setting declaration, for example, width-units = 6.2
                 this.checkSettingsWhitespaces();
                 this.handleSettings();
                 if (this.areWeIn("for")) {

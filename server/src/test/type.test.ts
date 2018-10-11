@@ -766,6 +766,20 @@ suite("Type check tests", () => {
                 ),
             ],
         ),
+        new Test(
+            "Incorrect: empty settings are not allowed",
+            `type = console
+class =
+entity =`,
+            [
+                createDiagnostic(
+                    Range.create(1, 0, 1, "class".length), "class must be one of:\n * terminal",
+                ),
+                createDiagnostic(
+                    Range.create(2, 0, 2, "entity".length), "entity can not be empty",
+                )
+            ]
+        )
     ];
 
     tests.forEach((test: Test): void => { test.validationTest(); });
