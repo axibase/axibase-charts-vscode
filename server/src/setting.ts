@@ -252,9 +252,7 @@ export class Setting {
                     const enumList: string = this.enum.sort().join("\n * ")
                         .replace(/percentile\(.+/, "percentile_{num}");
                     result = createDiagnostic(range, `${name} must be one of:\n * ${enumList}`);
-                } /* else if (!/\S/.test(value)) {
-                    result = createDiagnostic(range, `${name} can not be empty`);
-                } */
+                }
                 break;
             }
             case "interval": {
