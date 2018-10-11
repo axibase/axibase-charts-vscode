@@ -19,6 +19,10 @@ import {
     repetitionDiagnostic
 } from "./util";
 
+const placeholderContainingSettings = [
+    "url", "urlparameters"
+];
+
 /**
  * Performs validation of a whole document line by line.
  */
@@ -103,10 +107,6 @@ export class Validator {
      */
     private readonly settingValues: Map<string, string> = new Map<string, string>();
     /**
-     * Variables declared in `url-parameters` setting
-     */
-    private readonly urlParameters: string[] = [];
-    /**
      * Map of defined variables, where key is type (for, var, csv...)
      */
     private readonly variables: Map<string, string[]> = new Map([
@@ -160,6 +160,7 @@ export class Validator {
         this.checkAliases();
         this.diagnosticForLeftKeywords();
         this.checkRequredSettingsForSection();
+        this.checkUrlPlaceholders();
         this.setSectionToStack(null);
 
         return this.result;
@@ -195,6 +196,7 @@ export class Validator {
         const name: string = Setting.clearSetting(this.match[2]);
         const value: string = Setting.clearValue(this.match[3]);
         this.settingValues.set(name, value);
+        this.sectionStack.insertCurrentSetting(name, value);
     }
 
     /**
@@ -569,22 +571,6 @@ export class Validator {
     }
 
     /**
-     * Finds all url parameters in the current line and adds them
-     * to the corresponding array
-     */
-    private findUrlParams(): void {
-        const line: string = this.getCurrentLine();
-        this.urlParameters.splice(0, this.urlParameters.length);
-        const regexp: RegExp = /{(.+?)}/g;
-        this.match = regexp.exec(line);
-        while (this.match !== null) {
-            const cleared: string = Setting.clearSetting(this.match[1]);
-            this.urlParameters.push(cleared);
-            this.match = regexp.exec(line);
-        }
-    }
-
-    /**
      * Gets current line
      * @returns current line
      */
@@ -635,9 +621,7 @@ export class Validator {
                 return undefined;
             }
             if (this.currentSection !== undefined && this.currentSection.text === "placeholders") {
-                if (this.urlParameters.includes(name)) {
-                    return undefined;
-                }
+                return undefined;
             }
             if (name.startsWith("column")) {
                 return undefined;
@@ -836,6 +820,7 @@ export class Validator {
             this.aliases.splice(0, this.aliases.length);
             this.settingValues.clear();
         }
+        this.checkUrlPlaceholders();
         this.previousSettings = this.currentSettings.splice(0, this.currentSettings.length);
         this.previousSection = this.currentSection;
         this.ifSettings.clear();
@@ -956,9 +941,6 @@ export class Validator {
         this.checkExcludes(setting);
         this.checkNegativeStyle(setting);
 
-        if (setting.name === "urlparameters") {
-            this.findUrlParams();
-        }
         // Aliases
         if (setting.name === "alias") {
             this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
@@ -1243,5 +1225,51 @@ export class Validator {
             setting.textRange = range;
         }
         return setting;
+    }
+
+    private checkUrlPlaceholders() {
+        let phs = this.getUrlPlaceholders();
+        if (phs.length > 0) {
+            if (this.currentSection && this.currentSection.text.match(/widget/i)) {
+                this.sectionStack.requireSections("widget", "placeholders");
+            }
+        }
+        let placeholderRange = this.sectionStack.getSectionRange("placeholders");
+        if (placeholderRange) {
+            let phValues = this.sectionStack.getSectionSettings("placeholders", false);
+            let missingPhs = phs.filter(key => phValues.get(Setting.clearValue(key)) == null);
+            if (missingPhs.length > 0) {
+                this.result.push(createDiagnostic(
+                    placeholderRange.range,
+                    `Missing placeholders: ${missingPhs.join(", ")}.`,
+                    DiagnosticSeverity.Error
+                ));
+            }
+            let unnecessaryPhs = [...phValues.keys()].filter(key => !phs.includes(key));
+            if (unnecessaryPhs.length > 0) {
+                this.result.push(createDiagnostic(
+                    placeholderRange.range,
+                    `Unnecessary placeholders: ${unnecessaryPhs.join(", ")}.`,
+                    DiagnosticSeverity.Warning
+                ));
+            }
+        }
+    }
+
+    private getUrlPlaceholders(): string[] {
+        let result = new Set();
+        for (let setting of placeholderContainingSettings) {
+            let value = this.sectionStack.getCurrentSetting(setting);
+            if (value) {
+                const regexp: RegExp = /{(.+?)}/g;
+                let match = regexp.exec(value);
+                while (match !== null) {
+                    const cleared: string = Setting.clearSetting(match[1]);
+                    result.add(cleared);
+                    match = regexp.exec(value);
+                }
+            }
+        }
+        return [...result];
     }
 }

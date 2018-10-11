@@ -122,6 +122,32 @@ suite("SectionStack tests", () => {
         ));
     });
 
+    test("Allows inheritable section on higher level", () => {
+        let error: Diagnostic | null;
+        error = stack.insertSection(textRange("configuration"));
+        assert.strictEqual(error, null);
+        error = stack.insertSection(textRange("group", 1));
+        assert.strictEqual(error, null);
+        error = stack.insertSection(textRange("keys", 2));
+        assert.strictEqual(error, null);
+        error = stack.insertSection(textRange("widget", 3));
+        assert.strictEqual(error, null);
+        error = stack.insertSection(textRange("series", 4));
+        assert.strictEqual(error, null);
+        error = stack.finalize();
+        assert.deepStrictEqual(error, null);
+    });
+
+    test("Forbids inheritable section on top level", () => {
+        let error: Diagnostic | null;
+        error = stack.insertSection(textRange("keys"));
+        assert.deepStrictEqual(error, createDiagnostic(
+            textRange("keys").range,
+            "Unexpected section [keys]. Expected [configuration].",
+            DiagnosticSeverity.Error
+        ));
+    });
+
     function textRange(text: string, line: number = 0): TextRange {
         return new TextRange(text, Range.create(line, 1, line, text.length));
     }

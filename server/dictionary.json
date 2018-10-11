@@ -729,7 +729,7 @@
             ],
             "section": "widget",
             "override": {
-                "[widget == 'console']": {
+                "[widget == 'console' || widget == 'property']": {
                     "enum": [
                         "terminal"
                     ]

@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { requiredSectionSettingsMap, sectionDepthMap } from "./resources";
+import { inheritableSections, requiredSectionSettingsMap, sectionDepthMap } from "./resources";
+import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic } from "./util";
 
@@ -8,8 +9,11 @@ interface DependencyResolveInfo {
     unresolved: string[];
 }
 
+type AtLeastOneString = [string, ...string[]];
+
 class SectionStackNode {
     public readonly dependencies: DependencyResolveInfo[] = [];
+    public readonly settings: Map<string, any> = new Map();
 
     public constructor(public range: TextRange) {
         const deps = requiredSectionSettingsMap.get(this.name);
@@ -26,6 +30,14 @@ class SectionStackNode {
                 unresolved: option.slice(),
             });
         }
+    }
+
+    public insertSetting(name: string, value: any) {
+        this.settings.set(Setting.clearSetting(name), value);
+    }
+
+    public getSetting(name: string): any | undefined {
+        return this.settings.get(Setting.clearSetting(name));
     }
 
     /**
@@ -95,10 +107,13 @@ const DummySectionStackNode: SectionStackNode & {[Symbol.toStringTag]: string} =
     dependenciesResolved: true,
     name: "",
     range: new TextRange("", Range.create(Position.create(0, 0), Position.create(0, 0))),
+    settings: new Map(),
     unresolved: [],
 
     resolveDependency() { /* void */ },
     setRequiredSections() { /* void */},
+    getSetting() { /* void */},
+    insertSetting() { /* void */},
     [Symbol.toStringTag]: "DummySectionStackNode",
 };
 
@@ -139,11 +154,70 @@ export class SectionStack {
         return err;
     }
 
+    public requireSections(targetSection: string, ...sections: AtLeastOneString) {
+        let target = this.stack.find(s => s.name === targetSection);
+        if (target) {
+            for (let dep of target.dependencies) {
+                for (let section of sections) {
+                    if (!dep.unresolved.includes(section)) {
+                        dep.unresolved.push(section);
+                    }
+                }
+            }
+            if (target.dependencies.length == 0) {
+                target.dependencies.push({
+                    resolvedCount: 0,
+                    unresolved: sections,
+                })
+            }
+        }
+    }
+
     public setSectionRequirements(targetSection: string, sections: string[][]) {
         let target = this.stack.find(s => s.name === targetSection);
         if (target) {
             target.setRequiredSections(sections);
         }
+    }
+
+    public insertCurrentSetting(name: string, value: any) {
+        if (this.stack.length > 0) {
+            let target = this.stack[this.stack.length - 1];
+            target.insertSetting(name, value);
+        }
+    }
+
+    public getCurrentSetting(name: string, recursive: boolean = true): any | undefined {
+        let visitSectionCount = recursive ? this.stack.length : 1;
+        for (let i = visitSectionCount; i > 0;) {
+            let section = this.stack[--i];
+            let value = section.getSetting(name);
+            if (value !== void 0) {
+                return value;
+            }
+        }
+
+        return;
+    }
+
+    public getSectionSettings(section: string,  recursive: boolean = true): Map<string, any> {
+        let targetIdx = this.stack.findIndex(s => s.name === section);
+        let result = new Map();
+        if (targetIdx >= 0) {
+            let start = recursive ? 0 : targetIdx;
+            for (let i = start; i <= targetIdx; i++) {
+                let target = this.stack[i];
+                for (let [key, val] of target.settings) {
+                    result.set(key, val);
+                }
+            }
+        }
+        return result;
+    }
+
+    public getSectionRange(section: string): TextRange | null {
+        let node = this.stack.find(s => s.name === section);
+        return node ? node.range : null;
     }
 
     private createErrorDiagnostic(section: TextRange, message: string): Diagnostic {
@@ -179,24 +253,29 @@ export class SectionStack {
     private checkAndGetDepth(sectionRange: TextRange): [number, Diagnostic | null] {
         const section = sectionRange.text;
         const expectedDepth: number = this.stack.length;
-        const actualDepth: number = sectionDepthMap[section];
 
+        let actualDepth: number = sectionDepthMap[section];
         let error: Diagnostic = null;
 
         if (actualDepth == null) {
             error = this.createErrorDiagnostic(sectionRange, `Unknown section [${section}].`);
         } else if (actualDepth > expectedDepth) {
-            let errorMessage = `Unexpected section [${section}]. `;
-            let expectedSections: string[] = Object.entries(sectionDepthMap)
-                .filter(([, depth]) => depth === expectedDepth)
-                .map(([key, ]) => `[${key}]`);
-
-            if (expectedSections.length > 1) {
-                errorMessage += `Expected one of ${expectedSections.join(", ")}.`;
+            let canBeInherited = inheritableSections.has(section);
+            if (canBeInherited && expectedDepth > 0) {
+                actualDepth = expectedDepth;
             } else {
-                errorMessage += `Expected ${expectedSections[0]}.`;
+                let errorMessage = `Unexpected section [${section}]. `;
+                let expectedSections: string[] = Object.entries(sectionDepthMap)
+                    .filter(([, depth]) => depth === expectedDepth)
+                    .map(([key, ]) => `[${key}]`);
+
+                if (expectedSections.length > 1) {
+                    errorMessage += `Expected one of ${expectedSections.join(", ")}.`;
+                } else {
+                    errorMessage += `Expected ${expectedSections[0]}.`;
+                }
+                error = this.createErrorDiagnostic(sectionRange, errorMessage);
             }
-            error = this.createErrorDiagnostic(sectionRange, errorMessage);
         }
 
         return [actualDepth, error];

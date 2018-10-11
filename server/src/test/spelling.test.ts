@@ -74,18 +74,6 @@ type = chart`,
             [],
         ),
         new Test(
-            "Placeholders section contains invalid items  ",
-            `url-parameters = ?queryName=EVTNOT&id=\${id}&sd=\${sd}&ed=\${ed}
-[placeholders]
-  id = none
-  ad = 0
-  ed = 0`,
-            [createDiagnostic(
-                Range.create(Position.create(3, "  ".length), Position.create(3, "  ".length + "ad".length)),
-                unknownToken("ad"),
-            )],
-        ),
-        new Test(
             "Column setting",
             `[widget]
   type = table
