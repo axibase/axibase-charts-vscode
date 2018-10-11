@@ -91,6 +91,14 @@ metric = cpu_iowait`,
                 "Section tag is unclosed",
             )],
         ),
+        new Test(
+            "Correct: no errors about spaces and custom names in settings of [property]",
+            `[properties]
+            Data Center = Cuperito
+            Site = California
+            Function = SAP DB`,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test) => {
