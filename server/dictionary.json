@@ -2739,11 +2739,27 @@
         },
         {
             "displayName": "horizontal-grid",
-            "type": "boolean",
+            "type": "enum",
             "example": false,
-            "defaultValue": true,
-            "widget": "chart",
-            "section": "widget"
+            "enum": [],
+            "section": "widget",
+            "override": {
+                "[widget == 'chart']": {
+                    "enum": [
+                        "true",
+                        "false"
+                    ]
+                },
+                "[widget == 'histogram']": {
+                    "enum": [
+                        "none",
+                        "density",
+                        "fractions",
+                        "frequency",
+                        "false"
+                    ]
+                }
+            }
         },
         {
             "displayName": "hour-format",

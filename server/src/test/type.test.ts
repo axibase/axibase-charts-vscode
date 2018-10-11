@@ -779,6 +779,31 @@ entity =`,
                     Range.create(2, 0, 2, "entity".length), "entity can not be empty",
                 )
             ]
+        ),
+        new Test(
+            "Correct: horizontal-grid = density for \"histogram\"",
+            `type = histogram
+            horizontal-grid = density`, []
+        ),
+        new Test(
+            "Correct: horizontal-grid = false for \"chart\"",
+            `type = chart
+            horizontal-grid = false`, []
+        ),
+        new Test(
+            "incorrect: horizontal-grid = frequency for \"chart\"",
+            `type = chart
+horizontal-grid = frequency`, [createDiagnostic(
+                Range.create(1, 0, 1, "horizontal-grid".length), "horizontal-grid must be one of:\n * false\n * true",
+            )]
+        ),
+        new Test(
+            "incorrect: horizontal-grid = true for \"histogram\"",
+            `type = histogram
+horizontal-grid = true`, [createDiagnostic(
+                Range.create(1, 0, 1, "horizontal-grid".length),
+                "horizontal-grid must be one of:\n * density\n * false\n * fractions\n * frequency\n * none",
+            )]
         )
     ];
 
