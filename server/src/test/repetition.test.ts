@@ -272,7 +272,8 @@ script = document.head.appendChild(stylesheet);`,
         new Test(
             "Allow *style repetitions",
             `[widget]
-  type = table
+  type = chart
+  mode = column
   alert-row-style = color:red
   alert-row-style = color:red
   alert-style = color:red

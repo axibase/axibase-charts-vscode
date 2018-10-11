@@ -38,15 +38,21 @@ export function isAnyInArray<T>(target: T[], array: T[]): boolean {
 
     return false;
 }
+
 /**
  * Clears the passed argument and looks for a setting with the same name
  * @param name name of the wanted setting
+ * @param range TextRange of the setting in text.
  * @returns the wanted setting or undefined if not found
  */
-export function getSetting(name: string): Setting | undefined {
+export function getSetting(name: string, range?: Range): Setting | undefined {
     const clearedName: string = Setting.clearSetting(name);
 
-    return settingsMap.get(clearedName);
+    const setting = settingsMap.get(clearedName);
+    if (setting && range) {
+        setting.textRange = range;
+    }
+    return setting;
 }
 
 /**

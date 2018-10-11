@@ -1,10 +1,23 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { deprecatedTagSection, settingNameInTags, settingsWithWhitespaces, tagNameWithWhitespaces, unknownToken } from "./messageUtil";
-import { requiredSectionSettingsMap, widgetRequirementsByType } from "./resources";
+import {
+    deprecatedTagSection, negativeStyleScope,
+    settingNameInTags,
+    settingsWithWhitespaces,
+    tagNameWithWhitespaces,
+    unknownToken
+} from "./messageUtil";
+import { requiredSectionSettingsMap, settingsMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
-import { countCsvColumns, createDiagnostic, deleteComments, getSetting, isAnyInArray, isInMap, repetitionDiagnostic } from "./util";
+import {
+    countCsvColumns,
+    createDiagnostic,
+    deleteComments,
+    isAnyInArray,
+    isInMap,
+    repetitionDiagnostic
+} from "./util";
 
 /**
  * Performs validation of a whole document line by line.
@@ -196,7 +209,7 @@ export class Validator {
             return result;
         }
         const [, indent, name] = this.match;
-        const variable: Setting | undefined = getSetting(name);
+        const variable: Setting | undefined = this.getSetting(name);
         if (variable === undefined) {
             return result;
         }
@@ -615,7 +628,8 @@ export class Validator {
             return undefined;
         }
         const name: string = this.match[2];
-        let setting: Setting | undefined = getSetting(name);
+
+        let setting: Setting | undefined = this.getSetting(name);
         if (setting === undefined) {
             if (TextRange.KEYWORD_REGEXP.test(name)) {
                 return undefined;
@@ -845,7 +859,7 @@ export class Validator {
             sectionStackError = this.sectionStack.finalize();
         } else {
             sectionStackError = this.sectionStack.insertSection(this.currentSection);
-        };
+        }
         if (sectionStackError) {
             this.result.push(sectionStackError);
         }
@@ -869,7 +883,7 @@ export class Validator {
                 return;
             }
             const [, indent, name] = this.match;
-            const setting: Setting | undefined = getSetting(name);
+            const setting: Setting | undefined = this.getSetting(name);
             if (this.isAllowedWidget(setting)) {
                 this.result.push(createDiagnostic(
                     Range.create(
@@ -906,12 +920,12 @@ export class Validator {
         }
 
         if (setting.name === "table") {
-            const attribute: Setting | undefined = getSetting("attribute");
+            const attribute: Setting | undefined = this.getSetting("attribute");
             if (attribute !== undefined) {
                 this.requiredSettings.push([attribute]);
             }
         } else if (setting.name === "attribute") {
-            const table: Setting | undefined = getSetting("table");
+            const table: Setting | undefined = this.getSetting("table");
             if (table !== undefined) {
                 this.requiredSettings.push([table]);
             }
@@ -935,9 +949,12 @@ export class Validator {
 
         if (!setting.multiLine) {
             this.checkRepetition(setting);
+        } else {
+            this.currentSettings.push(setting);
         }
         this.typeCheck(setting);
         this.checkExcludes(setting);
+        this.checkNegativeStyle(setting);
 
         if (setting.name === "urlparameters") {
             this.findUrlParams();
@@ -1173,5 +1190,58 @@ export class Validator {
             }
             this.match = atRegexp.exec(line);
         }
+    }
+
+    private checkNegativeStyle(setting: Setting) {
+        if (this.currentSection && this.currentSection.text === "widget") {
+            const typeSetting = this.getSectionSetting("type");
+            const modeSetting = this.getSectionSetting("mode");
+            const negativeStyleSetting = this.getSectionSetting("negativestyle");
+            if (typeSetting && negativeStyleSetting) {
+                const possibleType = "chart";
+                const possibleModes = ["column", "column-stack"];
+                const textRange = negativeStyleSetting.textRange ? negativeStyleSetting.textRange : setting.textRange;
+                const widgetMode = modeSetting ? this.getSectionSettingValue(modeSetting.name) : undefined;
+                if (possibleType !== this.getSectionSettingValue(typeSetting.name)
+                    || modeSetting && possibleModes.indexOf(widgetMode) < 0) {
+                    this.result.push(createDiagnostic(
+                        textRange,
+                        negativeStyleScope(),
+                        DiagnosticSeverity.Warning
+                    ));
+                }
+            }
+        }
+    }
+
+    private getSectionSettingValue(settingName: string) {
+        const value = this.settingValues.get(settingName);
+        return value ? value : Setting.clearValue(this.match[3]);
+    }
+
+    private getSectionSetting(settingName: string): Setting | undefined {
+        const currentSetting = Setting.clearSetting(this.match[2]);
+        if (currentSetting === settingName) {
+            return this.getSetting(settingName);
+        } else {
+            return this.currentSettings
+                .find(s => s.name === settingName);
+        }
+    }
+
+    private getSetting(name: string): Setting | undefined {
+        const clearedName: string = Setting.clearSetting(name);
+
+        const line = this.getCurrentLine();
+        const start: number = line.indexOf(name);
+        const range: Range = (start > -1) ? Range.create(
+            Position.create(this.currentLineNumber, start),
+            Position.create(this.currentLineNumber, start + name.length),
+        ) : undefined;
+        const setting = settingsMap.get(clearedName);
+        if (setting && range) {
+            setting.textRange = range;
+        }
+        return setting;
     }
 }

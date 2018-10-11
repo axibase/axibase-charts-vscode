@@ -79,6 +79,13 @@ function isDate(text: string): boolean {
  * Holds the description of a setting and corresponding methods
  */
 export class Setting {
+    get textRange(): Range {
+        return this._textRange;
+    }
+
+    set textRange(value: Range) {
+        this._textRange = value;
+    }
     /**
      * Lowercases the string and deletes non-alphabetic characters
      * @param str string to be cleared
@@ -152,6 +159,7 @@ export class Setting {
     public readonly override?: { [scope: string]: Partial<Setting> };
 
     private overrideCache: OverrideCacheEntry[] = [];
+    private _textRange: Range;
 
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
