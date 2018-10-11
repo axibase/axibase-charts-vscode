@@ -13,7 +13,7 @@ function readSettings(): Setting[] {
     const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
 
     return dictionary.settings;
-};
+}
 
 /**
  * Reads descriptions from "descriptions.md" file

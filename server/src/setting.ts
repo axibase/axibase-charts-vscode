@@ -72,7 +72,7 @@ const calculatedRegExp: RegExp = /[@$]\{.+\}/;
  * @returns true if the string is date expression, false otherwise
  */
 function isDate(text: string): boolean {
-    return calendarRegExp.test(text) || localDateRegExp.test(text) || zonedDateRegExp.test(text)
+    return calendarRegExp.test(text) || localDateRegExp.test(text) || zonedDateRegExp.test(text);
 }
 
 /**
@@ -214,7 +214,7 @@ export class Setting {
         }
         switch (this.type) {
             case "string": {
-                if (value.length === 0) {
+                if (!/\S/.test(value)) {
                     result = createDiagnostic(range, `${name} can not be empty`);
                 }
                 break;
@@ -252,7 +252,9 @@ export class Setting {
                     const enumList: string = this.enum.sort().join("\n * ")
                         .replace(/percentile\(.+/, "percentile_{num}");
                     result = createDiagnostic(range, `${name} must be one of:\n * ${enumList}`);
-                }
+                } /* else if (!/\S/.test(value)) {
+                    result = createDiagnostic(range, `${name} can not be empty`);
+                } */
                 break;
             }
             case "interval": {

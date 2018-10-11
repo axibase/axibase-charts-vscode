@@ -169,6 +169,20 @@ Displays background circle.
 Apply Unix style with black background.  
   
 ## collapsible  
+
+## columnalertexpression  
+  
+Boolean expression to apply conditional style to bars. The CSS style must be specified in the `column-alert-style` setting.
+The `value` field contains the total of all series in the given bar.  
+  
+## columnalertstyle  
+  
+CSS style applied to the bar rectangle if `column-alert-expression` is `true`.  
+  
+## columnlabelformat  
+  
+Column label pattern containing text and placeholders.
+Supported placeholders: `entity`, `metric`, `tagName`, `tagValue`, `tags.{tag-name}`, `statistics`, `period`.  
   
 ## color  
   
