@@ -1,5 +1,7 @@
 # Axibase Charts Extension for VSCode
 
+![](./images/axibase-and-vscode.png)
+
 [![](https://vsmarketplacebadge.apphb.com/version-short/Axibase.axibasecharts-syntax.svg)](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax)
 
 **Axibase Charts** extension for Microsoft [Visual Studio Code](https://code.visualstudio.com/) is a design tool that simplifies portal development and data exploration using the [Axibase Charts](https://github.com/axibase/charts/blob/master/README.md) library of declarative graphics.
