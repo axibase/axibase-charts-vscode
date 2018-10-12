@@ -1,7 +1,7 @@
 {
 	"name": "axibase-charts-syntax",
 	"description": "VSCode part of a language server",
-	"author": "Kirill Kamakin",
+	"author": "Axibase DEV",
 	"version": "0.0.1",
 	"license": "Apache-2.0",
 	"publisher": "Axibase",

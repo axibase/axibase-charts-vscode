@@ -2,7 +2,7 @@
 	"name": "axibase-charts-server",
 	"description": "Implementation of Axibase Charts Language Server",
 	"version": "0.0.1",
-	"author": "Kirill Kamakin",
+	"author": "Axibase DEV",
 	"license": "Apache-2.0",
 	"publisher": "Axibase",
 	"engines": {
