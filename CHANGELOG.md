@@ -1,5 +1,22 @@
 # Change Log
 
+## `v.1.0.10`
+
+* Validator fixes:
+  * Check required sections based on widget type.
+  * Raise error on empty settings.
+  * Raise error on multiple value settings.
+  * Check `mode`, `class`, `horizontal-grid`, `expand-panels` setting values based on widget type.
+  * Fix `statistics` check. Raise error on function aliases.
+  * Allow `rgb()` function in color settings.
+  * Check correlated settings: `thresholds` and `colors`.
+  * Raise error on plural time units.
+  * Remove false `csv` warning.
+  * Remove false warnings on unknown variables.
+
+* Diagnostic messages:
+  * Display allowed values based on widget type.
+
 ## `v1.0.9`
 
 * Remove suggestions based on Levenshtein distance due to low match quality.
