@@ -72,7 +72,6 @@ interface SectionRequirements {
     settings?: Setting[][];
     sections?: string[][];
 }
-
 /**
  * Map of required settings for each section and their "aliases".
  * For instance, `series` requires `entity`, but `entities` is also allowed.
@@ -113,6 +112,11 @@ export const requiredSectionSettingsMap = new Map<string, SectionRequirements>([
     ["dropdown", {
         settings: [
             [settingsMap.get("onchange")!, settingsMap.get("changefield")!],
+        ],
+    }],
+    ["node", {
+        settings: [
+            [settingsMap.get("id")],
         ],
     }],
 ]);

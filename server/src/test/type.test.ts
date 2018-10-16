@@ -43,6 +43,8 @@ function satisticsError_4(name: string): string {
  * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
 }
 
+const arrowLengthMsg = "arrow-length should be a real (floating-point) number. For example, 0.3, 30%";
+
 suite("Type check tests", () => {
     const tests: Test[] = [
         new Test(
@@ -103,11 +105,11 @@ suite("Type check tests", () => {
             `[configuration]
   arrow-length = 1
 [configuration]
-  arrow-length = 100000
+  font-scale = 0
 [configuration]
-  arrow-length = -100000
+  downsample-ratio = 1
 [configuration]
-  arrow-length = +100000
+  default-size = 2
 [configuration]
   arrow-length = .3
 [configuration]
@@ -115,7 +117,7 @@ suite("Type check tests", () => {
 [configuration]
   arrow-length = 0.333333333
 [configuration]
-  arrow-length = 1000.333333333
+  arrow-length = 30%
 `,
             [],
         ),
@@ -146,48 +148,37 @@ suite("Type check tests", () => {
 `,
             [
                 createDiagnostic(
-                    Range.create(1, "  ".length, 1, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(1, "  ".length, 1, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(3, "  ".length, 3, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(3, "  ".length, 3, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(5, "  ".length, 5, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(7, "  ".length, 7, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(9, "  ".length, 9, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(11, "  ".length, 11, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(13, "  ".length, 13, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(13, "  ".length, 13, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(15, "  ".length, 15, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(15, "  ".length, 15, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(17, "  ".length, 17, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(17, "  ".length, 17, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(19, "  ".length, 19, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(19, "  ".length, 19, "  arrow-length".length), arrowLengthMsg
                 ),
                 createDiagnostic(
-                    Range.create(21, "  ".length, 21, "  arrow-length".length),
-                    "arrow-length should be a real (floating-point) number. For example, 0.3",
+                    Range.create(21, "  ".length, 21, "  arrow-length".length), arrowLengthMsg
                 ),
             ],
         ),
@@ -781,29 +772,43 @@ entity =`,
             ]
         ),
         new Test(
-            "Correct: horizontal-grid = density for \"histogram\"",
+            "Correct: horizontal-grid = density for histogram",
             `type = histogram
             horizontal-grid = density`, []
         ),
         new Test(
-            "Correct: horizontal-grid = false for \"chart\"",
+            "Correct: horizontal-grid = false for chart",
             `type = chart
             horizontal-grid = false`, []
         ),
         new Test(
-            "incorrect: horizontal-grid = frequency for \"chart\"",
+            "Incorrect: horizontal-grid = frequency for chart",
             `type = chart
 horizontal-grid = frequency`, [createDiagnostic(
                 Range.create(1, 0, 1, "horizontal-grid".length), "horizontal-grid must be one of:\n * false\n * true",
             )]
         ),
         new Test(
-            "incorrect: horizontal-grid = true for \"histogram\"",
+            "Incorrect: horizontal-grid = true for histogram",
             `type = histogram
 horizontal-grid = true`, [createDiagnostic(
                 Range.create(1, 0, 1, "horizontal-grid".length),
                 "horizontal-grid must be one of:\n * density\n * false\n * fractions\n * frequency\n * none",
             )]
+        ),
+        new Test(
+            "Incorrect: color-range contains less than 2 colors",
+            `color-range = blue`, [createDiagnostic(
+                Range.create(0, 0, 0, "color-range".length), "Specify at least two colors.",
+            )]
+        ),
+        new Test(
+            "Correct: color-range colors separated by comma",
+            `color-range = blue, red, grey`, []
+        ),
+        new Test(
+            "Correct: color-range colors separated by space",
+            `color-range = blue red grey`, []
         )
     ];
 
