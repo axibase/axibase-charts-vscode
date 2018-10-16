@@ -184,6 +184,26 @@ CSS style applied to the bar rectangle if `column-alert-expression` is `true`.
 Column label pattern containing text and placeholders.
 Supported placeholders: `entity`, `metric`, `tagName`, `tagValue`, `tags.{tag-name}`, `statistics`, `period`.  
   
+## columnentity  
+  
+Change the name of column `entity` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
+Hide `column-entity` with `column-entity = null`.  
+  
+## columnmetric  
+  
+Change the name of column `metric` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
+Hide `column-metric` with `column-metric = null`.  
+  
+## columntime  
+  
+Change the name of column `time` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
+Hide `column-time` with `column-time = null`.  
+  
+## columnvalue  
+  
+Change the name of column `value` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
+Hide `column-value` with `column-value = null`.  
+  
 ## color  
   
 Assign a color to the series.  

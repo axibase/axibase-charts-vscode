@@ -471,7 +471,7 @@
             "type": "number",
             "section": "widget",
             "widget": "gauge",
-            "example": "0.3",
+            "example": "0.3, 30%",
             "maxValue": 1,
             "minValue": 0
         },
@@ -750,18 +750,31 @@
         },
         {
             "displayName": "color-range",
-            "type": "enum",
-            "example": "black",
+            "type": "string",
+            "example": "black, blue",
             "excludes": [
                 "colors",
                 "color"
             ],
-            "enum": [
-                "blue",
-                "red",
-                "black",
-                "green",
-                "yellow"
+            "possibleValues": [
+                {
+                    "value": "blue"
+                },
+                {
+                    "value": "red"
+                },
+                {
+                    "value": "black"
+                },
+                {
+                    "value": "green"
+                },
+                {
+                    "value": "yellow"
+                },
+                {
+                    "value": "silver"
+                }
             ]
         },
         {
@@ -785,6 +798,30 @@
             "type": "string",
             "example": "fill: red; stroke: red",
             "section": "column"
+        },
+        {
+            "displayName": "column-entity",
+            "type": "string",
+            "example": "Entity",
+            "section": "widget"
+        },
+        {
+            "displayName": "column-metric",
+            "type": "string",
+            "example": "Temperature",
+            "section": "widget"
+        },
+        {
+            "displayName": "column-time",
+            "type": "string",
+            "example": "Time in seconds",
+            "section": "widget"
+        },
+        {
+            "displayName": "column-value",
+            "type": "string",
+            "example": "CPU Usage",
+            "section": "widget"
         },
         {
             "displayName": "column-label-format",
@@ -2515,8 +2552,9 @@
         },
         {
             "displayName": "gradient-count",
-            "type": "string",
-            "example": "5, 2, 1",
+            "type": "integer",
+            "example": "5",
+            "minValue": 1,
             "section": "widget"
         },
         {
