@@ -6,6 +6,7 @@ import {
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
+import { RelatedSettingsChecker } from "./relatedSettingsChecker";
 import { requiredSectionSettingsMap, settingsMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
@@ -52,6 +53,10 @@ export class Validator {
      */
     private currentSettings: Setting[] = [];
     /**
+     * Array of settings declared in the current document
+     */
+    private allSettings: Setting[] = [];
+    /**
      * Array of de-aliases (value('alias')) in the current widget
      */
     private readonly deAliases: TextRange[] = [];
@@ -95,6 +100,10 @@ export class Validator {
      */
     private previousSettings: Setting[] = [];
     /**
+     * Util class which helps to check related settings, for example, tresholds and colors.
+     */
+    private relatedSettingsChecker: RelatedSettingsChecker = new RelatedSettingsChecker();
+    /**
      * Settings required to declare in the current section
      */
     private requiredSettings: Setting[][] = [];
@@ -136,7 +145,7 @@ export class Validator {
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
                 /**
-                 *  lines in multiline script and var sections
+                 *  Lines in multiline script and var sections
                  *  will be cheked in JavaScriptValidator.processScript() and processVar()
                  */
                 continue;
@@ -160,6 +169,8 @@ export class Validator {
         this.checkAliases();
         this.diagnosticForLeftKeywords();
         this.checkRequredSettingsForSection();
+        this.result.push(...this.relatedSettingsChecker.check(true, this.currentSettings));
+        this.result.push(...this.relatedSettingsChecker.check(false, this.allSettings));
         this.checkUrlPlaceholders();
         this.setSectionToStack(null);
 
@@ -187,9 +198,10 @@ export class Validator {
     }
 
     /**
-     * Adds new entry to settingValue map based on this.match
+     * Adds new entry to settingValue map based on this.match and sets value for setting.
+     * @param setting setting to which value will be set
      */
-    private addSettingValue(): void {
+    private addSettingValue(setting?: Setting): void {
         if (this.match == null) {
             throw new Error("Trying to add new entry to settingValue map based on undefined");
         }
@@ -197,6 +209,9 @@ export class Validator {
         const value: string = Setting.clearValue(this.match[3]);
         this.settingValues.set(name, value);
         this.sectionStack.insertCurrentSetting(name, value);
+        if (setting) {
+            setting.value = value;
+        }
     }
 
     /**
@@ -625,10 +640,8 @@ export class Validator {
             if (TextRange.KEYWORD_REGEXP.test(name)) {
                 return undefined;
             }
-            if (this.currentSection !== undefined && this.currentSection.text === "placeholders") {
-                return undefined;
-            }
-            if (name.startsWith("column")) {
+            if (this.currentSection !== undefined && (this.currentSection.text === "placeholders" ||
+                this.currentSection.text === "properties")) {
                 return undefined;
             }
             const message: string = unknownToken(name);
@@ -810,6 +823,7 @@ export class Validator {
     private handleSection(): void {
         this.checkRequredSettingsForSection();
         this.addCurrentToParentSettings();
+        this.result.push(...this.relatedSettingsChecker.check(true, this.currentSettings));
         if (this.match == null) {
             if (this.previousSection !== undefined) {
                 this.currentSection = this.previousSection;
@@ -863,7 +877,7 @@ export class Validator {
             return;
         }
         const line: string = this.getCurrentLine();
-        if (this.currentSection === undefined || !/(?:tag|key|properties)s?/.test(this.currentSection.text)) {
+        if (this.currentSection === undefined || !/(?:tag|key)s?/.test(this.currentSection.text)) {
             this.handleRegularSetting();
         } else if (/(?:tag|key)s?/.test(this.currentSection.text) &&
             // We are in tags/keys section
@@ -903,31 +917,12 @@ export class Validator {
      */
     private handleRegularSetting(): void {
         const line: string = this.getCurrentLine();
-        this.addSettingValue();
         const setting: Setting | undefined = this.getSettingCheck();
+        this.addSettingValue(setting);
         if (setting === undefined) {
             return;
         }
-
-        if (setting.name === "table") {
-            const attribute: Setting | undefined = this.getSetting("attribute");
-            if (attribute !== undefined) {
-                this.requiredSettings.push([attribute]);
-            }
-        } else if (setting.name === "attribute") {
-            const table: Setting | undefined = this.getSetting("table");
-            if (table !== undefined) {
-                this.requiredSettings.push([table]);
-            }
-        }
-
-        if (setting.name === "colors") {
-            this.checkColorsMatchTreshold(true, false);
-        }
-
-        if (setting.name === "thresholds") {
-            this.checkColorsMatchTreshold(false, true);
-        }
+        this.allSettings.push(setting);
 
         if (setting.name === "type") {
             this.currentWidget = this.match[3];
@@ -952,40 +947,6 @@ export class Validator {
             this.addToStringArray(this.aliases);
         }
         this.findDeAliases();
-    }
-
-    /**
-     *  Check the relationship between thresholds and colors:
-     *  in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
-     */
-    private checkColorsMatchTreshold(atColorsString: boolean, atTresholdString: boolean) {
-        const line: string = this.getCurrentLine();
-        let typeValue: string = this.settingValues.get("type");
-        if (["gauge", "calendar", "treemap"].includes(typeValue)) {
-            let thresholdsValue: string = this.settingValues.get("thresholds");
-            let colorsValue: string = this.settingValues.get("colors");
-            if (atTresholdString && colorsValue || atColorsString && thresholdsValue) {
-                if (colorsValue.split(/[^\d],[^\d]/g).length !== (thresholdsValue.split(",").length - 1)) {
-                    let value = line.split("=")[1].trim();
-                    this.result.push(createDiagnostic(Range.create(
-                        this.currentLineNumber, line.indexOf(value),
-                        this.currentLineNumber, line.indexOf(value) + value.length,
-                    ), `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`));
-                }
-            } else if (atColorsString) {
-                this.result.push(createDiagnostic(Range.create(
-                    this.currentLineNumber, line.indexOf("colors"),
-                    this.currentLineNumber, line.indexOf("colors") + "colors".length,
-                ), `"thresholds" are required if "colors" are specified`));
-            }
-            if (atTresholdString) {
-                const index = this.result.findIndex(x =>
-                    x.message === `"thresholds" are required if "colors" are specified`);
-                if (index > -1) {
-                    this.result.splice(index, 1);
-                }
-            }
-        }
     }
 
     /**
@@ -1123,7 +1084,7 @@ export class Validator {
             this.currentLineNumber, this.match[1].length,
             this.currentLineNumber, this.match[1].length + this.match[2].length,
         );
-        const diagnostic: Diagnostic | undefined = setting.checkType(this.match[3], range, this.match[2]);
+        const diagnostic: Diagnostic | undefined = setting.checkType(range);
         if (diagnostic != null) {
             this.result.push(diagnostic);
         }

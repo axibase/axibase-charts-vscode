@@ -129,21 +129,21 @@ endfor`,
         new Test(
             "Table without attribute",
             `[series]
-  entity = server
-  table = cpu_busy`,
+entity = server
+table = cpu_busy`,
             [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                "attribute is required",
+                Range.create(Position.create(2, 0), Position.create(2, "table".length)),
+                "attribute is required if table is specified",
             )],
         ),
         new Test(
             "Attribute without table",
             `[series]
-  entity = server
-  attribute = cpu_busy`,
+entity = server
+attribute = cpu_busy`,
             [createDiagnostic(
-                Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
-                "table is required",
+                Range.create(Position.create(2, 0), Position.create(2, "attribute".length)),
+                "table is required if attribute is specified",
             )],
         ),
         new Test(

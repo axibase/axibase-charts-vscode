@@ -125,11 +125,11 @@ export class Setting {
     /**
      * The maximum allowed value for the setting
      */
-    public readonly maxValue: number = Infinity;
+    public maxValue: number = Infinity;
     /**
      * The minimum allowed value for the setting
      */
-    public readonly minValue: number = -Infinity;
+    public minValue: number = -Infinity;
     /**
      * Is the setting allowed to be repeated
      */
@@ -153,13 +153,33 @@ export class Setting {
      * Possible values: string, number, integer, boolean, enum, interval, date
      */
     public readonly type: string = "";
+
+    /**
+     * Setting value.
+     */
+    public value: string = "";
+
     public readonly widget?: string;
+    /**
+     * String values that can assigned to the setting.
+     * Do not prevent use other values, in comparison with enum.
+     */
     public readonly possibleValues?: PossibleValue[];
 
     public readonly override?: { [scope: string]: Partial<Setting> };
 
     private overrideCache: OverrideCacheEntry[] = [];
     private _textRange: Range;
+
+    private additionalChecks = new Map<string, () => Diagnostic | undefined>([
+        ["color-range", () => {
+            const colors = this.value.split(/,|[^,]\s+/g);
+            if (colors.length < 2) {
+                return createDiagnostic(this.textRange, `Specify at least two colors.`);
+            }
+            return undefined;
+        }]
+    ]);
 
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
@@ -201,65 +221,66 @@ export class Setting {
 
     /**
      * Checks the type of the setting and creates a corresponding diagnostic
-     * @param value value which is assigned to the setting
      * @param range where the error should be displayed
-     * @param name name of the setting which is used by user
      */
-    public checkType(value: string, range: Range, name: string): Diagnostic | undefined {
+    public checkType(range: Range): Diagnostic | undefined {
         // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions
-        if (calculatedRegExp.test(value)) {
+        if (calculatedRegExp.test(this.value)) {
             return result;
         }
         switch (this.type) {
             case "string": {
-                if (!/\S/.test(value)) {
-                    result = createDiagnostic(range, `${name} can not be empty`);
+                if (!/\S/.test(this.value)) {
+                    result = createDiagnostic(range, `${this.displayName} can not be empty`);
+                }
+                if (this.additionalChecks.has(this.displayName)) {
+                    result = this.additionalChecks.get(this.displayName)();
                 }
                 break;
             }
             case "number": {
-                if (!numberRegExp.test(value)) {
-                    result = createDiagnostic(
-                        range, `${name} should be a real (floating-point) number. For example, ${this.example}`,
-                    );
+                const persent = /(\d*)%/.exec(this.value);
+                if (this.name === "arrowlength" && persent) {
+                    this.maxValue = this.maxValue * 100;
+                    this.minValue = this.minValue * 100;
+                    this.value = persent[1];
                 }
+                result = this.checkNumber(numberRegExp,
+                    `${this.displayName} should be a real (floating-point) number.`, range);
+
                 break;
             }
             case "integer": {
-                if (!integerRegExp.test(value)) {
-                    result = createDiagnostic(
-                        range, `${name} should be an integer number. For example, ${this.example}`,
-                    );
-                }
+                result = this.checkNumber(integerRegExp, `${this.displayName} should be an integer number.`, range);
                 break;
             }
             case "boolean": {
-                if (!booleanRegExp.test(value)) {
+                if (!booleanRegExp.test(this.value)) {
                     result = createDiagnostic(
-                        range, `${name} should be a boolean value. For example, ${this.example}`,
+                        range, `${this.displayName} should be a boolean value. For example, ${this.example}`,
                     );
                 }
                 break;
             }
             case "enum": {
-                const index: number = this.findIndexInEnum(value);
+                const index: number = this.findIndexInEnum(this.value);
                 // Empty enum means that the setting is not allowed
                 if (this.enum.length === 0) {
-                    result = createDiagnostic(range, `${name} setting is not allowed here.`);
+                    result = createDiagnostic(range, `${this.displayName} setting is not allowed here.`);
                 } else if (index < 0) {
                     const enumList: string = this.enum.sort().join("\n * ")
                         .replace(/percentile\(.+/, "percentile_{num}");
-                    result = createDiagnostic(range, `${name} must be one of:\n * ${enumList}`);
+                    result = createDiagnostic(range, `${this.displayName} must be one of:\n * ${enumList}`);
                 }
                 break;
             }
             case "interval": {
-                if (!intervalRegExp.test(value)) {
+                if (!intervalRegExp.test(this.value)) {
                     const message =
                         `.\nFor example, ${this.example}. Supported units:\n * ${intervalUnits.join("\n * ")}`;
-                    if (this.name === "updateinterval" && /^\d+$/.test(value)) {
+                    if (this.name === "updateinterval" && /^\d+$/.test(this.value)) {
                         result = createDiagnostic(
                             range,
                             `Specifying the interval in seconds is deprecated.\nUse \`count unit\` format${message}`,
@@ -271,20 +292,22 @@ export class Setting {
                          * (for example, period, summarize-period, group-period supports "auto")
                          */
                         if (this.enum.length > 0) {
-                            if (this.findIndexInEnum(value) < 0) {
+                            if (this.findIndexInEnum(this.value) < 0) {
                                 result = createDiagnostic(range,
                                     `Use ${this.enum.sort().join(", ")} or \`count unit\` format${message}`);
                             }
                         } else {
-                            result = createDiagnostic(range, `${name} should be set as \`count unit\`${message}`);
+                            result = createDiagnostic(range,
+                                `${this.displayName} should be set as \`count unit\`${message}`);
                         }
                     }
                 }
                 break;
             }
             case "date": {
-                if (!isDate(value)) {
-                    result = createDiagnostic(range, `${name} should be a date. For example, ${this.example}`);
+                if (!isDate(this.value)) {
+                    result = createDiagnostic(range,
+                        `${this.displayName} should be a date. For example, ${this.example}`);
                 }
                 break;
             }
@@ -334,6 +357,19 @@ export class Setting {
         }
 
         return result;
+    }
+
+    private checkNumber(reg: RegExp, message: string, range: Range): Diagnostic {
+        const example = ` For example, ${this.example}`;
+        if (!reg.test(this.value)) {
+            return createDiagnostic(range, `${message}${example}`);
+        }
+        if (+this.value < this.minValue || +this.value > this.maxValue) {
+            return createDiagnostic(
+                range, `${this.displayName} should be in range [${this.minValue}, ${this.maxValue}].${example}`,
+            );
+        }
+        return undefined;
     }
 
     private findIndexInEnum(value: string) {
