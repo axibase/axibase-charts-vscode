@@ -83,6 +83,15 @@ endcsv`,
             endcsv`,
             [],
         ),
+        new Test(
+            "Correct csv with *",
+            ` csv values = 
+        names, ids
+        All Countries, *
+        Top 10 Countries, value >= top(10)
+        endcsv  `,
+            [],
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
