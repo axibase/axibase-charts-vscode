@@ -7814,7 +7814,14 @@
                 "console",
                 "table",
                 "property"
-            ]
+            ],
+            "override": {
+                "[section == 'property']": {
+                    "enum": [
+                        ".*"
+                    ]
+                }
+            }
         },
         {
             "displayName": "unscale",
