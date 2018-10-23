@@ -198,5 +198,5 @@ export const sectionDepthMap: { [section: string]: number } = {
  * `max_depth` is a value from `sectionDepthMap`
  */
 export const inheritableSections: Set<string> = new Set([
-    "keys",
+    "keys", "tags"
 ]);
