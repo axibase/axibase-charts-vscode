@@ -171,16 +171,6 @@ export class Setting {
     private overrideCache: OverrideCacheEntry[] = [];
     private _textRange: Range;
 
-    private additionalChecks = new Map<string, () => Diagnostic | undefined>([
-        ["color-range", () => {
-            const colors = this.value.split(/,|[^,]\s+/g);
-            if (colors.length < 2) {
-                return createDiagnostic(this.textRange, `Specify at least two colors.`);
-            }
-            return undefined;
-        }]
-    ]);
-
     public constructor(setting?: Setting) {
         Object.assign(this, setting);
         this.enum = this.enum.map((v: string): string => v.toLowerCase());
@@ -234,9 +224,6 @@ export class Setting {
             case "string": {
                 if (!/\S/.test(this.value)) {
                     result = createDiagnostic(range, `${this.displayName} can not be empty`);
-                }
-                if (this.additionalChecks.has(this.displayName)) {
-                    result = this.additionalChecks.get(this.displayName)();
                 }
                 break;
             }
