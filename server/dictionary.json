@@ -3617,7 +3617,7 @@
             "defaultValue": "undefined",
             "enum": [
                 "top",
-                "botton",
+                "bottom",
                 "undefined"
             ]
         },
