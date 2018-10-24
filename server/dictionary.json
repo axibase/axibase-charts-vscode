@@ -716,8 +716,8 @@
             "displayName": "class",
             "type": "enum",
             "example": "terminal",
-            "enum": [],
-            "section": "widget",
+            "enum": ["terminal", "metro"],
+            "section": "configuration",
             "override": {
                 "[widget == 'console' || widget == 'property']": {
                     "enum": [
@@ -4342,6 +4342,13 @@
             "example": 20
         },
         {
+            "displayName": "node-radiuses",
+            "type": "string",
+            "widget": "graph",
+            "section": "widget",
+            "example": "10, 20, 30, 40"
+        },
+        {
             "displayName": "nodes",
             "widget": "graph",
             "type": "string",
@@ -7816,7 +7823,7 @@
                 "property"
             ],
             "override": {
-                "[section == 'property']": {
+                "[section == 'property' || section == 'properties']": {
                     "enum": [
                         ".*"
                     ]
