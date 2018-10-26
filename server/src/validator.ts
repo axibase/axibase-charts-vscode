@@ -634,7 +634,9 @@ export class Validator {
             return undefined;
         }
         const name: string = this.match[2];
-
+        if (/column-/.test(name)) {
+            return undefined;
+        }
         let setting: Setting | undefined = this.getSetting(name);
         if (setting === undefined) {
             if (TextRange.KEYWORD_REGEXP.test(name)) {
