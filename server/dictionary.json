@@ -2552,7 +2552,7 @@
         },
         {
             "displayName": "gradient-count",
-            "type": "integer",
+            "type": "string",
             "example": "5",
             "minValue": 1,
             "section": "widget"
