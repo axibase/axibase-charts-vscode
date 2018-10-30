@@ -797,12 +797,6 @@ horizontal-grid = true`, [createDiagnostic(
             )]
         ),
         new Test(
-            "Incorrect: color-range contains less than 2 colors",
-            `color-range = blue`, [createDiagnostic(
-                Range.create(0, 0, 0, "color-range".length), "Specify at least two colors.",
-            )]
-        ),
-        new Test(
             "Correct: color-range colors separated by comma",
             `color-range = blue, red, grey`, []
         ),

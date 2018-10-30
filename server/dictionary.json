@@ -716,8 +716,8 @@
             "displayName": "class",
             "type": "enum",
             "example": "terminal",
-            "enum": [],
-            "section": "widget",
+            "enum": ["terminal", "metro"],
+            "section": "configuration",
             "override": {
                 "[widget == 'console' || widget == 'property']": {
                     "enum": [
@@ -2552,7 +2552,7 @@
         },
         {
             "displayName": "gradient-count",
-            "type": "integer",
+            "type": "string",
             "example": "5",
             "minValue": 1,
             "section": "widget"
@@ -3617,7 +3617,7 @@
             "defaultValue": "undefined",
             "enum": [
                 "top",
-                "botton",
+                "bottom",
                 "undefined"
             ]
         },
@@ -4340,6 +4340,13 @@
             "widget": "graph",
             "section": "widget",
             "example": 20
+        },
+        {
+            "displayName": "node-radiuses",
+            "type": "string",
+            "widget": "graph",
+            "section": "widget",
+            "example": "10, 20, 30, 40"
         },
         {
             "displayName": "nodes",
@@ -7816,7 +7823,7 @@
                 "property"
             ],
             "override": {
-                "[section == 'property']": {
+                "[section == 'property' || section == 'properties']": {
                     "enum": [
                         ".*"
                     ]

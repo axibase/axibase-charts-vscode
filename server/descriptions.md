@@ -910,6 +910,10 @@ Parameter value is a value of scale when labels appear based on vertex threshold
 Radius of the vertex in pixels.  
 Not valid in `hierarchy` mode.  
   
+## noderadiuses  
+  
+Radii of the lighting for the display of the time series `thresholds` linked to the vertices and separated by commas or spaces.  
+  
 ## nodes  
   
 List of vertices associated with this series.  
