@@ -232,9 +232,9 @@ export class JavaScriptValidator {
         percentile,max,min,avg,sum,delta,counter,last,first,
         min_value_time,max_value_time,count,threshold_count,threshold_percent,
         threshold_duration,time,bottom,top,meta,entityTag,metricTag,median,
-        average,minimum,maximum,getValueWithOffset,getValueForDate,getMaximumValue,series,metric,entity,tags
+        average,minimum,maximum,getValueWithOffset,getValueForDate,getMaximumValue,data,config,series,metric,entity,tags
         ${this.imports.length > 0 ? "," + this.imports : ""}){ return ${value}; })` +
-            `(${this.generateCall(36, "new Function()")},` +
+            `(${this.generateCall(38, "new Function()")},` +
             `${this.generateCall(1, "[]")},` +
             `${this.generateCall(this.importCounter + 3, "{}")});\n`,
             Range.create(
