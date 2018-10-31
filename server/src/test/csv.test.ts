@@ -85,13 +85,21 @@ endcsv`,
         ),
         new Test(
             "Correct csv with *",
-            ` csv values = 
+            `csv values =
         names, ids
         All Countries, *
         Top 10 Countries, value >= top(10)
-        endcsv  `,
+        endcsv`,
             [],
         ),
+        new Test(
+            "Correct csv with spaces and + ",
+            `csv dbmetrics = metric              ,isSize ,isRate
+            mssql.active_transactions            ,       ,
+            mssql.backup_restore_throughput      ,       ,   +
+            endcsv`,
+            [],
+        )
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
