@@ -64,13 +64,8 @@ export function countCsvColumns(line: string): number {
     if (line.length === 0) {
         return 0;
     }
-    const regex: RegExp = /(['"]).+\1|\*|\w[^,"']+/g;
-    let counter: number = 0;
-    while (regex.exec(line) !== null) {
-        counter++;
-    }
-
-    return counter;
+    const lineWithoutEscapes = line.replace(/(['"]).+\1/g, ""); // remove strings in quotes "6,3" or "6 3"
+    return lineWithoutEscapes.split(",").length;
 }
 
 /**
