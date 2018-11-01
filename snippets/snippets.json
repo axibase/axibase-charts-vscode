@@ -364,7 +364,7 @@
             "  node-labels = ${3:true}",
             "  link-data = ${4:true}",
             "  timespan = ${5:1 day}",
-            "  endtime = ${6:date('2015-03-14')}",
+            "  endtime = ${6:2015-03-14}",
             "",
             "  node-radius = ${7:20}",
             "",

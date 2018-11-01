@@ -7861,6 +7861,7 @@
             "displayName": "value",
             "type": "string",
             "example": "Math.max(0, value('alias'))",
+            "multiLine": true,
             "section": "series",
             "script": {
                 "returnValue": "number",
