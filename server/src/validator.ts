@@ -733,7 +733,17 @@ export class Validator {
         this.match = /(^\s*for\s+)(\w+)\s+in/m.exec(line);
         if (this.match !== null) {
             const matching: RegExpExecArray = this.match;
-            this.match = /^([ \t]*for[ \t]+\w+[ \t]+in[ \t]+)(?:Object\.keys\((\w+)\)|(\w+)).*$/im.exec(line);
+            // tslint:disable-next-line:max-line-length
+            this.match = /^([ \t]*for[ \t]+\w+[ \t]+in[ \t]+)(?:Object\.keys\((\w+)(?:\.\w+)*\)|(\w+))[\[\]\d]*$/im.exec(line);
+            /**
+             * First part "^([ \t]*for[ \t]+\w+[ \t]+in[ \t]+)" mathes "for <alias> in", for example "for agent in".
+             * Second part "(?:Object\.keys\((\w+)(?:\.\w+)*\)|(\w+))[\[\]\d]*$"
+             * matches variable "apps" in the following cases:
+             * 1) for agent in Object.keys(apps)
+             * 2) for agent in Object.keys(apps.tags)
+             * 3) for agent in apps
+             * 4) for agent in apps[2]
+             */
             if (this.match !== null) {
                 const [, forIn, key, collection] = this.match;
                 const range: Range = Range.create(

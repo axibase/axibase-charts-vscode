@@ -209,7 +209,19 @@ endfor`,
             )],
         ),
         new Test(
-            "Index after collection name",
+            "Correct Object.keys() with access via dot",
+            `var seriesList = getSeries('df.bytes.percentused', 'nurswgvml006')
+
+            for sobj in seriesList
+                [tags]
+                for tagName in Object.keys(sobj.tags)
+                  "@{tagName}" = @{sobj.tags[tagName]}
+                endfor
+            endfor`,
+            [],
+        ),
+        new Test(
+            "Correct: index after collection name",
             `var host = [
   ["abc","/app",["dm-3","dm-2"]],
   ["cde","/db",["dm-1","dm-0"]]
