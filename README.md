@@ -8,11 +8,12 @@
 
 The extension implements the following functionality:
 
-* Code highlighting
-* Syntax validation
-* Auto-completion
-* Settings reference
-* Live preview
+* [Settings Reference](#introduction)
+* [Live Preview](#live-preview)
+* [Syntax Highlighting](#syntax-highlighting)
+* [Code Formatting](#code-formatting)
+* [Auto-completion](#snippets)
+* [Syntax Validation](#validation)
 
 ## Installation
 
