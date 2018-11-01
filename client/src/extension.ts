@@ -131,7 +131,10 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             provider.update();
         }
         const tabLabel = "Preview Portal";
-        commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, tabLabel);
+        commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, tabLabel)
+            .then(() => {
+                provider.update();
+            });
     }));
     context.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent): Promise<void> => {
