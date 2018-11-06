@@ -15,6 +15,7 @@ const sectionStackStub: SectionStack  = {
     stack: [],
     finalize(): null { return null; },
     getCurrentSetting(): null { return null; },
+    getLastSection(): undefined { return undefined; },
     getSectionRange(): null { return null; },
     getSectionSettings() { return new Map(); },
     insertCurrentSetting() { /* void */},

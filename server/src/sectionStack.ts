@@ -13,7 +13,7 @@ type AtLeastOneString = [string, ...string[]];
 
 class SectionStackNode {
     public readonly dependencies: DependencyResolveInfo[] = [];
-    public readonly settings: Map<string, any> = new Map();
+    public readonly settings: Setting[] = [];
 
     public constructor(public range: TextRange) {
         const deps = requiredSectionSettingsMap.get(this.name);
@@ -32,12 +32,12 @@ class SectionStackNode {
         }
     }
 
-    public insertSetting(name: string, value: any) {
-        this.settings.set(Setting.clearSetting(name), value);
+    public insertSetting(setting: Setting) {
+        this.settings.push(setting);
     }
 
-    public getSetting(name: string): any | undefined {
-        return this.settings.get(Setting.clearSetting(name));
+    public getSetting(name: string): Setting | undefined {
+        return this.settings.find(s => s.name === Setting.clearSetting(name));
     }
 
     /**
@@ -102,18 +102,18 @@ class SectionStackNode {
 /**
  * A null object to prevent multiple errors on missing root section
  */
-const DummySectionStackNode: SectionStackNode & {[Symbol.toStringTag]: string} = {
+const DummySectionStackNode: SectionStackNode & { [Symbol.toStringTag]: string } = {
     dependencies: [],
     dependenciesResolved: true,
     name: "",
     range: new TextRange("", Range.create(Position.create(0, 0), Position.create(0, 0))),
-    settings: new Map(),
+    settings: [],
     unresolved: [],
 
     resolveDependency() { /* void */ },
-    setRequiredSections() { /* void */},
-    getSetting() { /* void */},
-    insertSetting() { /* void */},
+    setRequiredSections() { /* void */ },
+    getSetting() { return undefined; },
+    insertSetting() { /* void */ },
     [Symbol.toStringTag]: "DummySectionStackNode",
 };
 
@@ -148,6 +148,10 @@ export class SectionStack {
         return error;
     }
 
+    public getLastSection(): SectionStackNode {
+        return this.stack[this.stack.length - 1];
+    }
+
     public finalize(): Diagnostic {
         let err =  this.checkDependenciesResolved(0);
         this.stack = [];
@@ -164,11 +168,11 @@ export class SectionStack {
                     }
                 }
             }
-            if (target.dependencies.length == 0) {
+            if (target.dependencies.length === 0) {
                 target.dependencies.push({
                     resolvedCount: 0,
                     unresolved: sections,
-                })
+                });
             }
         }
     }
@@ -180,14 +184,20 @@ export class SectionStack {
         }
     }
 
-    public insertCurrentSetting(name: string, value: any) {
+    public insertCurrentSetting(setting: Setting) {
         if (this.stack.length > 0) {
             let target = this.stack[this.stack.length - 1];
-            target.insertSetting(name, value);
+            target.insertSetting(setting);
         }
     }
 
-    public getCurrentSetting(name: string, recursive: boolean = true): any | undefined {
+    /**
+     * Returns the setting by name.
+     * @param name setting name
+     * @param recursive if true searches setting in the whole stack and returns the closest one,
+     * otherwise searches setting in the current section
+     */
+    public getCurrentSetting(name: string, recursive: boolean = true): Setting | undefined {
         let visitSectionCount = recursive ? this.stack.length : 1;
         for (let i = visitSectionCount; i > 0;) {
             let section = this.stack[--i];
@@ -197,18 +207,18 @@ export class SectionStack {
             }
         }
 
-        return;
+        return undefined;
     }
 
-    public getSectionSettings(section: string,  recursive: boolean = true): Map<string, any> {
-        let targetIdx = this.stack.findIndex(s => s.name === section);
-        let result = new Map();
+    public getSectionSettings(section?: string, recursive: boolean = true): Setting[] {
+        let targetIdx = section ? this.stack.findIndex(s => s.name === section) : this.stack.length - 1;
+        let result = [];
         if (targetIdx >= 0) {
             let start = recursive ? 0 : targetIdx;
             for (let i = start; i <= targetIdx; i++) {
                 let target = this.stack[i];
-                for (let [key, val] of target.settings) {
-                    result.set(key, val);
+                for (const setting of target.settings) {
+                    result.push(setting);
                 }
             }
         }

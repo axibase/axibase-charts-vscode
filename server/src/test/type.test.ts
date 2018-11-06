@@ -795,14 +795,6 @@ horizontal-grid = true`, [createDiagnostic(
                 Range.create(1, 0, 1, "horizontal-grid".length),
                 "horizontal-grid must be one of:\n * density\n * false\n * fractions\n * frequency\n * none",
             )]
-        ),
-        new Test(
-            "Correct: color-range colors separated by comma",
-            `color-range = blue, red, grey`, []
-        ),
-        new Test(
-            "Correct: color-range colors separated by space",
-            `color-range = blue red grey`, []
         )
     ];
 
