@@ -163,7 +163,6 @@ export class Validator {
 
                 this.switchKeyword();
             }
-
         }
 
         this.checkAliases();
@@ -441,6 +440,10 @@ export class Validator {
                 const columnMetric: string | undefined = this.settingValues.get("columnmetric");
                 const columnValue: string | undefined = this.settingValues.get("columnvalue");
                 if (columnMetric === "null" && columnValue === "null") {
+                    continue;
+                }
+                const changeField: string | undefined = this.settingValues.get("changefield");
+                if (/metric/.test(changeField)) {
                     continue;
                 }
             }

@@ -242,3 +242,16 @@ attribute = cpu_busy`,
     tests.forEach((test: Test) => { test.validationTest(); });
 
 });
+
+suite("No metric is required if change-field value contains \"metric\"", () => {
+    new Test("Correct, no errors shoud be raised",
+    `[configuration]
+    entity = atsd
+  [group]
+    [widget]
+      type = chart
+  [dropdown]
+    change-field = metric
+  [series]`, []).validationTest();
+
+});
