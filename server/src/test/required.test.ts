@@ -243,7 +243,7 @@ attribute = cpu_busy`,
 
 });
 
-suite("No metric is required if change-field value contais \"metric\"", () => {
+suite("No metric is required if change-field value contains \"metric\"", () => {
     new Test("Correct, no errors shoud be raised",
     `[configuration]
     entity = atsd
