@@ -27,7 +27,7 @@ suite("Validator for negative-style setting", () => {
                                 createDiagnostic(Range.create(Position.create(7, 0),
                                         Position.create(7, "negative-style".length)),
                                         uselessScope("negative-style",
-                                                "type is chart, mode is one of column-stack, column"),
+                                                "mode is one of column-stack, column"),
                                         DiagnosticSeverity.Warning)
                         ],
                         mode: "stack",

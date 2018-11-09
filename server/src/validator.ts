@@ -1166,7 +1166,7 @@ export class Validator {
             Position.create(this.currentLineNumber, start + name.length),
         ) : undefined;
         const setting = settingsMap.get(clearedName);
-        let copy = new Setting();
+        let copy = Object.create(Setting.prototype);
         if (setting) {
             Object.assign(copy, setting);
             if (range) {
@@ -1187,7 +1187,10 @@ export class Validator {
         let placeholderRange = this.sectionStack.getSectionRange("placeholders");
         if (placeholderRange) {
             let phSectionSettings = this.sectionStack.getSectionSettings("placeholders", false);
-            let missingPhs = phs.filter(key => phSectionSettings.find(s => s.name === Setting.clearValue(key)) == null);
+            let missingPhs = phs.filter(key => {
+                const cleared = Setting.clearValue(key);
+                return phSectionSettings.find(s => s.name === cleared) == null;
+            });
             if (missingPhs.length > 0) {
                 this.result.push(createDiagnostic(
                     placeholderRange.range,

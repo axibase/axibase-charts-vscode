@@ -37,7 +37,8 @@ class SectionStackNode {
     }
 
     public getSetting(name: string): Setting | undefined {
-        return this.settings.find(s => s.name === Setting.clearSetting(name));
+        const cleared = Setting.clearSetting(name);
+        return this.settings.find(s => s.name === cleared);
     }
 
     /**
@@ -153,7 +154,7 @@ export class SectionStack {
     }
 
     public finalize(): Diagnostic {
-        let err =  this.checkDependenciesResolved(0);
+        let err = this.checkDependenciesResolved(0);
         this.stack = [];
         return err;
     }

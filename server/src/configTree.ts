@@ -1,106 +1,99 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { uselessScope } from "./messageUtil";
+import { Condition, Requirement, SectionScope } from "./requirement";
 import { sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
-export interface Requirement {
-    /**
-     * setting name = possible values
-     */
-    conditions: Map<string, string[]>;
-    checked: Setting;
-    dependent: string | string[];
-}
-
 /**
- * If "checked" != null, the section will be checked for match to conditions;
- * if section matches conditions, "checked" setting is required for this section.
+ * If requiredIfConditions !== null, the section will be checked for match to conditions;
+ * if section matches conditions, requiredIfConditions setting is required for this section.
  *
- * If "checked" == null, the section will be checked for availability of any of "dependent";
+ * If requiredIfConditions == null, the section will be checked for applicability of any of "dependent";
  * if any dependent is declared in the section, than section will be checked for match to conditions.
  */
 const relatedSettings: Requirement[] = [
-    {
-        checked: getSetting("thresholds"),
-        conditions: new Map([
+    new Requirement(
+        "colors",
+        getSetting("thresholds"),
+        new Map([
             ["type", ["calendar", "treemap", "gauge"]],
             ["mode", ["half", "default"]]
-        ]),
-        dependent: "colors"
-    },
-    {
-        checked: getSetting("data-type"),
-        conditions: new Map([
+        ])
+    ),
+    new Requirement(
+        "forecast-style",
+        getSetting("data-type"),
+        new Map([
             ["type", ["chart"]],
             ["mode", ["column", "column-stack"]]
-        ]),
-        dependent: "forecast-style"
-    },
-    {
-        checked: null,
-        conditions: new Map([
+        ])
+    ),
+    new Requirement(
+        ["negative-style", "current-period-style"],
+        null,
+        new Map([
             ["type", ["chart"]],
             ["mode", ["column-stack", "column"]]
-        ]),
-        dependent: ["negative-style", "current-period-style"]
-    },
-    {
-        checked: null,
-        conditions: new Map([
+        ])
+    ),
+    new Requirement(
+        "moving-average",
+        null,
+        new Map([
             ["type", ["chart"]],
             ["server-aggregate", ["false"]]
-        ]),
-        dependent: "moving-average"
-    },
-    {
-        checked: null,
-        conditions: new Map([
+        ])
+    ),
+    new Requirement(
+        ["ticks", "color-range", "gradient-count"],
+        null,
+        new Map([
             ["type", ["calendar", "treemap", "gauge"]],
             ["mode", ["half", "default"]]
-        ]),
-        dependent: ["ticks", "color-range", "gradient-count"]
-    },
-    {
-        checked: getSetting("attribute"), conditions: null, dependent: "table"
-    },
-    {
-        checked: getSetting("table"), conditions: null, dependent: "attribute"
-    },
-    {
-        checked: getSetting("column-alert-expression"), conditions: null, dependent: "column-alert-style"
-    },
-    {
-        checked: getSetting("alert-expression"), conditions: null, dependent: "alert-style"
-    },
-    {
-        checked: getSetting("alert-expression"), conditions: null, dependent: "link-alert-style"
-    },
-    {
-        checked: getSetting("alert-expression"), conditions: null, dependent: "node-alert-style"
-    },
-    {
-        checked: getSetting("icon-alert-expression"), conditions: null, dependent: "icon-alert-style"
-    },
-    {
-        checked: getSetting("icon"), conditions: null, dependent: "icon-alert-expression"
-    },
-    {
-        checked: getSetting("icon"), conditions: null, dependent: "icon-color"
-    },
-    {
-        checked: getSetting("icon"), conditions: null, dependent: "icon-position"
-    },
-    {
-        checked: getSetting("icon"), conditions: null, dependent: "icon-size"
-    },
-    {
-        checked: getSetting("caption"), conditions: null, dependent: "caption-style"
-    }
+        ])
+    ),
+    new Requirement(
+        "table", getSetting("attribute")
+    ),
+    new Requirement(
+        "attribute", getSetting("table")
+    ),
+    new Requirement(
+        "column-alert-style", getSetting("column-alert-expression")
+    ),
+    new Requirement(
+        "alert-style", getSetting("alert-expression")
+    ),
+    new Requirement(
+        "link-alert-style", getSetting("alert-expression")
+    ),
+    new Requirement(
+        "node-alert-style", getSetting("alert-expression")
+    ),
+    new Requirement(
+        "icon-alert-style", getSetting("icon-alert-expression")
+    ),
+    new Requirement(
+        "icon-alert-expression", getSetting("icon")
+    ),
+    new Requirement(
+        "icon-color", getSetting("icon")
+    ),
+    new Requirement(
+        "icon-position", getSetting("icon")
+    ),
+    new Requirement(
+        "icon-size", getSetting("icon")
+    ),
+    new Requirement(
+        "caption-style", getSetting("caption")
+    )
 ];
 
 class Section {
+
     public name: string;
     public settings: Setting[];
     public parent: Section;
@@ -110,6 +103,7 @@ class Section {
      * section name = requirements for this section
      */
     public requirementsForChildren: Map<string, Requirement[]> = new Map();
+    public scope: SectionScope = {};
 
     public constructor(range: TextRange, settings: Setting[]) {
         this.range = range;
@@ -117,13 +111,57 @@ class Section {
         this.settings = settings;
     }
 
+    public applyScope() {
+        if (this.parent !== undefined) {
+            /**
+             * We are not at [configuration].
+             */
+            this.scope = Object.create(this.parent.scope);
+        }
+        for (const setting of this.settings) {
+            if (setting.name === "type") {
+                this.scope.widgetType = setting.value;
+            } else if (setting.name === "mode") {
+                this.scope.mode = setting.value;
+            }
+        }
+    }
+
     public getSetting(name: string): Setting | undefined {
-        return this.settings.find(s => s.name === Setting.clearSetting(name));
+        const cleared = Setting.clearSetting(name);
+        return this.settings.find(s => s.name === cleared);
+    }
+
+    public getScopeValue(settingName: string): string {
+        return settingName === "type" ? this.scope.widgetType : this.scope.mode;
     }
 }
 
+/**
+ * checks related settings.
+ */
 // tslint:disable-next-line:max-classes-per-file
 export class ConfigTree {
+
+    /**
+     * Searches setting in the parents starting from the startSection and ending root, returns the closest one.
+     * @param settingName setting name
+     * @param startSection node of subtree to search for settingName
+     */
+    public static getSetting(startSection: Section, settingName: string): Setting | undefined {
+        let currentSection = startSection;
+        do {
+            let value = currentSection.getSetting(settingName);
+            if (value !== void 0) {
+                return value;
+            }
+            currentSection = currentSection.parent;
+        }
+        while (currentSection !== undefined);
+
+        return undefined;
+    }
+
     public diagnostics: Diagnostic[];
     private root: Section;
     private lastAdded: Section = null;
@@ -136,22 +174,22 @@ export class ConfigTree {
         const section = new Section(range, settings);
         const depth: number = sectionDepthMap[range.text];
         switch (depth) {
-            case 0: {
+            case 0: { // [configuration]
                 this.root = section;
                 break;
             }
-            case 1: {
+            case 1: { // [group]
                 this.root.children.push(section);
                 section.parent = this.root;
                 break;
             }
-            case 2: {
+            case 2: { // [widget]
                 const group = this.root.children[this.root.children.length - 1];
                 section.parent = group;
                 section.parent.children.push(section);
                 break;
             }
-            case 3: {
+            case 3: { // [series], [dropdown], [column], ...
                 if (this.lastAdded && this.lastAdded.name === "column" && range.text === "series") {
                     section.parent = this.lastAdded;
                 } else {
@@ -163,12 +201,13 @@ export class ConfigTree {
                 section.parent.children.push(section);
                 break;
             }
-            case 4: {
+            case 4: { // [option], [properties], ...
                 section.parent = this.lastAdded;
                 section.parent.children.push(section);
                 break;
             }
         }
+        section.applyScope();
 
         for (const setting of settings) {
             const requirement = this.getRequirement(setting.displayName);
@@ -182,7 +221,8 @@ export class ConfigTree {
     }
 
     /**
-     * Bypasses tree and addes diagnostics if required.
+     * Bypasses the tree and addes diagnostics about not applicable settings
+     * or absent required setting.
      */
     public goThroughTree() {
         if (this.root === undefined) {
@@ -231,16 +271,14 @@ export class ConfigTree {
             }
             this.checkAllChildren(targetSectionName, requirements, child);
         }
-
     }
 
-    private sectionMatchConditions(section: Section, conditions: Map<string, string[]>): boolean {
-        if (conditions === null) {
+    private sectionMatchConditions(section: Section, conditions: Condition[]): boolean {
+        if (conditions.length === 0) {
             return true;
         }
-        for (let [settingName, allowedValues] of conditions) {
-            const setting = this.getSetting(section, settingName);
-            const currCondition = setting ? allowedValues.includes(setting.value) : true;
+        for (const condition of conditions) {
+            const currCondition = condition(section);
             if (!currCondition) {
                 return false;
             }
@@ -249,36 +287,17 @@ export class ConfigTree {
     }
 
     /**
-     * Searches setting in the parents starting from the startSection and ending root, returns the closest one.
-     * @param settingName setting name
-     * @param startSection node of subtree to search for settingName
-     */
-    private getSetting(startSection: Section, settingName: string): Setting | undefined {
-        let currentSection = startSection;
-        do {
-            let value = currentSection.getSetting(settingName);
-            if (value !== void 0) {
-                return value;
-            }
-            currentSection = currentSection.parent;
-        }
-        while (currentSection !== undefined);
-
-        return undefined;
-    }
-
-    /**
      * Adds Diagnostic if section mathes condifitons and doesn't contain required ("checked") setting.
      */
     private checkSection(requirements: Requirement[], section: Section) {
         for (const req of requirements) {
             if (this.sectionMatchConditions(section, req.conditions)) {
-                const checkedSetting = this.getSetting(section, req.checked.name);
+                const checkedSetting = ConfigTree.getSetting(section, req.requiredIfConditions.name);
                 if (checkedSetting === undefined) {
                     this.diagnostics.push(createDiagnostic(section.range.range,
-                        `${req.checked.displayName} is required if ${req.dependent} is specified`));
-                } else if (req.checked.name === "thresholds") {
-                    const colorsSetting = this.getSetting(section, "colors");
+                        `${req.requiredIfConditions.displayName} is required if ${req.dependent} is specified`));
+                } else if (req.requiredIfConditions.name === "thresholds") {
+                    const colorsSetting = ConfigTree.getSetting(section, "colors");
                     this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
                 }
             }
@@ -286,40 +305,22 @@ export class ConfigTree {
     }
 
     /**
-     * If section doesn't match at least one condition, adds new Diagnostic.
+     * If section doesn't match at least one condition, adds new Diagnostic about dependent.
      */
     private checkDependentUseless(section: Section, requirement: Requirement, dependent: Setting) {
-        for (let [settingName, allowedValues] of requirement.conditions) {
-            let setting = this.getSetting(section, settingName);
-            let value;
-            if (setting === undefined) {
-                /**
-                 * Setting is not declared, so loooking for default value.
-                 */
-                setting = getSetting(settingName);
-                if (setting !== undefined) {
-                    value = setting.defaultValue;
-                }
-            } else {
-                value = setting.value;
+        const msg: string[] = [];
+        for (const condition of requirement.conditions) {
+            const infoMessage: string = condition(section) as string;
+            if (infoMessage !== null) {
+                msg.push(infoMessage);
             }
-            const currCondition = value ? allowedValues.includes(value.toString()) : true;
-            if (!currCondition) {
-                let msg: string[] = [];
-                requirement.conditions.forEach((k, v) => {
-                    if (k.length > 1) {
-                        msg.push(`${v} is one of ${k.join(", ")}`);
-                    } else {
-                        msg.push(`${v} is ${k}`);
-                    }
-                });
-                this.diagnostics.push(createDiagnostic(
-                    dependent.textRange,
-                    uselessScope(dependent.displayName, `${msg.join(", ")}`),
-                    DiagnosticSeverity.Warning
-                ));
-                break;
-            }
+        }
+        if (msg.length > 0) {
+            this.diagnostics.push(createDiagnostic(
+                dependent.textRange,
+                uselessScope(dependent.displayName, `${msg.join(", ")}`),
+                DiagnosticSeverity.Warning
+            ));
         }
     }
 
@@ -339,16 +340,17 @@ export class ConfigTree {
     }
 
     private checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
-        if (requirement.checked === null) {
+        if (requirement.requiredIfConditions === null) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
-        const sectionNames = requirement.checked.section;
-        const childSectionNames: string[] = typeof sectionNames === "string" ? [sectionNames] : sectionNames;
+        const sectionNames = requirement.requiredIfConditions.section;
         if (sectionNames.includes(section.name)) {
+            // check current
             this.checkSection([requirement], section);
             return;
         }
+        const childSectionNames: string[] = typeof sectionNames === "string" ? [sectionNames] : sectionNames;
         for (const secName of childSectionNames) {
             const reqs = section.requirementsForChildren.get(secName);
             if (reqs) {
