@@ -55,8 +55,13 @@
 					]
 				},
 				{
+					"name": "keyword.control.axibase.charts",
+					"match": "^[ \t]*(script|endscript|import|csv|endcsv|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
+				},
+				{
 					"name": "entity.name.tag.axibase.charts",
-					"match": "^[ \t]*\\w[-\\w\\s\\d_]+?(?=\\s*=)"
+					"match": "^[ \t]*\\w[-\\w\\s\\d_]+?(?=\\s*=)",
+					"comment": "Setting name"
 				},
 				{
 					"begin": "^[ \t]*var[ \\t]*\\S+[ \\t]*(?=[ \\t]*=)",
@@ -81,10 +86,6 @@
 				{
 					"name": "keyword.control.axibase.charts",
 					"match": "\\bin\\b"
-				},
-				{
-					"name": "keyword.control.axibase.charts",
-					"match": "^[ \t]*(script|endscript|import|csv|endcsv|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
 				}
 			]
 		}

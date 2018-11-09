@@ -13,7 +13,8 @@ import {
     Diagnostic,
     DiagnosticCollection,
     ExtensionContext,
-    languages,
+    languages, Position,
+    Range,
     TextDocument,
     Uri,
     ViewColumn,
@@ -71,8 +72,14 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             // There are differ in severity levels on language server and client.
             // The severity should be normalized.
             const normalizedDiagnostic: Diagnostic[] = serverDiagnostic
-                .map((d: Diagnostic) =>
-                    new Diagnostic(d.range, d.message, d.severity - 1));
+                .map(transformToClientDiagnostic);
+
+            function transformToClientDiagnostic(d: Diagnostic) {
+                const start = new Position(d.range.start.line, d.range.start.character);
+                const end = new Position(d.range.end.line, d.range.end.character);
+                return new Diagnostic(new Range(start, end), d.message, d.severity - 1);
+            }
+
             const validatedDocUri: Uri = Uri.parse(uri);
             const validatedDoc: TextDocument | undefined = workspace.textDocuments
                 .find((doc: TextDocument) => !doc.isClosed && doc.uri.fsPath === validatedDocUri.fsPath);

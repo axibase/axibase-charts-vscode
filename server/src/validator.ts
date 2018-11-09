@@ -450,6 +450,10 @@ export class Validator {
                 if (columnMetric === "null" && columnValue === "null") {
                     continue;
                 }
+                const changeField: string | undefined = this.settingValues.get("changefield");
+                if (/metric/.test(changeField)) {
+                    continue;
+                }
             }
             if (isAnyInArray(options, this.currentSettings)) {
                 continue;
