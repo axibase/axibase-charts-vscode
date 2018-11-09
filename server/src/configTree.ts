@@ -24,7 +24,7 @@ const relatedSettings: Requirement[] = [
             sectionMatchConditionRequired("mode", ["half", "default"])
         ],
         dependent: "colors",
-        requiredIfConditions: getSetting("thresholds")
+        requiredIfConditions: "thresholds"
     },
     {
         conditions: [
@@ -32,7 +32,7 @@ const relatedSettings: Requirement[] = [
             sectionMatchConditionRequired("mode", ["column", "column-stack"])
         ],
         dependent: "forecast-style",
-        requiredIfConditions: getSetting("data-type")
+        requiredIfConditions: "data-type"
     },
     {
         conditions: [
@@ -56,40 +56,40 @@ const relatedSettings: Requirement[] = [
         dependent: ["ticks", "color-range", "gradient-count"]
     },
     {
-        dependent: "table", requiredIfConditions: getSetting("attribute")
+        dependent: "table", requiredIfConditions: "attribute"
     },
     {
-        dependent: "attribute", requiredIfConditions: getSetting("table")
+        dependent: "attribute", requiredIfConditions: "table"
     },
     {
-        dependent: "column-alert-style", requiredIfConditions: getSetting("column-alert-expression")
+        dependent: "column-alert-style", requiredIfConditions: "column-alert-expression"
     },
     {
-        dependent: "alert-style", requiredIfConditions: getSetting("alert-expression")
+        dependent: "alert-style", requiredIfConditions: "alert-expression"
     },
     {
-        dependent: "link-alert-style", requiredIfConditions: getSetting("alert-expression")
+        dependent: "link-alert-style", requiredIfConditions: "alert-expression"
     },
     {
-        dependent: "node-alert-style", requiredIfConditions: getSetting("alert-expression")
+        dependent: "node-alert-style", requiredIfConditions: "alert-expression"
     },
     {
-        dependent: "icon-alert-style", requiredIfConditions: getSetting("icon-alert-expression")
+        dependent: "icon-alert-style", requiredIfConditions: "icon-alert-expression"
     },
     {
-        dependent: "icon-alert-expression", requiredIfConditions: getSetting("icon")
+        dependent: "icon-alert-expression", requiredIfConditions: "icon"
     },
     {
-        dependent: "icon-color", requiredIfConditions: getSetting("icon")
+        dependent: "icon-color", requiredIfConditions: "icon"
     },
     {
-        dependent: "icon-position", requiredIfConditions: getSetting("icon")
+        dependent: "icon-position", requiredIfConditions: "icon"
     },
     {
-        dependent: "icon-size", requiredIfConditions: getSetting("icon")
+        dependent: "icon-size", requiredIfConditions: "icon"
     },
     {
-        dependent: "caption-style", requiredIfConditions: getSetting("caption")
+        dependent: "caption-style", requiredIfConditions: "caption"
     }
 ];
 
@@ -226,7 +226,7 @@ export class ConfigTree {
      * or absent required setting.
      */
     public goThroughTree() {
-        if (this.root === undefined) {
+        if (!this.root) {
             return;
         }
         let currentLevel: Section[] = [this.root];
@@ -248,10 +248,10 @@ export class ConfigTree {
      */
     private getRequirement(settingName: string): Requirement | undefined {
         return relatedSettings.find(req => {
-            if (typeof req.dependent === "string") {
-                return req.dependent === settingName;
+            if (Array.isArray(req.dependent)) {
+                return req.dependent.includes(settingName);
             }
-            return req.dependent.includes(settingName);
+            return req.dependent === settingName;
         });
     }
 
@@ -293,11 +293,12 @@ export class ConfigTree {
     private checkSection(requirements: Requirement[], section: Section) {
         for (const req of requirements) {
             if (this.sectionMatchConditions(section, req.conditions)) {
-                const checkedSetting = ConfigTree.getSetting(section, req.requiredIfConditions.name);
+                const required = req.requiredIfConditions;
+                const checkedSetting = ConfigTree.getSetting(section, required);
                 if (checkedSetting === undefined) {
                     this.diagnostics.push(createDiagnostic(section.range.range,
-                        `${req.requiredIfConditions.displayName} is required if ${req.dependent} is specified`));
-                } else if (req.requiredIfConditions.name === "thresholds") {
+                        `${required} is required if ${req.dependent} is specified`));
+                } else if (required === "thresholds") {
                     const colorsSetting = ConfigTree.getSetting(section, "colors");
                     this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
                 }
@@ -345,7 +346,8 @@ export class ConfigTree {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
-        const sectionNames = requirement.requiredIfConditions.section;
+        const required = getSetting(requirement.requiredIfConditions);
+        const sectionNames = required.section;
         if (sectionNames.includes(section.name)) {
             // check current
             this.checkSection([requirement], section);

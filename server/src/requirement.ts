@@ -1,5 +1,4 @@
 import { ConfigTree } from "./configTree";
-import { Setting } from "./setting";
 import { getSetting } from "./util";
 
 export const frequentlyUsed = ["mode", "type"];
@@ -80,5 +79,5 @@ export interface Requirement {
     // setting names, that are may depend on requiredIfConditions setting
     dependent: string | string[];
     // this setting will be required if the conditions are satisfied
-    requiredIfConditions?: Setting | null;
+    requiredIfConditions?: string;
 }
