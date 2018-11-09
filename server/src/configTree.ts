@@ -1,6 +1,10 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { uselessScope } from "./messageUtil";
-import { Condition, Requirement, SectionScope } from "./requirement";
+import {
+    Condition, Requirement,
+    sectionMatchConditionRequired, sectionMatchConditionUseless,
+    SectionScope
+} from "./requirement";
 import { sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
@@ -14,82 +18,79 @@ import { createDiagnostic, getSetting } from "./util";
  * if any dependent is declared in the section, than section will be checked for match to conditions.
  */
 const relatedSettings: Requirement[] = [
-    new Requirement(
-        "colors",
-        getSetting("thresholds"),
-        new Map([
-            ["type", ["calendar", "treemap", "gauge"]],
-            ["mode", ["half", "default"]]
-        ])
-    ),
-    new Requirement(
-        "forecast-style",
-        getSetting("data-type"),
-        new Map([
-            ["type", ["chart"]],
-            ["mode", ["column", "column-stack"]]
-        ])
-    ),
-    new Requirement(
-        ["negative-style", "current-period-style"],
-        null,
-        new Map([
-            ["type", ["chart"]],
-            ["mode", ["column-stack", "column"]]
-        ])
-    ),
-    new Requirement(
-        "moving-average",
-        null,
-        new Map([
-            ["type", ["chart"]],
-            ["server-aggregate", ["false"]]
-        ])
-    ),
-    new Requirement(
-        ["ticks", "color-range", "gradient-count"],
-        null,
-        new Map([
-            ["type", ["calendar", "treemap", "gauge"]],
-            ["mode", ["half", "default"]]
-        ])
-    ),
-    new Requirement(
-        "table", getSetting("attribute")
-    ),
-    new Requirement(
-        "attribute", getSetting("table")
-    ),
-    new Requirement(
-        "column-alert-style", getSetting("column-alert-expression")
-    ),
-    new Requirement(
-        "alert-style", getSetting("alert-expression")
-    ),
-    new Requirement(
-        "link-alert-style", getSetting("alert-expression")
-    ),
-    new Requirement(
-        "node-alert-style", getSetting("alert-expression")
-    ),
-    new Requirement(
-        "icon-alert-style", getSetting("icon-alert-expression")
-    ),
-    new Requirement(
-        "icon-alert-expression", getSetting("icon")
-    ),
-    new Requirement(
-        "icon-color", getSetting("icon")
-    ),
-    new Requirement(
-        "icon-position", getSetting("icon")
-    ),
-    new Requirement(
-        "icon-size", getSetting("icon")
-    ),
-    new Requirement(
-        "caption-style", getSetting("caption")
-    )
+    {
+        conditions: [
+            sectionMatchConditionRequired("type", ["calendar", "treemap", "gauge"]),
+            sectionMatchConditionRequired("mode", ["half", "default"])
+        ],
+        dependent: "colors",
+        requiredIfConditions: getSetting("thresholds")
+    },
+    {
+        conditions: [
+            sectionMatchConditionRequired("type", ["chart"]),
+            sectionMatchConditionRequired("mode", ["column", "column-stack"])
+        ],
+        dependent: "forecast-style",
+        requiredIfConditions: getSetting("data-type")
+    },
+    {
+        conditions: [
+            sectionMatchConditionUseless("type", ["chart"]),
+            sectionMatchConditionUseless("mode", ["column-stack", "column"])
+        ],
+        dependent: ["negative-style", "current-period-style"]
+    },
+    {
+        conditions: [
+            sectionMatchConditionUseless("type", ["chart"]),
+            sectionMatchConditionUseless("server-aggregate", ["false"])
+        ],
+        dependent: "moving-average"
+    },
+    {
+        conditions: [
+            sectionMatchConditionUseless("type", ["calendar", "treemap", "gauge"]),
+            sectionMatchConditionUseless("mode", ["half", "default"])
+        ],
+        dependent: ["ticks", "color-range", "gradient-count"]
+    },
+    {
+        dependent: "table", requiredIfConditions: getSetting("attribute")
+    },
+    {
+        dependent: "attribute", requiredIfConditions: getSetting("table")
+    },
+    {
+        dependent: "column-alert-style", requiredIfConditions: getSetting("column-alert-expression")
+    },
+    {
+        dependent: "alert-style", requiredIfConditions: getSetting("alert-expression")
+    },
+    {
+        dependent: "link-alert-style", requiredIfConditions: getSetting("alert-expression")
+    },
+    {
+        dependent: "node-alert-style", requiredIfConditions: getSetting("alert-expression")
+    },
+    {
+        dependent: "icon-alert-style", requiredIfConditions: getSetting("icon-alert-expression")
+    },
+    {
+        dependent: "icon-alert-expression", requiredIfConditions: getSetting("icon")
+    },
+    {
+        dependent: "icon-color", requiredIfConditions: getSetting("icon")
+    },
+    {
+        dependent: "icon-position", requiredIfConditions: getSetting("icon")
+    },
+    {
+        dependent: "icon-size", requiredIfConditions: getSetting("icon")
+    },
+    {
+        dependent: "caption-style", requiredIfConditions: getSetting("caption")
+    }
 ];
 
 class Section {
@@ -274,7 +275,7 @@ export class ConfigTree {
     }
 
     private sectionMatchConditions(section: Section, conditions: Condition[]): boolean {
-        if (conditions.length === 0) {
+        if (conditions === undefined) {
             return true;
         }
         for (const condition of conditions) {
@@ -340,7 +341,7 @@ export class ConfigTree {
     }
 
     private checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
-        if (requirement.requiredIfConditions === null) {
+        if (requirement.requiredIfConditions === undefined) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }

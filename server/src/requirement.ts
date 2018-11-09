@@ -37,23 +37,13 @@ function getValueOfCheckedSetting(settingName: string, section: Section): string
     return value;
 }
 
-function sectionMatchCondition(requiredIfConditions: Setting | null,
-                               settingName: string, possibleValues: string[]): Condition {
-    if (requiredIfConditions === null) {
-        // check is Requirement.dependent applicable
-        return sectionMatchConditionUseless(settingName, possibleValues);
-    } else {
-        // check is Requirement.requiredIfConditions should be checked
-        return sectionMatchConditionRequired(settingName, possibleValues);
-    }
-}
-
 /**
- * Returns function which returns info message if conditions are not satisfied.
+ * Returns function which returns false if conditions are not satisfied.
+ * Check is Requirement.requiredIfConditions should be checked.
  * @param settingName name of the setting
  * @param possibleValues values that can be assigned to the setting
  */
-function sectionMatchConditionRequired(settingName: string, possibleValues: string[]): Condition {
+export function sectionMatchConditionRequired(settingName: string, possibleValues: string[]): Condition {
     return (section: Section) => {
         const value = getValueOfCheckedSetting(settingName, section);
         return value ? new RegExp(possibleValues.join("|")).test(value) : true;
@@ -62,10 +52,11 @@ function sectionMatchConditionRequired(settingName: string, possibleValues: stri
 
 /**
  * Returns function which returns info message if conditions are not satisfied.
+ * Checks is Requirement.dependent applicable.
  * @param settingName name of the setting
  * @param possibleValues values that can be assigned to the setting
  */
-function sectionMatchConditionUseless(settingName: string, possibleValues: string[]): Condition {
+export function sectionMatchConditionUseless(settingName: string, possibleValues: string[]): Condition {
     return (section: Section) => {
         const value = getValueOfCheckedSetting(settingName, section);
         const currCondition = value ? new RegExp(possibleValues.join("|")).test(value.toString()) : true;
@@ -83,18 +74,11 @@ function sectionMatchConditionUseless(settingName: string, possibleValues: strin
 /**
  * Helps to check related settings.
  */
-export class Requirement {
-    public conditions: Condition[] = [];
-
-    public constructor(
-                       // setting names, that are may depend on requiredIfConditions setting
-                       public dependent: string | string[],
-                       // this setting will be required if the conditions are satisfied
-                       public requiredIfConditions: Setting | null,
-                       // conditions map: settingName=[possibleValues]
-                       enumMap?: Map<string, string[]>) {
-        if (enumMap !== undefined) {
-            enumMap.forEach((k, v) => this.conditions.push(sectionMatchCondition(requiredIfConditions, v, k)));
-        }
-    }
+export interface Requirement {
+    // functions to check conditions
+    conditions?: Condition[];
+    // setting names, that are may depend on requiredIfConditions setting
+    dependent: string | string[];
+    // this setting will be required if the conditions are satisfied
+    requiredIfConditions?: Setting | null;
 }
