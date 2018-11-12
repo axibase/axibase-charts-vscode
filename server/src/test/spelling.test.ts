@@ -92,7 +92,7 @@ metric = cpu_iowait`,
             )],
         ),
         new Test(
-            "Correct: no errors about spaces and custom names in settings of [property]",
+            "Correct: no errors about spaces and custom names in settings of [properties]",
             `[properties]
             Data Center = Cuperito
             Site = California

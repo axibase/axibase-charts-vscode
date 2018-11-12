@@ -1,12 +1,12 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { ConfigTree } from "./configTree";
 import {
-    deprecatedTagSection, negativeStyleScope,
+    deprecatedTagSection,
     settingNameInTags,
     settingsWithWhitespaces,
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
-import { RelatedSettingsChecker } from "./relatedSettingsChecker";
 import { requiredSectionSettingsMap, settingsMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
@@ -53,10 +53,6 @@ export class Validator {
      */
     private currentSettings: Setting[] = [];
     /**
-     * Array of settings declared in the current document
-     */
-    private allSettings: Setting[] = [];
-    /**
      * Array of de-aliases (value('alias')) in the current widget
      */
     private readonly deAliases: TextRange[] = [];
@@ -100,10 +96,6 @@ export class Validator {
      */
     private previousSettings: Setting[] = [];
     /**
-     * Util class which helps to check related settings, for example, tresholds and colors.
-     */
-    private relatedSettingsChecker: RelatedSettingsChecker = new RelatedSettingsChecker();
-    /**
      * Settings required to declare in the current section
      */
     private requiredSettings: Setting[][] = [];
@@ -126,9 +118,15 @@ export class Validator {
      */
     private currentWidget?: string;
 
+    /**
+     * Util class which helps to check related settings, for example, tresholds and colors.
+     */
+    private configTree: ConfigTree;
+
     public constructor(text: string) {
         this.lines = deleteComments(text)
             .split("\n");
+        this.configTree = new ConfigTree(this.result);
     }
 
     /**
@@ -164,15 +162,12 @@ export class Validator {
                 this.switchKeyword();
             }
         }
-
         this.checkAliases();
         this.diagnosticForLeftKeywords();
         this.checkRequredSettingsForSection();
-        this.result.push(...this.relatedSettingsChecker.check(true, this.currentSettings));
-        this.result.push(...this.relatedSettingsChecker.check(false, this.allSettings));
         this.checkUrlPlaceholders();
-        this.setSectionToStack(null);
-
+        this.setSectionToStackAndTree(null);
+        this.configTree.goThroughTree();
         return this.result;
     }
 
@@ -197,20 +192,18 @@ export class Validator {
     }
 
     /**
-     * Adds new entry to settingValue map based on this.match and sets value for setting.
+     * Adds new entry to settingValue map and new Setting to SectionStack
+     * based on this.match, also sets value for setting.
      * @param setting setting to which value will be set
      */
-    private addSettingValue(setting?: Setting): void {
+    private addSettingValue(setting: Setting): void {
         if (this.match == null) {
-            throw new Error("Trying to add new entry to settingValue map based on undefined");
+            throw new Error("Trying to add new entry to settingValues map and sectionStack based on undefined");
         }
-        const name: string = Setting.clearSetting(this.match[2]);
         const value: string = Setting.clearValue(this.match[3]);
-        this.settingValues.set(name, value);
-        this.sectionStack.insertCurrentSetting(name, value);
-        if (setting) {
-            setting.value = value;
-        }
+        setting.value = value;
+        this.settingValues.set(setting.name, value);
+        this.sectionStack.insertCurrentSetting(setting);
     }
 
     /**
@@ -219,17 +212,16 @@ export class Validator {
      * @param array the target array
      * @returns the array containing the setting from this.match
      */
-    private addToSettingArray(array?: Setting[]): Setting[] {
+    private addToSettingArray(variable: Setting, array?: Setting[]): Setting[] {
         const result: Setting[] = (array === undefined) ? [] : array;
         if (this.match == null) {
             return result;
         }
         const [, indent, name] = this.match;
-        const variable: Setting | undefined = this.getSetting(name);
         if (variable === undefined) {
             return result;
         }
-        if (result.includes(variable)) {
+        if (result.find(v => v.name === variable.name)) {
             const range: Range = Range.create(
                 Position.create(this.currentLineNumber, indent.length),
                 Position.create(this.currentLineNumber, indent.length + name.length),
@@ -447,19 +439,20 @@ export class Validator {
                     continue;
                 }
             }
-            if (isAnyInArray(options, this.currentSettings)) {
+            const optionsNames = options.map(s => s.name);
+            if (isAnyInArray(optionsNames, this.currentSettings.map(s => s.name))) {
                 continue;
             }
             for (const array of this.parentSettings.values()) {
                 // Trying to find in this section parents
-                if (isAnyInArray(options, array)) {
+                if (isAnyInArray(optionsNames, array.map(s => s.name))) {
                     continue required;
                 }
             }
             if (this.ifSettings.size > 0) {
                 for (const array of this.ifSettings.values()) {
                     // Trying to find in each one of if-elseif-else... statement
-                    if (!isAnyInArray(options, array)) {
+                    if (!isAnyInArray(optionsNames, array.map(s => s.name))) {
                         notFound.push(displayName);
                         continue required;
                     }
@@ -504,14 +497,14 @@ export class Validator {
                 throw new Error("We are in if, but last condition is undefined");
             }
             let array: Setting[] | undefined = this.ifSettings.get(this.lastCondition);
-            array = this.addToSettingArray(array);
+            array = this.addToSettingArray(setting, array);
             this.ifSettings.set(this.lastCondition, array);
-            if (this.currentSettings.includes(setting)) {
+            if (this.currentSettings.find(v => v.name === setting.name)) {
                 // The setting was defined before if
                 this.result.push(repetitionDiagnostic(range, setting, name));
             }
         } else {
-            this.addToSettingArray(this.currentSettings);
+            this.addToSettingArray(setting, this.currentSettings);
         }
     }
 
@@ -636,24 +629,31 @@ export class Validator {
         if (this.match == null) {
             return undefined;
         }
-        const name: string = this.match[2];
-        if (/column-/.test(name)) {
-            return undefined;
-        }
-        let setting: Setting | undefined = this.getSetting(name);
+        const settingName: string = this.match[2];
+        let setting: Setting | undefined = this.getSetting(settingName);
+
         if (setting === undefined) {
-            if (TextRange.KEYWORD_REGEXP.test(name)) {
+            if (/column-/.test(settingName)) {
+                return undefined;
+            }
+            if (TextRange.KEYWORD_REGEXP.test(settingName)) {
                 return undefined;
             }
             if (this.currentSection !== undefined && (this.currentSection.text === "placeholders" ||
                 this.currentSection.text === "properties")) {
-                return undefined;
+                /**
+                 * Return Setting instead of undefined because SectionStack.getSectionSettings(),
+                 * which is used in checkUrlPlaceholders(), returns Setting[] instead of Map<string, any>
+                 */
+                setting = new Setting();
+                setting = Object.assign(setting, { name: settingName, section: this.currentSection.text });
+                return setting;
             }
-            const message: string = unknownToken(name);
+            const message: string = unknownToken(settingName);
             this.result.push(createDiagnostic(
                 Range.create(
                     this.currentLineNumber, this.match[1].length,
-                    this.currentLineNumber, this.match[1].length + name.length,
+                    this.currentLineNumber, this.match[1].length + settingName.length,
                 ),
                 message,
             ));
@@ -838,7 +838,6 @@ export class Validator {
     private handleSection(): void {
         this.checkRequredSettingsForSection();
         this.addCurrentToParentSettings();
-        this.result.push(...this.relatedSettingsChecker.check(true, this.currentSettings));
         if (this.match == null) {
             if (this.previousSection !== undefined) {
                 this.currentSection = this.previousSection;
@@ -863,17 +862,23 @@ export class Validator {
             this.currentLineNumber, indent.length + name.length,
         ));
         this.parentSettings.delete(this.currentSection.text);
-        this.setSectionToStack(this.currentSection);
+        this.setSectionToStackAndTree(this.currentSection);
     }
 
     /**
      * Attempts to add section to section stack, displays error if section
      * is out ouf hierarchy, unknown or has unresolved section dependencies
      * If section is null, finalizes section stack and return summary error
+     * Adds last section of stack to ConfigTree.
      * @param section section to add or null
      */
-    private setSectionToStack(section: TextRange | null): void {
+    private setSectionToStackAndTree(section: TextRange | null): void {
         let sectionStackError: Diagnostic | null;
+        const lastSection = this.sectionStack.getLastSection();
+        if (lastSection) {
+            this.configTree.addSection(lastSection.range,
+                lastSection.settings);
+        }
         if (section == null) {
             sectionStackError = this.sectionStack.finalize();
         } else {
@@ -933,11 +938,10 @@ export class Validator {
     private handleRegularSetting(): void {
         const line: string = this.getCurrentLine();
         const setting: Setting | undefined = this.getSettingCheck();
-        this.addSettingValue(setting);
         if (setting === undefined) {
             return;
         }
-        this.allSettings.push(setting);
+        this.addSettingValue(setting);
 
         if (setting.name === "type") {
             this.currentWidget = this.match[3];
@@ -952,16 +956,16 @@ export class Validator {
         } else {
             this.currentSettings.push(setting);
         }
-        this.typeCheck(setting);
-        this.checkExcludes(setting);
-        this.checkNegativeStyle(setting);
-
-        // Aliases
-        if (setting.name === "alias") {
-            this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
-            this.addToStringArray(this.aliases);
+        if (!(this.currentSection && ["placeholders", "properties", "property"].includes(this.currentSection.text))) {
+            this.typeCheck(setting);
+            this.checkExcludes(setting);
+            // Aliases
+            if (setting.name === "alias") {
+                this.match = /(^\s*alias\s*=\s*)(\S+)\s*$/m.exec(line);
+                this.addToStringArray(this.aliases);
+            }
+            this.findDeAliases();
         }
-        this.findDeAliases();
     }
 
     /**
@@ -1156,46 +1160,8 @@ export class Validator {
         }
     }
 
-    private checkNegativeStyle(setting: Setting) {
-        if (this.currentSection && this.currentSection.text === "widget") {
-            const typeSetting = this.getSectionSetting("type");
-            const modeSetting = this.getSectionSetting("mode");
-            const negativeStyleSetting = this.getSectionSetting("negativestyle");
-            if (typeSetting && negativeStyleSetting) {
-                const possibleType = "chart";
-                const possibleModes = ["column", "column-stack"];
-                const textRange = negativeStyleSetting.textRange ? negativeStyleSetting.textRange : setting.textRange;
-                const widgetMode = modeSetting ? this.getSectionSettingValue(modeSetting.name) : undefined;
-                if (possibleType !== this.getSectionSettingValue(typeSetting.name)
-                    || modeSetting && possibleModes.indexOf(widgetMode) < 0) {
-                    this.result.push(createDiagnostic(
-                        textRange,
-                        negativeStyleScope(),
-                        DiagnosticSeverity.Warning
-                    ));
-                }
-            }
-        }
-    }
-
-    private getSectionSettingValue(settingName: string) {
-        const value = this.settingValues.get(settingName);
-        return value ? value : Setting.clearValue(this.match[3]);
-    }
-
-    private getSectionSetting(settingName: string): Setting | undefined {
-        const currentSetting = Setting.clearSetting(this.match[2]);
-        if (currentSetting === settingName) {
-            return this.getSetting(settingName);
-        } else {
-            return this.currentSettings
-                .find(s => s.name === settingName);
-        }
-    }
-
     private getSetting(name: string): Setting | undefined {
         const clearedName: string = Setting.clearSetting(name);
-
         const line = this.getCurrentLine();
         const start: number = line.indexOf(name);
         const range: Range = (start > -1) ? Range.create(
@@ -1203,10 +1169,15 @@ export class Validator {
             Position.create(this.currentLineNumber, start + name.length),
         ) : undefined;
         const setting = settingsMap.get(clearedName);
-        if (setting && range) {
-            setting.textRange = range;
+        let copy = Object.create(Setting.prototype);
+        if (setting) {
+            Object.assign(copy, setting);
+            if (range) {
+                copy.textRange = range;
+            }
+            return copy;
         }
-        return setting;
+        return undefined;
     }
 
     private checkUrlPlaceholders() {
@@ -1218,8 +1189,11 @@ export class Validator {
         }
         let placeholderRange = this.sectionStack.getSectionRange("placeholders");
         if (placeholderRange) {
-            let phValues = this.sectionStack.getSectionSettings("placeholders", false);
-            let missingPhs = phs.filter(key => phValues.get(Setting.clearValue(key)) == null);
+            let phSectionSettings = this.sectionStack.getSectionSettings("placeholders", false);
+            let missingPhs = phs.filter(key => {
+                const cleared = Setting.clearValue(key);
+                return phSectionSettings.find(s => s.name === cleared) == null;
+            });
             if (missingPhs.length > 0) {
                 this.result.push(createDiagnostic(
                     placeholderRange.range,
@@ -1227,7 +1201,7 @@ export class Validator {
                     DiagnosticSeverity.Error
                 ));
             }
-            let unnecessaryPhs = [...phValues.keys()].filter(key => !phs.includes(key));
+            let unnecessaryPhs = phSectionSettings.filter(s => !phs.includes(s.name)).map(s => s.name);
             if (unnecessaryPhs.length > 0) {
                 this.result.push(createDiagnostic(
                     placeholderRange.range,
@@ -1238,17 +1212,20 @@ export class Validator {
         }
     }
 
+    /**
+     * Returns all placeholders declared before the current line.
+     */
     private getUrlPlaceholders(): string[] {
         let result = new Set();
         for (let setting of placeholderContainingSettings) {
-            let value = this.sectionStack.getCurrentSetting(setting);
-            if (value) {
+            let currentSetting = this.sectionStack.getCurrentSetting(setting);
+            if (currentSetting) {
                 const regexp: RegExp = /{(.+?)}/g;
-                let match = regexp.exec(value);
+                let match = regexp.exec(currentSetting.value);
                 while (match !== null) {
                     const cleared: string = Setting.clearSetting(match[1]);
                     result.add(cleared);
-                    match = regexp.exec(value);
+                    match = regexp.exec(currentSetting.value);
                 }
             }
         }

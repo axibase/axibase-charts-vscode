@@ -1,4 +1,4 @@
-type MessageFactoryMethod = (found?: string) => string;
+type MessageFactoryMethod = (found?: string, msg?: string) => string;
 /**
  * Creates a error message for unknown setting or value.
  * @param found the variant found in the user's text
@@ -30,5 +30,5 @@ export const settingNameInTags: MessageFactoryMethod = (found: string): string =
   `Move the setting outside of the [tags] section or\n` +
   "enclose in double-quotes to send it to the server without\na warning.";
 
-export const negativeStyleScope: MessageFactoryMethod = (): string =>
-    `negative-style setting is allowed only for chart widget in column, and column-stack mode.`;
+export const uselessScope: MessageFactoryMethod = (found: string, msg: string): string =>
+  `${found} setting is appplied only if ${msg}.`;

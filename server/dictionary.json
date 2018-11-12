@@ -18,7 +18,10 @@
         {
             "displayName": "alert-expression",
             "type": "string",
-            "section": "widget",
+            "section": [
+                "column",
+                "widget"
+            ],
             "example": "value > 5",
             "script": {
                 "returnValue": "boolean",
@@ -427,7 +430,7 @@
             "displayName": "alert-style",
             "multiLine": true,
             "type": "string",
-            "section": "link",
+            "section": "series",
             "example": "stroke: red; stroke-width: 2",
             "script": {
                 "returnValue": "string",
@@ -716,8 +719,11 @@
             "displayName": "class",
             "type": "enum",
             "example": "terminal",
-            "enum": ["terminal", "metro"],
-            "section": "configuration",
+            "enum": [
+                "terminal",
+                "metro"
+            ],
+            "section": "widget",
             "override": {
                 "[widget == 'console' || widget == 'property']": {
                     "enum": [
@@ -912,7 +918,7 @@
                 "lower_confidence",
                 "upper_confidence"
             ],
-            "section": "widget"
+            "section": "series"
         },
         {
             "displayName": "day-format",
@@ -2555,7 +2561,12 @@
             "type": "string",
             "example": "5",
             "minValue": 1,
-            "section": "widget"
+            "section": "widget",
+            "widget": [
+                "gauge",
+                "treemap",
+                "calendar"
+            ]
         },
         {
             "displayName": "gradient-intensity",
@@ -3841,8 +3852,51 @@
                 "row",
                 "pie",
                 "ring",
-                "auto"
-            ]
+                "auto",
+                "line"
+            ],
+            "override": {
+                "[widget == 'chart']": {
+                    "enum": [
+                        "line",
+                        "stack",
+                        "column",
+                        "range",
+                        "column-stack"
+                    ]
+                },
+                "[widget == 'gauge']": {
+                    "enum": [
+                        "sleek",
+                        "half",
+                        "default"
+                    ]
+                },
+                "[widget == 'pie']": {
+                    "enum": [
+                        "pie",
+                        "ring"
+                    ]
+                },
+                "[widget == 'histogram']": {
+                    "enum": [
+                        "stack"
+                    ]
+                },
+                "[widget == 'treemap']": {
+                    "enum": [
+                        "row",
+                        "column",
+                        "auto"
+                    ]
+                },
+                "[widget == 'graph']": {
+                    "enum": [
+                        "hierarchy",
+                        "non-hierarchy"
+                    ]
+                }
+            }
         },
         {
             "displayName": "moving-average",
@@ -6916,6 +6970,11 @@
             "type": "string",
             "example": "0, 50, 90, 100",
             "section": "series",
+            "widget": [
+                "gauge",
+                "treemap",
+                "calendar"
+            ],
             "script": {
                 "returnValue": "number",
                 "fields": [

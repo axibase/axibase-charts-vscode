@@ -1,6 +1,8 @@
 import { Position, Range } from "vscode-languageserver";
 import { Test } from "./test";
 
+// tslint:disable-next-line:max-line-length
+const message = "Apply server-side filter to all series based on entity names, tags, and fields.  \n\nExample: entity-expression = tags.app = 'ATSD'  \nType: string  \nCan not be specified with: entities,entity,entity-group  \nAllowed in section: series  \nAllowed in widgets: all  \n";
 suite("Hover tests", () => {
     [
         new Test(
@@ -8,8 +10,7 @@ suite("Hover tests", () => {
             `[configuration]
   entity-expression = cpu_busy`,
             {
-                // tslint:disable-next-line:max-line-length
-                contents: "Apply server-side filter to all series based on entity names, tags, and fields.  \n\nExample: entity-expression = tags.app = 'ATSD'  \nType: string  \nCan not be specified with: entities,entity,entity-group  \nAllowed in section: series  \n",
+                contents: message,
                 range: Range.create(1, "  ".length, 1, "  ".length + "entity-expression".length),
             },
             undefined,
@@ -36,8 +37,7 @@ suite("Hover tests", () => {
             `[configuration]
   entity expression = cpu_busy`,
             {
-                // tslint:disable-next-line:max-line-length
-                contents: "Apply server-side filter to all series based on entity names, tags, and fields.  \n\nExample: entity-expression = tags.app = 'ATSD'  \nType: string  \nCan not be specified with: entities,entity,entity-group  \nAllowed in section: series  \n",
+                contents: message,
                 range: Range.create(1, "  ".length, 1, "  ".length + "entity expression".length),
             },
             undefined,
@@ -48,8 +48,7 @@ suite("Hover tests", () => {
             `[configuration]
   entity expression= cpu_busy`,
             {
-                // tslint:disable-next-line:max-line-length
-                contents: "Apply server-side filter to all series based on entity names, tags, and fields.  \n\nExample: entity-expression = tags.app = 'ATSD'  \nType: string  \nCan not be specified with: entities,entity,entity-group  \nAllowed in section: series  \n",
+                contents: message,
                 range: Range.create(1, "  ".length, 1, "  ".length + "entity expression".length),
             },
             undefined,
