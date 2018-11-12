@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 interface IDictionary { $schema: string; settings: Setting[]; }
 
@@ -50,7 +51,7 @@ function isCompleteSetting(setting?: Partial<Setting>): boolean {
 /**
  * @returns map of settings, key is the setting name, value is instance of Setting
  */
-function createSettingsMap(): Map<string, Setting> {
+function createSettingsMap(): Map<string, DefaultSetting> {
     const descriptions: Map<string, string> = readDescriptions();
     const settings: Setting[] = readSettings();
     const map: Map<string, Setting> = new Map();
@@ -66,10 +67,10 @@ function createSettingsMap(): Map<string, Setting> {
     return map;
 }
 
-export const settingsMap: Map<string, Setting> = createSettingsMap();
+export const settingsMap: Map<string, DefaultSetting> = createSettingsMap();
 
 interface SectionRequirements {
-    settings?: Setting[][];
+    settings?: DefaultSetting[][];
     sections?: string[][];
 }
 /**

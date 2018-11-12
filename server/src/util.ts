@@ -48,8 +48,12 @@ export function isAnyInArray<T>(target: T[], array: T[]): boolean {
 export function getSetting(name: string, range?: Range): Setting | undefined {
     const clearedName: string = Setting.clearSetting(name);
 
-    const setting = settingsMap.get(clearedName);
-    if (setting && range) {
+    const defaultSetting = settingsMap.get(clearedName);
+    if (defaultSetting === undefined) {
+        return undefined;
+    }
+    const setting = new Setting(defaultSetting);
+    if (range) {
         setting.textRange = range;
     }
     return setting;
@@ -134,15 +138,15 @@ export function isEmpty(str: string): boolean {
  * Creates a diagnostic for a repeated setting. Warning if this setting was
  * multi-line previously, but now it is deprecated, error otherwise.
  * @param range The range where the diagnostic will be displayed
- * @param variable The setting, which has been repeated
- * @param name The name of the setting which is used by the user
+ * @param declaredAbove The setting, which has been declared earlier
+ * @param current The current setting
  */
-export function repetitionDiagnostic(range: Range, variable: Setting, name: string): Diagnostic {
+export function repetitionDiagnostic(range: Range, declaredAbove: Setting, current: Setting): Diagnostic {
     const diagnosticSeverity: DiagnosticSeverity =
-        (["script", "thresholds", "colors"].includes(variable.name)) ?
+        (["script", "thresholds", "colors"].includes(current.name)) ?
             DiagnosticSeverity.Warning : DiagnosticSeverity.Error;
     let message: string;
-    switch (variable.name) {
+    switch (current.name) {
         case "script": {
             message =
                 "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript";
@@ -155,6 +159,7 @@ thresholds = 60
 thresholds = 80
 
 thresholds = 0, 60, 80`;
+            declaredAbove.values.push(current.value);
             break;
         }
         case "colors": {
@@ -164,10 +169,11 @@ colors = yellow
 colors = green
 
 colors = red, yellow, green`;
+            declaredAbove.values.push(current.value);
             break;
         }
         default:
-            message = `${name} is already defined`;
+            message = `${declaredAbove.displayName} is already defined`;
     }
 
     return createDiagnostic(range, message, diagnosticSeverity);

@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { ConfigTree } from "./configTree";
+import { DefaultSetting } from "./defaultSetting";
 import {
     deprecatedTagSection,
     settingNameInTags,
@@ -7,7 +8,7 @@ import {
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
-import { requiredSectionSettingsMap, settingsMap, widgetRequirementsByType } from "./resources";
+import { requiredSectionSettingsMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
@@ -15,6 +16,7 @@ import {
     countCsvColumns,
     createDiagnostic,
     deleteComments,
+    getSetting,
     isAnyInArray,
     isInMap,
     repetitionDiagnostic
@@ -98,7 +100,7 @@ export class Validator {
     /**
      * Settings required to declare in the current section
      */
-    private requiredSettings: Setting[][] = [];
+    private requiredSettings: DefaultSetting[][] = [];
     /**
      * Validation result
      */
@@ -204,7 +206,6 @@ export class Validator {
         const value: string = Setting.clearValue(this.match[3]);
         setting.value = value;
         this.settingValues.set(setting.name, value);
-        this.sectionStack.insertCurrentSetting(setting);
     }
 
     /**
@@ -222,12 +223,13 @@ export class Validator {
         if (variable === undefined) {
             return result;
         }
-        if (result.find(v => v.name === variable.name)) {
+        const declaredAbove = result.find(v => v.name === variable.name);
+        if (declaredAbove !== undefined) {
             const range: Range = Range.create(
                 Position.create(this.currentLineNumber, indent.length),
                 Position.create(this.currentLineNumber, indent.length + name.length),
             );
-            this.result.push(repetitionDiagnostic(range, variable, name));
+            this.result.push(repetitionDiagnostic(range, declaredAbove, variable));
         } else {
             result.push(variable);
         }
@@ -436,7 +438,7 @@ export class Validator {
         if (!sectionRequirements) {
             return;
         }
-        const required: Setting[][] | undefined = sectionRequirements.settings;
+        const required: DefaultSetting[][] | undefined = sectionRequirements.settings;
         if (required !== undefined) {
             this.requiredSettings = required.concat(this.requiredSettings);
         }
@@ -522,12 +524,14 @@ export class Validator {
             let array: Setting[] | undefined = this.ifSettings.get(this.lastCondition);
             array = this.addToSettingArray(setting, array);
             this.ifSettings.set(this.lastCondition, array);
-            if (this.currentSettings.find(v => v.name === setting.name)) {
+            const declaredAbove = this.currentSettings.find(v => v.name === setting.name);
+            if (declaredAbove !== undefined) {
                 // The setting was defined before if
-                this.result.push(repetitionDiagnostic(range, setting, name));
+                this.result.push(repetitionDiagnostic(range, declaredAbove, setting));
             }
         } else {
             this.addToSettingArray(setting, this.currentSettings);
+            this.sectionStack.insertCurrentSetting(setting);
         }
     }
 
@@ -668,8 +672,8 @@ export class Validator {
                  * Return Setting instead of undefined because SectionStack.getSectionSettings(),
                  * which is used in checkUrlPlaceholders(), returns Setting[] instead of Map<string, any>
                  */
-                setting = new Setting();
-                setting = Object.assign(setting, { name: settingName, section: this.currentSection.text });
+                setting = new Setting(new DefaultSetting());
+                Object.assign(setting, { name: settingName, section: this.currentSection.text });
                 return setting;
             }
             const message: string = unknownToken(settingName);
@@ -687,7 +691,7 @@ export class Validator {
         setting = setting.applyScope({
             section: this.currentSection ? this.currentSection.text.trim() : "",
             widget: this.currentWidget || "",
-        });
+        }) as Setting;
 
         return setting;
     }
@@ -984,6 +988,7 @@ export class Validator {
             this.checkRepetition(setting);
         } else {
             this.currentSettings.push(setting);
+            this.sectionStack.insertCurrentSetting(setting);
         }
         if (!(this.currentSection && ["placeholders", "properties", "property"].includes(this.currentSection.text))) {
             this.typeCheck(setting);
@@ -1191,23 +1196,13 @@ export class Validator {
     }
 
     private getSetting(name: string): Setting | undefined {
-        const clearedName: string = Setting.clearSetting(name);
         const line = this.getCurrentLine();
         const start: number = line.indexOf(name);
         const range: Range = (start > -1) ? Range.create(
             Position.create(this.currentLineNumber, start),
             Position.create(this.currentLineNumber, start + name.length),
         ) : undefined;
-        const setting = settingsMap.get(clearedName);
-        let copy = Object.create(Setting.prototype);
-        if (setting) {
-            Object.assign(copy, setting);
-            if (range) {
-                copy.textRange = range;
-            }
-            return copy;
-        }
-        return undefined;
+        return getSetting(name, range);
     }
 
     private checkUrlPlaceholders() {
