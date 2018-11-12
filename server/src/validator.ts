@@ -868,7 +868,6 @@ export class Validator {
              */
             this.checkRequredSettingsForSection();
             this.addCurrentToParentSettings();
-            this.result.push(...this.relatedSettingsChecker.check(true, this.currentSettings));
             if (/widget/i.test(name)) {
                 this.checkAliases();
                 this.deAliases.splice(0, this.deAliases.length);
