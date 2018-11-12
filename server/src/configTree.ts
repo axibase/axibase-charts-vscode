@@ -174,6 +174,9 @@ export class ConfigTree {
     public addSection(range: TextRange, settings: Setting[]) {
         const section = new Section(range, settings);
         const depth: number = sectionDepthMap[range.text];
+        if (depth > 0 && !this.root) {
+            return;
+        }
         switch (depth) {
             case 0: { // [configuration]
                 this.root = section;
