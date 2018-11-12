@@ -9,6 +9,20 @@ metric = t
 [group]
 [widget]`;
 
+const colorsMsg = `Replace multiple \`colors\` settings with one, for example:
+colors = red
+colors = yellow
+colors = green
+
+colors = red, yellow, green`;
+
+const thresholdsMsg = `Replace multiple \`thresholds\` settings with one, for example:
+thresholds = 0
+thresholds = 60
+thresholds = 80
+
+thresholds = 0, 60, 80`;
+
 suite("RelatedSettings: thresholds and colors tests", () => {
     test("Correct number of colors: \"thresholds\" declared before \"colors\"", () => {
         const conf = `${config}
@@ -138,6 +152,61 @@ colors = green, orange, red
             "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
             DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
+    });
+
+    let deprecate = [createDiagnostic(Range.create(Position.create(7, 0),
+        Position.create(7, "thresholds".length)), thresholdsMsg, DiagnosticSeverity.Warning,
+    ),
+    createDiagnostic(Range.create(Position.create(8, 0),
+        Position.create(8, "thresholds".length)), thresholdsMsg, DiagnosticSeverity.Warning,
+    )];
+
+    test("Correct: both multiline", () => {
+        const conf = `${config}
+            type = gauge
+            thresholds = 0
+thresholds = Math.max(0, 25)
+thresholds = 100
+            colors = silver
+colors = orange
+            [series]`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, deprecate.concat(
+            createDiagnostic(Range.create(Position.create(10, 0),
+                Position.create(10, "colors".length)), colorsMsg, DiagnosticSeverity.Warning,
+            )), `Config: \n${conf}`);
+    });
+
+    test("Correct: \"thresholds\" is multiline", () => {
+        const conf = `${config}
+            type = gauge
+            thresholds = 0
+thresholds = Math.max(0, 25)
+thresholds = 100
+            colors = silver, orange
+            [series]`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, deprecate, `Config: \n${conf}`);
+    });
+
+    test("Incorrect number of colors: \"thresholds\" is multiline", () => {
+        const conf = `${config}
+            type = gauge
+            thresholds = 0
+thresholds = Math.max(0, 25)
+thresholds = 100
+colors = silver
+    [series]`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, deprecate.concat(createDiagnostic(
+            Range.create(Position.create(9, 0),
+                Position.create(9, "colors".length)),
+            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
+            DiagnosticSeverity.Error,
+        )), `Config: \n${conf}`);
     });
 });
 

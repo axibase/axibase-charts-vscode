@@ -150,16 +150,12 @@ export class ConfigTree {
      * @param startSection node of subtree to search for settingName
      */
     public static getSetting(startSection: Section, settingName: string): Setting | undefined {
-        let currentSection = startSection;
-        do {
-            let value = currentSection.getSetting(settingName);
+        for (let currentSection = startSection; currentSection; currentSection = currentSection.parent) {
+            const value = currentSection.getSetting(settingName);
             if (value !== void 0) {
                 return value;
             }
-            currentSection = currentSection.parent;
         }
-        while (currentSection !== undefined);
-
         return undefined;
     }
 
@@ -222,7 +218,7 @@ export class ConfigTree {
     }
 
     /**
-     * Bypasses the tree and addes diagnostics about not applicable settings
+     * Bypasses the tree and adds diagnostics about not applicable settings
      * or absent required setting.
      */
     public goThroughTree() {
@@ -248,10 +244,7 @@ export class ConfigTree {
      */
     private getRequirement(settingName: string): Requirement | undefined {
         return relatedSettings.find(req => {
-            if (Array.isArray(req.dependent)) {
-                return req.dependent.includes(settingName);
-            }
-            return req.dependent === settingName;
+            return Array.isArray(req.dependent) ? req.dependent.includes(settingName) : req.dependent === settingName;
         });
     }
 
@@ -310,13 +303,7 @@ export class ConfigTree {
      * If section doesn't match at least one condition, adds new Diagnostic about dependent.
      */
     private checkDependentUseless(section: Section, requirement: Requirement, dependent: Setting) {
-        const msg: string[] = [];
-        for (const condition of requirement.conditions) {
-            const infoMessage: string = condition(section) as string;
-            if (infoMessage !== null) {
-                msg.push(infoMessage);
-            }
-        }
+        const msg: string[] = requirement.conditions.map(condition => condition(section) as string).filter(m => m);
         if (msg.length > 0) {
             this.diagnostics.push(createDiagnostic(
                 dependent.textRange,
@@ -331,13 +318,29 @@ export class ConfigTree {
      * in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
      */
     private checkColorsMatchTreshold(colorsSetting: Setting, thresholdsSetting: Setting) {
-        const thresholdsValue = thresholdsSetting.value;
-        const colorsValue = colorsSetting.value;
-        if (colorsValue && thresholdsValue) {
-            if (colorsValue.split(/[^\d],[^\d]/g).length !== (thresholdsValue.split(",").length - 1)) {
-                this.diagnostics.push(createDiagnostic(colorsSetting.textRange,
-                    `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`));
-            }
+        let colorsValues;
+        let thresholdsValues;
+        if (colorsSetting.values.length > 0) {
+            colorsSetting.values.push(colorsSetting.value);
+            colorsValues = colorsSetting.values;
+        } else {
+            /**
+             * Matches the following cases:
+             * 1) colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)
+             * 2) colors = red, green, blue
+             */
+            colorsValues = colorsSetting.value.split(/[^\d],[^\d]/g);
+        }
+        if (thresholdsSetting.values.length > 0) {
+            thresholdsSetting.values.push(thresholdsSetting.value);
+            thresholdsValues = thresholdsSetting.values;
+        } else {
+            thresholdsValues = thresholdsSetting.value.split(",");
+        }
+
+        if (colorsValues.length !== thresholdsValues.length - 1) {
+            this.diagnostics.push(createDiagnostic(colorsSetting.textRange,
+                `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`));
         }
     }
 

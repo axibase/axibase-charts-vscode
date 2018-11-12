@@ -1,17 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
-import { PossibleValue } from "./possibleValue";
-import { Script } from "./script";
+import { DefaultSetting } from "./defaultSetting";
 import { createDiagnostic } from "./util";
-
-export interface SettingScope {
-    widget: string;
-    section: string;
-}
-
-interface OverrideCacheEntry {
-    setting: Partial<Setting>;
-    test(scope: SettingScope): boolean;
-}
 
 export const intervalUnits: string[] = [
     "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
@@ -76,9 +65,10 @@ function isDate(text: string): boolean {
 }
 
 /**
- * Holds the description of a setting and corresponding methods
+ * In addition to DefaultSetting contains specific fields.
  */
-export class Setting {
+export class Setting extends DefaultSetting {
+
     get textRange(): Range {
         return this._textRange;
     }
@@ -87,131 +77,20 @@ export class Setting {
         this._textRange = value;
     }
     /**
-     * Lowercases the string and deletes non-alphabetic characters
-     * @param str string to be cleared
-     * @returns cleared string
-     */
-    public static clearSetting: (str: string) => string = (str: string): string =>
-        str.toLowerCase().replace(/[^a-z]/g, "")
-
-    /**
-     * Lowercases the value of setting
-     * @param str string to be cleared
-     * @returns cleared string
-     */
-    public static clearValue: (str: string) => string = (str: string): string => str.toLowerCase();
-
-    public readonly defaultValue?: string | number | boolean;
-    /**
-     * A brief description for the setting
-     */
-    public readonly description: string = "";
-    /**
-     * User-friendly setting name like 'refresh-interval'
-     */
-    public readonly displayName: string = "";
-    /**
-     * Array containing all possible values. RegExp is supported
-     */
-    public readonly enum: string[] = [];
-    /**
-     * Example value for the setting. Should not equal to the default value
-     */
-    public readonly example: string | number | boolean = "";
-    /**
-     * The settings in this array must not be declared simultaneously with the current
-     */
-    public readonly excludes: string[] = [];
-    /**
-     * The maximum allowed value for the setting
-     */
-    public maxValue: number = Infinity;
-    /**
-     * The minimum allowed value for the setting
-     */
-    public minValue: number = -Infinity;
-    /**
-     * Is the setting allowed to be repeated
-     */
-    public readonly multiLine: boolean = false;
-    /**
-     * Inner setting name. Lower-cased, without any symbols except alphabetical.
-     * For example, "refreshinterval"
-     */
-    public readonly name: string = "";
-    /**
-     * Holds the description of the setting if it is a script
-     */
-    public readonly script?: Script;
-    /**
-     * The section, where the setting is applicable.
-     * For example, "widget" or "series".
-     */
-    public readonly section?: string | string[];
-    /**
-     * The type of the setting.
-     * Possible values: string, number, integer, boolean, enum, interval, date
-     */
-    public readonly type: string = "";
-
-    /**
      * Setting value.
      */
     public value: string = "";
-
     /**
-     * Type of the widget were setting is applicable, for example,
-     * gradient-count is applicable for gauge, treemap and calendar.
+     * Setting values for multiline settings (mostly for colors and thresholds).
      */
-    public readonly widget: string[] | string = [];
-
+    public values: string[] = [];
     /**
-     * String values that can assigned to the setting.
-     * Do not prevent use other values, in comparison with enum.
+     * Line number and characters placement of the setting.
      */
-    public readonly possibleValues?: PossibleValue[];
-
-    public readonly override?: { [scope: string]: Partial<Setting> };
-
-    private overrideCache: OverrideCacheEntry[] = [];
     private _textRange: Range;
 
-    public constructor(setting?: Setting) {
-        Object.assign(this, setting);
-        this.enum = this.enum.map((v: string): string => v.toLowerCase());
-        this.name = Setting.clearSetting(this.displayName);
-
-        if (this.override) {
-            for (const scope in this.override) {
-                if (this.override.hasOwnProperty(scope)) {
-                    this.overrideCache.push({
-                        setting: this.override[scope],
-                        test: this.getOverrideTest(scope),
-                    });
-                }
-            }
-        }
-    }
-
-    /**
-     * Create an instance of setting with matching overrides applied.
-     * If no override can be applied returns this instanse.
-     * @param scope Configuration scope where setting exist
-     */
-    public applyScope(scope: SettingScope): Setting {
-        if (this.override == null) {
-            return this;
-        }
-        let matchingOverrides = this.overrideCache
-            .filter((override) => override.test(scope))
-            .map((override) => override.setting);
-
-        if (matchingOverrides.length > 0) {
-            let copy = Object.create(Setting.prototype);
-            return Object.assign(copy, this, ...matchingOverrides);
-        } else {
-            return this;
-        }
+    public constructor(setting: DefaultSetting) {
+        super(setting);
     }
 
     /**
@@ -311,50 +190,6 @@ export class Setting {
         return result;
     }
 
-    /**
-     * Generates a string containing fully available information about the setting
-     */
-    public toString(): string {
-        // TODO: describe a script which is allowed as the setting value
-        if (this.description == null) {
-            return "";
-        }
-        let result: string = `${this.description}  \n\n`;
-        if (this.example != null && this.example !== "") {
-            result += `Example: ${this.displayName} = ${this.example}  \n`;
-        }
-        if (this.type != null && this.type !== "") {
-            result += `Type: ${this.type}  \n`;
-        }
-        if (this.defaultValue != null && this.defaultValue !== "") {
-            result += `Default value: ${this.defaultValue}  \n`;
-        }
-        if (this.enum == null && this.enum.length === 0) {
-            result += `Possible values: ${this.enum.join()}  \n`;
-        }
-        if (this.excludes != null && this.excludes.length !== 0) {
-            result += `Can not be specified with: ${this.excludes.join()}  \n`;
-        }
-        if (this.maxValue != null && this.maxValue !== Infinity) {
-            result += `Maximum: ${this.maxValue}  \n`;
-        }
-        if (this.minValue != null && this.minValue !== -Infinity) {
-            result += `Minimum: ${this.minValue}  \n`;
-        }
-        if (this.section != null && this.section.length !== 0) {
-            result += `Allowed in section: ${this.section}  \n`;
-        }
-        let widgets: string[] | string = "all";
-        if (typeof this.widget !== "string" && this.widget.length > 0) {
-            widgets = this.widget.join(", ");
-        } else if (this.widget.length > 0) {
-            widgets = this.widget;
-        }
-        result += `Allowed in widgets: ${widgets}  \n`;
-
-        return result;
-    }
-
     private checkNumber(reg: RegExp, message: string, range: Range): Diagnostic {
         const example = ` For example, ${this.example}`;
         if (!reg.test(this.value)) {
@@ -373,25 +208,5 @@ export class Setting {
             new RegExp(`^${option}$`, "i").test(value),
         );
         return index;
-    }
-
-    private getOverrideTest(scopeSrc: string): (scope: SettingScope) => boolean {
-        let scopeKeys: Array<keyof SettingScope> = ["widget", "section"];
-        let scopeSrcExtracted = /^\[(.*)\]$/.exec(scopeSrc);
-        if (scopeSrcExtracted == null) {
-            throw new Error("Wrong override scope format");
-        }
-        let source = `return !!(${scopeSrcExtracted[1]});`;
-        let compiledScope = new Function(scopeKeys.join(), source);
-
-        return (scope: SettingScope) => {
-            try {
-                let values = scopeKeys.map((key) => scope[key]);
-
-                return compiledScope.apply(void 0, values);
-            } catch (error) {
-                console.error(`In '${scopeSrc}' :: ${error}`);
-            }
-        };
     }
 }
