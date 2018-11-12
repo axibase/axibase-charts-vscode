@@ -117,6 +117,10 @@ export class Validator {
      * Type of the current widget
      */
     private currentWidget?: string;
+    /**
+     * Line number of last "endif" keyword
+     */
+    private lastEndIf: number = undefined;
 
     /**
      * Util class which helps to check related settings, for example, tresholds and colors.
@@ -151,14 +155,11 @@ export class Validator {
             if (this.isNotKeywordEnd("csv")) {
                 this.validateCsv();
             }
-
             this.eachLine();
-
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
                     this.keywordsStack.push(this.foundKeyword);
                 }
-
                 this.switchKeyword();
             }
         }
@@ -418,11 +419,18 @@ export class Validator {
     }
 
     /**
-     * Creates diagnostics if the current section does not contain required settings
+     * Creates diagnostics if the current section does not contain required settings.
      */
     private checkRequredSettingsForSection(): void {
         if (this.currentSection === undefined) {
             return;
+        }
+        if (this.previousSection && this.previousSection.text === "series" && /tag/i.test(this.currentSection.text)) {
+            /**
+             * [tags] has finished, perform checks for [series].
+             */
+            this.currentSettings = this.previousSettings;
+            this.currentSection = this.previousSection;
         }
         const sectionRequirements = requiredSectionSettingsMap.get(this.currentSection.text);
         if (!sectionRequirements) {
@@ -463,6 +471,14 @@ export class Validator {
                         notFound.push(displayName);
                         continue required;
                     }
+                }
+                const curSectLine = this.currentSection.range.end.line;
+                const lastCondLine = parseInt(this.lastCondition.match(/^\d+/)[0], 10);
+                if (// if-elseif-else statement inside the section
+                    this.areWeIn("if") ||
+                    // section inside the if-elseif-else statement
+                    curSectLine < this.lastEndIf && curSectLine > lastCondLine) {
+                    continue;
                 }
                 let ifCounter: number = 0;
                 let elseCounter: number = 0;
@@ -843,27 +859,33 @@ export class Validator {
      * Mostly empties arrays.
      */
     private handleSection(): void {
-        this.checkRequredSettingsForSection();
-        this.addCurrentToParentSettings();
         if (this.match == null) {
             if (this.previousSection !== undefined) {
                 this.currentSection = this.previousSection;
                 this.currentSettings = this.previousSettings;
             }
-
             return;
         }
         const [, indent, name] = this.match;
-        if (/widget/i.test(name)) {
-            this.checkAliases();
-            this.deAliases.splice(0, this.deAliases.length);
-            this.aliases.splice(0, this.aliases.length);
-            this.settingValues.clear();
+        const nextIsTags = this.currentSection && this.currentSection.text === "series" && /tag/i.test(name);
+        if (!nextIsTags) {
+            /**
+             * If we are in [series] and the next is [tags], no need to perform checks for [series] now,
+             * they will be done after [tags] section finished.
+             */
+            this.checkRequredSettingsForSection();
+            this.addCurrentToParentSettings();
+            if (/widget/i.test(name)) {
+                this.checkAliases();
+                this.deAliases.splice(0, this.deAliases.length);
+                this.aliases.splice(0, this.aliases.length);
+                this.settingValues.clear();
+            }
+            this.checkUrlPlaceholders();
+            this.ifSettings.clear();
         }
-        this.checkUrlPlaceholders();
         this.previousSettings = this.currentSettings.splice(0, this.currentSettings.length);
         this.previousSection = this.currentSection;
-        this.ifSettings.clear();
         this.currentSection = new TextRange(name, Range.create(
             this.currentLineNumber, indent.length,
             this.currentLineNumber, indent.length + name.length,
@@ -1043,6 +1065,7 @@ export class Validator {
             case "endfor":
                 this.handleEndFor();
             case "endif":
+                this.lastEndIf = this.currentLineNumber;
             case "endvar":
             case "endcsv":
             case "endlist":

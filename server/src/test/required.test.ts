@@ -223,6 +223,77 @@ endfor`,
 
 });
 
+suite("[series] declared inside if", () => {
+    new Test("Correct: metric and entity are declared in [series], no [tags]",
+    `[configuration]
+    [group]
+      [widget]
+        type = bar
+    if true
+        [series]
+          entity = a
+          metric = b
+    endif`, []).validationTest();
+
+    new Test("Correct: metric and entity are declared in [series] with [tags]",
+    `[configuration]
+    [group]
+      [widget]
+        type = bar
+    if true
+        [series]
+          entity = a
+          metric = b
+          [tags]
+              a = b
+    endif
+    `, []).validationTest();
+
+    new Test("Incorrect: no metric, no [tags]",
+    `[configuration]
+    [group]
+      [widget]
+        type = bar
+    if true
+[series]
+          entity = a
+    endif`, [createDiagnostic(
+        Range.create(5, 1, 5, "series]".length),
+        "metric is required",
+    )]).validationTest();
+
+    new Test("Incorrect: no metric, [tags] at EOF - expected one error",
+    `[configuration]
+    [group]
+      [widget]
+        type = bar
+    if true
+[series]
+          entity = a
+        [tags]
+          a = b
+    endif`, [createDiagnostic(
+        Range.create(5, 1, 5, "series]".length),
+        "metric is required",
+    )]).validationTest();
+
+    new Test("Incorrect: no metric, [tags] - expected one error",
+    `[configuration]
+    [group]
+      [widget]
+        type = bar
+    if true
+[series]
+          entity = a
+        [tags]
+          a = b
+    endif
+    `, [createDiagnostic(
+        Range.create(5, 1, 5, "series]".length),
+        "metric is required",
+    )]).validationTest();
+});
+
 suite("No metric is required if change-field value contains \"metric\"", () => {
     new Test("Correct, no errors shoud be raised",
     `[configuration]
@@ -233,5 +304,5 @@ suite("No metric is required if change-field value contains \"metric\"", () => {
   [dropdown]
     change-field = metric
   [series]`, []).validationTest();
-
+  
 });
