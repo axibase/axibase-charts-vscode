@@ -118,23 +118,51 @@
             "uniqueItems": true
           },
           "widget": {
-            "description": "[Optional] Which widget accepts the setting. Default is 'all'",
-            "type": "string",
-            "enum": [
-              "gauge",
-              "chart",
-              "bar",
-              "histogram",
-              "box",
-              "calendar",
-              "treemap",
-              "pie",
-              "graph",
-              "text",
-              "page",
-              "console",
-              "table",
-              "property"
+            "description": "[Optional] Which widget accepts the setting. If empty, applicable for all types.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "gauge",
+                  "chart",
+                  "bar",
+                  "histogram",
+                  "box",
+                  "calendar",
+                  "treemap",
+                  "pie",
+                  "graph",
+                  "text",
+                  "page",
+                  "console",
+                  "table",
+                  "property"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "gauge",
+                    "chart",
+                    "bar",
+                    "histogram",
+                    "box",
+                    "calendar",
+                    "treemap",
+                    "pie",
+                    "graph",
+                    "text",
+                    "page",
+                    "console",
+                    "table",
+                    "property"
+                  ]
+                }
+              }
             ]
           },
           "excludes": {
