@@ -392,3 +392,23 @@ colors = green, orange, red
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 });
+
+suite("RelatedSettings: settings in if statement", () => {
+    test("Correct: both alert-expression and alert-style in if statement", () => {
+        const conf = `[configuration]
+  entity = e
+  metric = m
+[group]
+  [widget]
+    type = table
+    [column]
+      if true
+        alert-expression = value == 0 && (row.map['jmx.activemq.queuesize'].last.v > 0)
+        alert-style = background-color: red; color: white
+      endif
+      [series]`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
+    });
+});
