@@ -528,11 +528,12 @@ export class Validator {
             if (declaredAbove !== undefined) {
                 // The setting was defined before if
                 this.result.push(repetitionDiagnostic(range, declaredAbove, setting));
+                return;
             }
         } else {
             this.addToSettingArray(setting, this.currentSettings);
-            this.sectionStack.insertCurrentSetting(setting);
         }
+        this.sectionStack.insertCurrentSetting(setting);
     }
 
     /**
