@@ -167,6 +167,12 @@ export class ConfigTree {
         this.diagnostics = diagnostics;
     }
 
+    /**
+     * Adds section to tree. Checks section for not aapplicable settings and declares requirements for children.
+     * Doesn't alert if the section is out of order, this check is performed by SectionStack.
+     * @param range the text and the position of the text
+     * @param settings section settings
+     */
     public addSection(range: TextRange, settings: Setting[]) {
         const section = new Section(range, settings);
         const depth: number = sectionDepthMap[range.text];
@@ -176,17 +182,23 @@ export class ConfigTree {
         switch (depth) {
             case 0: { // [configuration]
                 this.root = section;
+                this.lastAdded = section;
                 break;
             }
             case 1: { // [group]
                 this.root.children.push(section);
                 section.parent = this.root;
+                this.lastAdded = section;
                 break;
             }
             case 2: { // [widget]
                 const group = this.root.children[this.root.children.length - 1];
+                if (!group) {
+                    return;
+                }
                 section.parent = group;
                 section.parent.children.push(section);
+                this.lastAdded = section;
                 break;
             }
             case 3: { // [series], [dropdown], [column], ...
@@ -194,7 +206,13 @@ export class ConfigTree {
                     section.parent = this.lastAdded;
                 } else {
                     const group = this.root.children[this.root.children.length - 1];
+                    if (!group) {
+                        return;
+                    }
                     const widget = group.children[group.children.length - 1];
+                    if (!widget) {
+                        return;
+                    }
                     section.parent = widget;
                     this.lastAdded = section;
                 }
@@ -202,6 +220,9 @@ export class ConfigTree {
                 break;
             }
             case 4: { // [option], [properties], ...
+                if (!this.lastAdded) {
+                    return;
+                }
                 section.parent = this.lastAdded;
                 section.parent.children.push(section);
                 break;
