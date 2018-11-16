@@ -304,5 +304,23 @@ suite("No metric is required if change-field value contains \"metric\"", () => {
   [dropdown]
     change-field = metric
   [series]`, []).validationTest();
-  
+});
+
+suite("No duplicate errors with [tags]", () => {
+    new Test("[tags] at EOF in [widget] without type",
+    `[widget]
+    [tags]
+      host = *
+      `,  [createDiagnostic(
+        Range.create(0, 1, 0, "widget]".length),
+        "type is required",
+    )]).validationTest();
+
+    new Test("[tags] in [widget] without type",
+    `[widget]
+    [tags]
+      host = *`,  [createDiagnostic(
+        Range.create(0, 1, 0, "widget]".length),
+        "type is required",
+    )]).validationTest();
 });

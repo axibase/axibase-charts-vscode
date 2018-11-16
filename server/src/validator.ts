@@ -427,9 +427,9 @@ export class Validator {
         if (this.currentSection === undefined) {
             return;
         }
-        if (this.previousSection && this.previousSection.text === "series" && /tag/i.test(this.currentSection.text)) {
+        if (this.previousSection && /tag/i.test(this.currentSection.text)) {
             /**
-             * [tags] has finished, perform checks for [series].
+             * [tags] has finished, perform checks for parent section.
              */
             this.currentSettings = this.previousSettings;
             this.currentSection = this.previousSection;
@@ -872,10 +872,10 @@ export class Validator {
             return;
         }
         const [, indent, name] = this.match;
-        const nextIsTags = this.currentSection && this.currentSection.text === "series" && /tag/i.test(name);
+        const nextIsTags = this.currentSection && /tag/i.test(name);
         if (!nextIsTags) {
             /**
-             * If we are in [series] and the next is [tags], no need to perform checks for [series] now,
+             * If the next is [tags], no need to perform checks for current section now,
              * they will be done after [tags] section finished.
              */
             this.checkRequredSettingsForSection();
