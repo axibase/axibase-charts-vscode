@@ -1,8 +1,12 @@
 # Change Log
 
+## `v.1.0.12`
+
+* Multiple validator fixes
+
 ## `v.1.0.11`
 
-* CLick on Preview shows unsaved configuration
+* Click on Preview shows unsaved configuration
 * Multiple validator fixes
 
 ## `v.1.0.10`
