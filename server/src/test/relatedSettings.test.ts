@@ -402,7 +402,7 @@ suite("RelatedSettings: settings in if statement", () => {
   [widget]
     type = table
     [column]
-      if true
+      if "a" == "a"
         alert-expression = value == 0 && (row.map['jmx.activemq.queuesize'].last.v > 0)
         alert-style = background-color: red; color: white
       endif

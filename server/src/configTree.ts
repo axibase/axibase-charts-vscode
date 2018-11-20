@@ -5,7 +5,7 @@ import {
     sectionMatchConditionRequired, sectionMatchConditionUseless,
     SectionScope
 } from "./requirement";
-import { sectionDepthMap } from "./resources";
+import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
@@ -161,7 +161,8 @@ export class ConfigTree {
 
     public diagnostics: Diagnostic[];
     private root: Section;
-    private lastAdded: Section = null;
+    private lastAddedParent: Section;
+    private previous: Section;
 
     public constructor(diagnostics: Diagnostic[]) {
         this.diagnostics = diagnostics;
@@ -182,13 +183,12 @@ export class ConfigTree {
         switch (depth) {
             case 0: { // [configuration]
                 this.root = section;
-                this.lastAdded = section;
+                this.lastAddedParent = section;
                 break;
             }
             case 1: { // [group]
-                this.root.children.push(section);
                 section.parent = this.root;
-                this.lastAdded = section;
+                this.lastAddedParent = section;
                 break;
             }
             case 2: { // [widget]
@@ -197,13 +197,12 @@ export class ConfigTree {
                     return;
                 }
                 section.parent = group;
-                section.parent.children.push(section);
-                this.lastAdded = section;
+                this.lastAddedParent = section;
                 break;
             }
             case 3: { // [series], [dropdown], [column], ...
-                if (this.lastAdded && this.lastAdded.name === "column" && range.text === "series") {
-                    section.parent = this.lastAdded;
+                if (this.lastAddedParent && this.lastAddedParent.name === "column" && range.text === "series") {
+                    section.parent = this.lastAddedParent;
                 } else {
                     const group = this.root.children[this.root.children.length - 1];
                     if (!group) {
@@ -214,20 +213,27 @@ export class ConfigTree {
                         return;
                     }
                     section.parent = widget;
-                    this.lastAdded = section;
+                    this.lastAddedParent = section;
                 }
-                section.parent.children.push(section);
                 break;
             }
-            case 4: { // [option], [properties], ...
-                if (!this.lastAdded) {
+            case 4: { // [option], [properties], [tags]
+                if (isNestedToPrevious(range.text, this.previous.name)) {
+                    section.parent = this.previous;
+                } else {
+                    section.parent = this.lastAddedParent;
+                }
+                if (!section.parent) {
                     return;
                 }
-                section.parent = this.lastAdded;
-                section.parent.children.push(section);
                 break;
             }
         }
+        if (section.parent) {
+            // We are not in [configuration]
+            section.parent.children.push(section);
+        }
+        this.previous = section;
         section.applyScope();
 
         for (const setting of settings) {
@@ -375,6 +381,9 @@ export class ConfigTree {
         }
         const required = getSetting(requirement.requiredIfConditions);
         const sectionNames = required.section;
+        if (!sectionNames) {
+            return;
+        }
         if (sectionNames.includes(section.name)) {
             // check current
             this.checkSection([requirement], section);

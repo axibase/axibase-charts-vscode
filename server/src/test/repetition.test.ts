@@ -54,18 +54,6 @@ var srv = ['srv1', 'srv2']`,
             [],
         ),
         new Test(
-            "Correct: repetition of lists",
-            `list servers = 'srv1', 'srv2'
-             list servers = 'srv3', 'srv4'`,
-            [],
-        ),
-        new Test(
-            "Correct: repetition of vars",
-            `var servers = 'srv1', 'srv2'
-             var servers = 'srv3', 'srv4'`,
-            [],
-        ),
-        new Test(
             "Repetition of setting name",
             `[series]
    entity = srv
@@ -124,7 +112,7 @@ for server in servers
        entity = srv
        metric = temp
        color = 'yellow'
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'red'
        else
            color = 'green'
@@ -147,7 +135,7 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
            color = 'red'
        else
@@ -166,7 +154,7 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
        else
            color = 'red'
@@ -185,9 +173,9 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
-       elseif server = 'srv2'
+       elseif server == 'srv2'
            color = 'black'
        else
            color = 'red'
@@ -206,9 +194,9 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
-       elseif server = 'srv2'
+       elseif server == 'srv2'
            color = 'black'
        else
            color = 'green'
@@ -216,7 +204,7 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
        else
            color = 'green'
@@ -231,9 +219,9 @@ for server in servers
    [series]
        entity = srv
        metric = temp
-       if server = 'srv1'
+       if server == 'srv1'
            color = 'yellow'
-       elseif server = 'srv2'
+       elseif server == 'srv2'
            color = 'black'
        else
            color = 'green'

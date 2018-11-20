@@ -292,14 +292,6 @@ export class Validator {
             return map;
         }
         const [, indent, variable] = this.match;
-        let array: string[] | undefined = map.get(key);
-        if (/list|var/.test(key) && array && array.includes(variable)) {
-            /**
-             * list/var can override other list/var with the same name;
-             * list can not override var
-             */
-            return map;
-        }
         if (isInMap(variable, map)) {
             const startPosition: number = this.match.index + indent.length;
             this.result.push(createDiagnostic(
@@ -310,6 +302,7 @@ export class Validator {
                 `${variable} is already defined`,
             ));
         } else {
+            let array: string[] | undefined = map.get(key);
             if (array === undefined) {
                 array = [variable];
             } else {
@@ -1113,6 +1106,10 @@ export class Validator {
                 break;
             }
             case "if": {
+                const regex: RegExp = /!=|==/;
+                if (!regex.test(line)) {
+                    this.result.push(createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
+                }
                 this.setLastCondition();
                 break;
             }

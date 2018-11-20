@@ -223,13 +223,13 @@ endfor`,
 
 });
 
-suite("[series] declared inside if", () => {
+suite("Required: [series] declared inside if", () => {
     new Test("Correct: metric and entity are declared in [series], no [tags]",
     `[configuration]
     [group]
       [widget]
         type = bar
-    if true
+    if "a" == "a"
         [series]
           entity = a
           metric = b
@@ -240,7 +240,7 @@ suite("[series] declared inside if", () => {
     [group]
       [widget]
         type = bar
-    if true
+    if "a" == "a"
         [series]
           entity = a
           metric = b
@@ -254,7 +254,7 @@ suite("[series] declared inside if", () => {
     [group]
       [widget]
         type = bar
-    if true
+    if "a" == "a"
 [series]
           entity = a
     endif`, [createDiagnostic(
@@ -267,7 +267,7 @@ suite("[series] declared inside if", () => {
     [group]
       [widget]
         type = bar
-    if true
+    if "a" == "a"
 [series]
           entity = a
         [tags]
@@ -282,7 +282,7 @@ suite("[series] declared inside if", () => {
     [group]
       [widget]
         type = bar
-    if true
+    if "a" == "a"
 [series]
           entity = a
         [tags]
@@ -294,7 +294,7 @@ suite("[series] declared inside if", () => {
     )]).validationTest();
 });
 
-suite("No metric is required if change-field value contains \"metric\"", () => {
+suite("Required: No metric is required if change-field value contains \"metric\"", () => {
     new Test("Correct, no errors shoud be raised",
     `[configuration]
     entity = atsd
@@ -306,7 +306,7 @@ suite("No metric is required if change-field value contains \"metric\"", () => {
   [series]`, []).validationTest();
 });
 
-suite("No duplicate errors with [tags]", () => {
+suite("Required: No duplicate errors with [tags]", () => {
     new Test("[tags] at EOF in [widget] without type",
     `[widget]
     [tags]
