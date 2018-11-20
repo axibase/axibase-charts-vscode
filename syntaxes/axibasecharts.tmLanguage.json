@@ -60,7 +60,7 @@
 				},
 				{
 					"name": "entity.name.tag.axibase.charts",
-					"match": "^[ \t]*\\w[-\\w\\s\\d_]+?(?=\\s*=)",
+					"match": "^[ \t]*\\w[-\\w\\s\\d_]+?(?=\\s*=)|column-.*",
 					"comment": "Setting name"
 				},
 				{

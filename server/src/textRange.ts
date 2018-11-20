@@ -17,7 +17,7 @@ export class TextRange {
      * @returns true if the keyword closeable
      */
     public static isCloseAble(line: string): boolean {
-        return /^[ \t]*(?:for|if|list|var|script|csv|else|elseif)\b/.test(line);
+        return /^[\s\t]*(?:for|if|list|var|script[\s\t]*$|csv|else|elseif)\b/.test(line);
     }
 
     /**

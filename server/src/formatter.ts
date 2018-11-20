@@ -1,16 +1,20 @@
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
-import { getParents } from "./resources";
+import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { isEmpty } from "./util";
 
+interface Section {
+    indent?: string;
+    name?: string;
+}
 /**
  * Formats the document
  */
 export class Formatter {
     /**
-     * Current section name
+     * Number of spaces between parent and child indents
      */
-    private currentSection?: string;
+    private static readonly BASE_INDENT_SIZE: number = 2;
     /**
      * Currently used indent
      */
@@ -26,11 +30,11 @@ export class Formatter {
     /**
      * A flag used to determine are we inside of a keyword or not
      */
-    private isKeyword: boolean = false;
+    private insideKeyword: boolean = false;
     /**
      * Array containing indents at start of keywords to restore them later
      */
-    private readonly keywordsLevels: string[] = [];
+    private readonly keywordsLevels: number[] = [];
     /**
      * Caches last line returned by getLine() to avoid several calls to `removeExtraSpaces`
      * and improve performance
@@ -53,9 +57,13 @@ export class Formatter {
      */
     private readonly options: FormattingOptions;
     /**
-     * Previous section name
+     * Indent of last keyword.
      */
-    private previous?: string;
+    private lastKeywordIndent: string = "";
+
+    private lastAddedParent: Section = {};
+    private previousSection: Section = {};
+    private currentSection: Section = {};
 
     public constructor(text: string, formattingOptions: FormattingOptions) {
         this.options = formattingOptions;
@@ -71,13 +79,13 @@ export class Formatter {
         for (const line of this.lines) {
             this.currentLine++;
             if (isEmpty(line)) {
-                if (this.currentSection === "tags") {
-                    this.currentSection = "series";
+                if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
+                    Object.assign(this.currentSection, this.previousSection);
                     this.decreaseIndent();
                 }
                 continue;
             } else if (this.isSectionDeclaration()) {
-                this.calculateIndent();
+                this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
                 continue;
@@ -85,14 +93,17 @@ export class Formatter {
                 this.checkEquals();
             }
             if (TextRange.isClosing(line)) {
-                const stackHead: string | undefined = this.keywordsLevels.pop();
+                const stackHead: number | undefined = this.keywordsLevels.pop();
                 this.setIndent(stackHead);
+                this.insideKeyword = false;
+                this.lastKeywordIndent = "";
             }
             this.checkIndent();
             if (TextRange.isCloseAble(line) && this.shouldBeClosed()) {
-                this.keywordsLevels.push(this.currentIndent);
+                this.keywordsLevels.push(this.currentIndent.length / Formatter.BASE_INDENT_SIZE);
+                this.lastKeywordIndent = this.currentIndent;
                 this.increaseIndent();
-                this.isKeyword = true;
+                this.insideKeyword = true;
             }
         }
 
@@ -104,18 +115,30 @@ export class Formatter {
      */
     private checkEquals(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = /(^\s*.+?)(\s*?)=/;
+        const regexp: RegExp = /(^\s*.+?)(\s*?)(!=|==|=)(\s*)/;
         const match: RegExpExecArray | null = regexp.exec(line);
         if (match === null) {
             return;
         }
-        const [, declaration, spaces] = match;
-        if (spaces !== " ") {
+        const [, declaration, spacesBefore, sign, spacesAfter] = match;
+        if (spacesBefore !== " ") {
             this.edits.push(
                 TextEdit.replace(
                     Range.create(
                         Position.create(this.currentLine, declaration.length),
-                        Position.create(this.currentLine, declaration.length + spaces.length),
+                        Position.create(this.currentLine, declaration.length + spacesBefore.length),
+                    ),
+                    " ",
+                ),
+            );
+        }
+        if (spacesAfter !== " ") {
+            const start = line.indexOf(sign) + sign.length;
+            this.edits.push(
+                TextEdit.replace(
+                    Range.create(
+                        Position.create(this.currentLine, start),
+                        Position.create(this.currentLine, start + spacesAfter.length),
                     ),
                     " ",
                 ),
@@ -126,27 +149,71 @@ export class Formatter {
     /**
      * Calculates current indent based on current state
      */
-    private calculateIndent(): void {
+    private calculateSectionIndent(): void {
         if (!this.match) {
             throw new Error("this.match or/and this.current is not defined in calculateIndent");
         }
-        this.previous = this.currentSection;
-        [, , this.currentSection] = this.match;
-        if (/\[(?:group|configuration)\]/i.test(this.getCurrentLine())) {
-            this.setIndent("");
-
-            return;
+        Object.assign(this.previousSection, this.currentSection);
+        this.currentSection.name = this.match[2];
+        const depth: number = sectionDepthMap[this.currentSection.name];
+        switch (depth) {
+            case 0: // [configuration]
+            case 1: // [group]
+            case 2: { // [widget]
+                this.setIndent(depth - 1);
+                this.lastAddedParent = { name: this.currentSection.name, indent: this.currentIndent };
+                break;
+            }
+            case 3: { // [series], [dropdown], [column], ...
+                if (this.lastAddedParent.name === "column" && this.currentSection.name === "series") {
+                    /**
+                     * If parent of [series] is [column], i.e:
+                     *
+                     * [column]
+                     *   ...
+                     *     [series]
+                     *       ...
+                     * change only indent, leave parent name as is.
+                     */
+                    this.currentIndent = this.lastAddedParent.indent;
+                    this.lastAddedParent.indent = this.currentIndent;
+                    this.increaseIndent();
+                    if (this.insideKeyword && this.currentIndent.length <= this.lastKeywordIndent.length) {
+                        this.currentIndent = this.lastKeywordIndent;
+                    }
+                    break;
+                }
+                if (isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
+                    this.currentIndent = this.previousSection.indent;
+                    this.increaseIndent();
+                } else {
+                    /**
+                     *     [tags]
+                     *       ...
+                     *  [series]
+                     *    ...
+                     */
+                    this.setIndent(depth - 1);
+                }
+                if (this.insideKeyword && this.currentIndent.length <= this.lastKeywordIndent.length) {
+                    this.currentIndent = this.lastKeywordIndent;
+                }
+                this.lastAddedParent = { name: this.currentSection.name, indent: this.currentIndent };
+                break;
+            }
+            case 4: { // [option], [properties], [tags]
+                if (isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
+                    this.currentIndent = this.previousSection.indent;
+                } else {
+                    this.currentIndent = this.lastAddedParent.indent;
+                }
+                this.increaseIndent();
+                break;
+            }
         }
-        if (this.isKeyword) {
-            this.isKeyword = false;
-
-            return;
-        }
-        this.decreaseIndent();
-        if (this.isNested()) {
+        this.currentSection.indent = this.currentIndent;
+        if (this.insideKeyword) {
             this.increaseIndent();
-        } else if (!this.isSameLevel()) {
-            this.decreaseIndent();
         }
     }
 
@@ -227,33 +294,6 @@ export class Formatter {
     }
 
     /**
-     * @returns true if the current section is nested in the previous section
-     */
-    private isNested(): boolean {
-        if (this.currentSection === undefined) {
-            throw new Error("Current or previous section is not defined, but we're trying to check nested");
-        }
-        if (this.previous === undefined) {
-            return false;
-        }
-
-        return getParents(this.currentSection)
-            .includes(this.previous);
-    }
-
-    /**
-     * @returns true if current and previous section must be placed on the same indent level
-     */
-    private isSameLevel(): boolean {
-        return (this.previous === undefined) || (this.currentSection === this.previous) ||
-            (this.currentSection === "group" && this.previous === "configuration") ||
-            (this.currentSection === "link" && this.previous === "node") ||
-            (this.currentSection === "series" && this.previous === "link") ||
-            (this.currentSection === "link" && this.previous === "series") ||
-            (this.currentSection === "node" && this.previous === "link");
-    }
-
-    /**
      * @returns true, if current line is section declaration
      */
     private isSectionDeclaration(): boolean {
@@ -277,12 +317,14 @@ export class Formatter {
 
     /**
      * Sets current indent to the provided
-     * @param newIndent the new indent
+     * @param newIndentLenth the new indent
      */
-    private setIndent(newIndent?: string): void {
-        if (newIndent !== undefined) {
-            this.currentIndent = newIndent;
+    private setIndent(newIndentLenth: number = 0): void {
+        let newIndent = "";
+        for (; newIndentLenth > 0; newIndentLenth--) {
+            newIndent += "  ";
         }
+        this.currentIndent = newIndent;
     }
 
     /**
@@ -290,7 +332,7 @@ export class Formatter {
      */
     private shouldBeClosed(): boolean {
         let line: string | undefined = this.getCurrentLine();
-        this.match = /^[ \t]*((?:var|list)|script[ \t]*=)/.exec(line);
+        this.match = /^[ \t]*((?:var|list)|script[\s\t]*$)/.exec(line);
         if (!this.match) {
             return true;
         }

@@ -146,13 +146,25 @@ export const widgetRequirementsByType: Map<string, SectionRequirements> = new Ma
  */
 export const parentSections: Map<string, string[]> = new Map([
     ["widget", ["group", "configuration"]],
-    ["series", ["widget", "column"]],
+    ["series", ["widget", "column", "link"]],
     ["tag", ["series"]],
     ["tags", ["series"]],
     ["column", ["widget"]],
     ["node", ["widget"]],
     ["link", ["widget"]],
+    ["option", ["dropdown"]]
 ]);
+
+/**
+ * @returns true if the current section is nested in the previous section
+ */
+export function isNestedToPrevious(currentName: string, previousName: string): boolean {
+    if (currentName === undefined || previousName === undefined) {
+        return false;
+    }
+
+    return getParents(currentName).includes(previousName);
+}
 
 /**
  * @returns array of parent sections for the section
