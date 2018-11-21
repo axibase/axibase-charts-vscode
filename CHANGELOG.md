@@ -1,5 +1,9 @@
 # Change Log
 
+## `v.1.0.13`
+
+* Multiple fixes related to freemarker syntax validation
+
 ## `v.1.0.12`
 
 * Multiple validator fixes
