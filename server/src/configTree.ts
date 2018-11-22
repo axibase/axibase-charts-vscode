@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { uselessScope, incorrectColors } from "./messageUtil";
+import { incorrectColors, uselessScope } from "./messageUtil";
 import {
     Condition, Requirement,
     sectionMatchConditionRequired, sectionMatchConditionUseless,

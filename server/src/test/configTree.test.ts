@@ -43,7 +43,7 @@ suite("ConfigTree tests", () => {
             `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
 Current: 2, expected: 1`);
         assert.deepEqual(tree.diagnostics[0].range,
-            Range.create(0, 1, 0, "color".length), "Colors must be highlighted");
+            Range.create(0, 1, 0, "colors".length), "Colors must be highlighted");
     });
 
     function textRange(text: string): TextRange {
