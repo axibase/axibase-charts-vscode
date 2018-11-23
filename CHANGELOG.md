@@ -1,17 +1,21 @@
 # Change Log
 
+## `v.1.0.14`
+
+* Revert validator error causing false alert on `colors` setting.
+
 ## `v.1.0.13`
 
-* Multiple fixes related to freemarker syntax validation
+* Multiple fixes related to freemarker syntax validation.
 
 ## `v.1.0.12`
 
-* Multiple validator fixes
+* Multiple validator fixes.
 
 ## `v.1.0.11`
 
-* Click on Preview shows unsaved configuration
-* Multiple validator fixes
+* Click on Preview shows unsaved configuration.
+* Multiple validator fixes.
 
 ## `v.1.0.10`
 
