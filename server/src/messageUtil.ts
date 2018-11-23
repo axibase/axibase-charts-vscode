@@ -32,3 +32,7 @@ export const settingNameInTags: MessageFactoryMethod = (found: string): string =
 
 export const uselessScope: MessageFactoryMethod = (found: string, msg: string): string =>
   `${found} setting is appplied only if ${msg}.`;
+
+export const incorrectColors: MessageFactoryMethod = (found: string, msg: string): string =>
+`Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
+Current: ${found}, expected: ${msg}`;

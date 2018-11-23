@@ -1,5 +1,6 @@
 import assert = require("assert");
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { incorrectColors } from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
@@ -57,6 +58,17 @@ suite("RelatedSettings: thresholds and colors tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
+    test("Correct: colors declared as hex codes", () => {
+        const conf = `${config}
+        type = gauge
+        thresholds = 0, 10, 20, 30
+        colors = #d7ede2,#9ad1b6,#71bf99
+        [series]`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
+    });
+
     test("Correct: \"colors\" declared without \"thresholds\" for bar", () => {
         const conf = `${config}
         type = bar
@@ -91,8 +103,7 @@ colors = green, orange, red
         assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "colors".length)),
-            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
-            DiagnosticSeverity.Error,
+            incorrectColors("3", "4"), DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
     });
 
@@ -107,8 +118,7 @@ colors = green, orange, red
         assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(6, 0),
                 Position.create(6, "colors".length)),
-            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
-            DiagnosticSeverity.Error,
+            incorrectColors("3", "4"), DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
     });
 
@@ -143,14 +153,12 @@ colors = green, orange, red
         assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "colors".length)),
-            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
-            DiagnosticSeverity.Error,
+            incorrectColors("3", "4"), DiagnosticSeverity.Error,
         ),
         createDiagnostic(
             Range.create(Position.create(13, 0),
                 Position.create(13, "colors".length)),
-            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
-            DiagnosticSeverity.Error,
+                incorrectColors("3", "4"), DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
     });
 
@@ -204,8 +212,7 @@ colors = silver
         assert.deepStrictEqual(diags, deprecate.concat(createDiagnostic(
             Range.create(Position.create(9, 0),
                 Position.create(9, "colors".length)),
-            "Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.",
-            DiagnosticSeverity.Error,
+                incorrectColors("1", "2"), DiagnosticSeverity.Error,
         )), `Config: \n${conf}`);
     });
 });

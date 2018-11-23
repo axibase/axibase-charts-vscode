@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { uselessScope } from "./messageUtil";
+import { incorrectColors, uselessScope } from "./messageUtil";
 import {
     Condition, Requirement,
     sectionMatchConditionRequired, sectionMatchConditionUseless,
@@ -160,6 +160,17 @@ export class ConfigTree {
     }
 
     public diagnostics: Diagnostic[];
+    /**
+     * Prevents from duplicates for incorrect colors if [widget] contains several [series], for example:
+     *
+     * thresholds = 0, 10, 20
+     * colors = #d7ede2, #9ad1b6, #71bf99
+     * [series]
+     *   entity = nurswgvml006
+     * [series]
+     *   entity = nurswgvml007
+     */
+    private colorsDiagnostics: Map<Setting, Diagnostic> = new Map();
     private root: Section;
     private lastAddedParent: Section;
     private previous: Section;
@@ -266,6 +277,7 @@ export class ConfigTree {
             }
             currentLevel = childAccumulator;
         }
+        this.diagnostics.push(...this.colorsDiagnostics.values());
     }
 
     /**
@@ -355,22 +367,24 @@ export class ConfigTree {
             colorsValues = colorsSetting.values;
         } else {
             /**
-             * Matches the following cases:
+             * Converts 1) -> 2):
              * 1) colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)
-             * 2) colors = red, green, blue
+             * 2) colors = rgb, rgb, rgb
              */
-            colorsValues = colorsSetting.value.split(/[^\d],[^\d]/g);
+            colorsValues = colorsSetting.value.replace(/(\s*\d{3}\s*,?)/g, "");
+            colorsValues = colorsValues.split(",").filter(s => s.trim() !== "");
         }
         if (thresholdsSetting.values.length > 0) {
             thresholdsSetting.values.push(thresholdsSetting.value);
             thresholdsValues = thresholdsSetting.values;
         } else {
-            thresholdsValues = thresholdsSetting.value.split(",");
+            thresholdsValues = thresholdsSetting.value.split(",").filter(s => s.trim() !== "");
         }
 
-        if (colorsValues.length !== thresholdsValues.length - 1) {
-            this.diagnostics.push(createDiagnostic(colorsSetting.textRange,
-                `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.`));
+        const expected = thresholdsValues.length - 1;
+        if (colorsValues.length !== expected) {
+            this.colorsDiagnostics.set(colorsSetting, createDiagnostic(colorsSetting.textRange,
+                incorrectColors(`${colorsValues.length}`, `${expected}`)));
         }
     }
 
