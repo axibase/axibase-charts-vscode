@@ -908,6 +908,14 @@
             "widget": "graph"
         },
         {
+            "displayName": "data-labels",
+            "type": "boolean",
+            "example": true,
+            "defaultValue": false,
+            "section": "widget",
+            "widget": "calendar"
+        },
+        {
             "displayName": "data-type",
             "type": "enum",
             "example": "forecast",
