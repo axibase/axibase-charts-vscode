@@ -21,28 +21,15 @@ For example, 15 minute. Supported units:\n * nanosecond\n * millisecond\n * seco
  * minute\n * hour\n * day\n * week\n * month\n * quarter\n * year`;
 }
 
-function satisticsError_1(name: string): string {
-    return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * first\n * last\n * max
- * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
- * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
-}
-
-function satisticsError_2(name: string): string {
-    return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * first
- * last\n * max\n * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
- * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
-}
-
-function satisticsError_3(name: string): string {
-    return `${name} must be one of:\n * avg\n * count\n * last\n * max\n * median\n * min\n * percentile_{num}\n * sum`;
-}
-
-function satisticsError_4(name: string): string {
+function satisticsError(name: string): string {
     return `${name} must be one of:\n * avg\n * count\n * counter\n * delta\n * detail
- * first\n * last\n * max\n * max_value_time\n * median\n * min\n * min_value_time\n * percentile_{num}
+ * first\n * last\n * max\n * max_value_time\n * median\n * min\n * min_value_time\n * percentile(n)
  * standard_deviation\n * sum\n * threshold_count\n * threshold_duration\n * threshold_percent\n * wavg\n * wtavg`;
 }
 
+function percentileError(current: string):string{
+    return `n must be a decimal number between [0, 100]. Current: ${current}`;
+}
 const arrowLengthMsg = "arrow-length should be a real (floating-point) number. For example, 0.3, 30%";
 
 suite("Type check tests", () => {
@@ -488,7 +475,7 @@ suite("Type check tests", () => {
             [
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    satisticsError_4("statistic"),
+                    satisticsError("statistic"),
                 ),
             ],
         ),
@@ -499,74 +486,54 @@ suite("Type check tests", () => {
             [],
         ),
         new Test(
-            "Allow any percentile number in statistic settings",
+            "Allow percentile number in [0,100] for statistic settings",
             `[configuration]
-  group-statistic = percentile(25.5)
+  group-statistic = percentile(100)
 [configuration]
-  statistic = percentile_255
+  statistic = percentile(25.5)
 [configuration]
-  statistic = percentile_120
-[configuration]
-  statistics = percentile(10)
-[configuration]
-  statistics = percentile_10
-[configuration]
-  statistics = percentile(5)
-[configuration]
-  summarize-statistic = percentile_5`,
+  summarize-statistic = percentile(0)`,
             [],
         ),
         new Test(
             "Incorrect percentile is used",
             `[configuration]
-  group-statistic = percentile_-5
+  group-statistic = percentile(-5)
 [configuration]
-  statistic = percentile_-76
+  statistic = percentile(-0.1)
 [configuration]
-  statistics = percentile(-3)
-[configuration]
-  summarize-statistic = percentile(-93)
-[configuration]
-  group-statistic = percentile(120)
+  summarize-statistic = percentile(100.1)
 [configuration]
   group-statistic = percentile(a word)
 [configuration]
-  summarize-statistic = percentile_word
+  summarize-statistic = percentile(word)
 [configuration]
   statistics = percentile("a word")`,
             [
                 createDiagnostic(
                     Range.create(1, "  ".length, 1, "  ".length + "group-statistic".length),
-                    satisticsError_2("group-statistic"),
+                    percentileError("-5"),
                 ),
                 createDiagnostic(
                     Range.create(3, "  ".length, 3, "  ".length + "statistic".length),
-                    satisticsError_4("statistic"),
+                    percentileError("-0.1"),
                 ),
                 createDiagnostic(
-                    Range.create(5, "  ".length, 5, "  ".length + "statistics".length),
-                    satisticsError_1("statistics"),
+                    Range.create(5, "  ".length, 5, "  ".length + "summarize-statistic".length),
+                    percentileError("100.1"),
                 ),
                 createDiagnostic(
-                    Range.create(7, "  ".length, 7, "  ".length + "summarize-statistic".length),
-                    satisticsError_3("summarize-statistic"),
+                    Range.create(7, "  ".length, 7, "  ".length + "group-statistic".length),
+                    percentileError("a wo"),
                 ),
                 createDiagnostic(
-                    Range.create(9, "  ".length, 9, "  ".length + "group-statistic".length),
-                    satisticsError_2("group-statistic"),
+                    Range.create(9, "  ".length, 9, "  ".length + "summarize-statistic".length),
+                    percentileError("wo"),
                 ),
                 createDiagnostic(
-                    Range.create(11, "  ".length, 11, "  ".length + "group-statistic".length),
-                    satisticsError_2("group-statistic"),
-                ),
-                createDiagnostic(
-                    Range.create(13, "  ".length, 13, "  ".length + "summarize-statistic".length),
-                    satisticsError_3("summarize-statistic"),
-                ),
-                createDiagnostic(
-                    Range.create(15, "  ".length, 15, "  ".length + "statistics".length),
-                    satisticsError_1("statistics"),
-                ),
+                    Range.create(11, "  ".length, 11, "  ".length + "statistics".length),
+                    percentileError("\"a wo"),
+                )
             ],
         ),
         new Test(
