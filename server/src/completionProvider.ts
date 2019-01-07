@@ -185,7 +185,8 @@ endif
                 return this.getItemsArray(["true", "false"]);
             }
             case "enum": {
-                return this.getItemsArray(setting.enum);
+                return this.getItemsArray(setting.enum.map(el =>
+                    el.replace(/percentile\\.+/, "percentile(n)")));
             }
             case "interval": {
                 return this.getItemsArray(intervalUnits, ...setting.enum);
