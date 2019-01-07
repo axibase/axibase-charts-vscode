@@ -13,9 +13,8 @@
 		"url": "https://github.com/kirmanak/Axibase-Charts-Syntax"
 	},
 	"dependencies": {
-		"jquery": "^3.3.1",
 		"jsdom": "^12.0.0",
-		"vscode-languageserver": "^5.2.1"
+		"vscode-languageserver": "^5.1.0"
 	},
 	"scripts": {
 		"test": "node node_modules/vscode/bin/test --node-ipc"
