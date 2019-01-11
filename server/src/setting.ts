@@ -147,7 +147,7 @@ export class Setting extends DefaultSetting {
                     }
                     const enumList: string = this.enum.sort().join("\n * ")
                         .replace(/percentile\\.+/, "percentile(n)");
-                    result = createDiagnostic(range, `${this.displayName} must be a number between 0 and 100, inclusive.`);
+                    result = createDiagnostic(range, `${this.displayName} must be one of:\n * ${enumList}`);
                 }
                 break;
             }
