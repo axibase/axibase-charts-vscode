@@ -141,8 +141,12 @@ export class Setting extends DefaultSetting {
                 if (this.enum.length === 0) {
                     result = createDiagnostic(range, `${this.displayName} setting is not allowed here.`);
                 } else if (index < 0) {
+                    if (/percentile/.test(this.value) && /statistic/.test(this.name)) {
+                        result = this.checkPercentile(range);
+                        break;
+                    }
                     const enumList: string = this.enum.sort().join("\n * ")
-                        .replace(/percentile\(.+/, "percentile_{num}");
+                        .replace(/percentile\\.+/, "percentile(n)");
                     result = createDiagnostic(range, `${this.displayName} must be one of:\n * ${enumList}`);
                 }
                 break;
@@ -201,6 +205,23 @@ export class Setting extends DefaultSetting {
             );
         }
         return undefined;
+    }
+
+    private checkPercentile(range: Range): Diagnostic | undefined {
+        let result: Diagnostic;
+        const n = this.value.match(/[^percntil_()]+/);
+        if (n && +n[0] >= 0 && +n[0] <= 100) {
+            if (/_/.test(this.value)) {
+                result = createDiagnostic(range, `Underscore is deprecated, use percentile(${n[0]}) instead`,
+                    DiagnosticSeverity.Warning);
+            } else if (!new RegExp(`\\(${n[0]}\\)`).test(this.value)) {
+                result = createDiagnostic(range, `Wrong usage. Expected: percentile(${n[0]}).
+Current: ${this.value}`);
+            }
+        } else {
+            result = createDiagnostic(range, `n must be a decimal number between [0, 100]. Current: ${n ? n[0] : n}`);
+        }
+        return result;
     }
 
     private findIndexInEnum(value: string) {

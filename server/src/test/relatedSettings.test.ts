@@ -227,7 +227,7 @@ suite("RelatedSettings: \"forecast-style\" and \"data-type\" tests", () => {
         forecast-style = stroke: magenta;
 
         [series]
-          statistic = percentile_75
+          statistic = percentile(75)
           period = 10 minute
           mode = range
 
