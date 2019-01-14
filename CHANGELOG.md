@@ -1,5 +1,11 @@
 # Change Log
 
+## `v.1.0.15`
+
+* Validator: underscore in percentile is deprecated.
+* Added `data-labels` setting.
+
+
 ## `v.1.0.14`
 
 * Revert validator error causing false alert on `colors` setting.
