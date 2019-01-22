@@ -7863,6 +7863,21 @@
             }
         },
         {
+            "displayName": "transformation-order",
+            "type": "string",
+            "example": "aggregate, interpolate",
+            "enum": [
+                "none",
+                "interpolate",
+                "group",
+                "rate",
+                "aggregate",
+                "smooth",
+                "downsample",
+                "forecast"
+            ]
+        },
+        {
             "displayName": "transpose",
             "type": "boolean",
             "section": "widget",

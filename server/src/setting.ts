@@ -98,7 +98,6 @@ export class Setting extends DefaultSetting {
      * @param range where the error should be displayed
      */
     public checkType(range: Range): Diagnostic | undefined {
-        // TODO: create a diagnostic using information about the current widget
         let result: Diagnostic | undefined;
         // allows ${} and @{} expressions
         if (calculatedRegExp.test(this.value)) {
@@ -108,6 +107,14 @@ export class Setting extends DefaultSetting {
             case "string": {
                 if (!/\S/.test(this.value)) {
                     result = createDiagnostic(range, `${this.displayName} can not be empty`);
+                    break;
+                }
+                if (this.enum.length > 0) {
+                    if (this.value.split(/\s*,\s*/).some(s => this.enum.indexOf(s) < 0)) {
+                        const enumList: string = this.enum.sort().join("\n * ");
+                        result = createDiagnostic(range,
+                            `${this.displayName} must contain only the following:\n * ${enumList}`);
+                    }
                 }
                 break;
             }
