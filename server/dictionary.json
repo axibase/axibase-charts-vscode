@@ -2164,6 +2164,12 @@
             "defaultValue": true,
             "section": "series",
             "widget": "chart"
+        },        
+        {
+            "displayName": "filter",
+            "type": "string",
+            "example": "value > 1",
+            "section": "series"
         },
         {
             "displayName": "filter-range",
@@ -7865,6 +7871,7 @@
         {
             "displayName": "transformation-order",
             "type": "string",
+            "section": "series",
             "example": "aggregate, interpolate",
             "enum": [
                 "none",
