@@ -10,14 +10,14 @@
 		"url": "https://github.com/kirmanak/Axibase-Charts-Syntax"
 	},
 	"engines": {
-		"vscode": "^1.25.0"
+		"vscode": "^1.1.29"
 	},
 	"scripts": {
 		"update-vscode": "node ./node_modules/vscode/bin/install",
 		"postinstall": "node ./node_modules/vscode/bin/install"
 	},
 	"dependencies": {
-		"vscode": "^1.25.0",
+		"vscode": "^1.1.29",
 		"vscode-languageclient": "^5.1.0"
 	},
 	"devDependencies": {
