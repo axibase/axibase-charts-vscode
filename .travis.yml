@@ -19,9 +19,3 @@ script:
   - npm test --silent
   - npm run test:e2e --silent
 
-cache:
-  directories:
-    - node_modules
-    - server/node_modules
-    - client/node_modules
-    - server/.vscode-test
