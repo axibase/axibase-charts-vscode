@@ -13,8 +13,7 @@ before_install:
 
 install:
   - npm install
-  - npm info vscode-languageclient
-  - npm info vscode
+  - cat client/node_modules/vscode-languageclient/package.json
   - npm run vscode:prepublish
 
 script:
