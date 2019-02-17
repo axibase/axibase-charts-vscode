@@ -13,15 +13,17 @@ before_install:
 
 install:
   - npm install
+  - npm info vscode-languageclient
+  - npm info vscode
   - npm run vscode:prepublish
 
 script:
   - npm test --silent
   - npm run test:e2e --silent
 
-# cache:
-#   directories:
-#     - node_modules
-#     - server/node_modules
-#     - client/node_modules
-#     - server/.vscode-test
+cache:
+  directories:
+    - node_modules
+    - server/node_modules
+    - client/node_modules
+    - server/.vscode-test
