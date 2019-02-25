@@ -80,7 +80,8 @@
               "number",
               "interval",
               "date",
-              "integer"
+              "integer",
+              "object"
             ]
           },
           "defaultValue": {
@@ -101,11 +102,43 @@
           },
           "minValue": {
             "description": "[Optional] Minimal value constraint. Default is 'no constraint'",
-            "type": "number"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  },
+                  "excluded": {
+                    "description": "[Optional] Should this value be excluded or not from range interval. Default is false",
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
           },
           "maxValue": {
             "description": "[Optional] Maximal value constraint. Default is 'no constraint'",
-            "type": "number"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  },
+                  "excluded": {
+                    "description": "[Optional] Should this value be excluded or not from range interval. Default is false",
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
           },
           "multiLine": {
             "description": "[Optional] Can this setting be repeated or not. Default is false",

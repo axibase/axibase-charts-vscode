@@ -52,8 +52,8 @@ export function sectionMatchConditionRequired(settingName: string, possibleValue
 /**
  * Returns function which returns info message if conditions are not satisfied.
  * Checks is Requirement.dependent applicable.
- * @param settingName name of the setting
- * @param possibleValues values that can be assigned to the setting
+ * @param settingName Name of the setting
+ * @param possibleValues Values that can be assigned to the setting
  */
 export function sectionMatchConditionUseless(settingName: string, possibleValues: string[]): Condition {
     return (section: Section) => {

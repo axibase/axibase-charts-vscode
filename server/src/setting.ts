@@ -121,8 +121,8 @@ export class Setting extends DefaultSetting {
             case "number": {
                 const persent = /(\d*)%/.exec(this.value);
                 if (this.name === "arrowlength" && persent) {
-                    this.maxValue = this.maxValue * 100;
-                    this.minValue = this.minValue * 100;
+                    this.maxValue = typeof this.maxValue === "object" ? this.maxValue.value * 100 : this.maxValue * 100;
+                    this.minValue = typeof this.minValue === "object" ? this.minValue.value * 100 : this.minValue * 100;
                     this.value = persent[1];
                 }
                 result = this.checkNumber(numberRegExp,
@@ -193,6 +193,14 @@ export class Setting extends DefaultSetting {
                 }
                 break;
             }
+            case "object": {
+                try {
+                    JSON.parse(this.value);
+                } catch (err) {
+                    result = createDiagnostic(range, `Invalid object specified: ${err.message}`);
+                }
+                break;
+            }
             default: {
                 throw new Error(`${this.type} is not handled`);
             }
@@ -206,9 +214,16 @@ export class Setting extends DefaultSetting {
         if (!reg.test(this.value)) {
             return createDiagnostic(range, `${message}${example}`);
         }
-        if (+this.value < this.minValue || +this.value > this.maxValue) {
+        const minValue = typeof this.minValue === "object" ? this.minValue.value : this.minValue;
+        const minValueExcluded = typeof this.minValue === "object" ? this.minValue.excluded : false;
+        const maxValue = typeof this.maxValue === "object" ? this.maxValue.value : this.maxValue;
+        const maxValueExcluded = typeof this.maxValue === "object" ? this.maxValue.excluded : false;
+        const left = minValueExcluded ? `(` : `[`;
+        const right = maxValueExcluded ? `)` : `]`;
+        if (minValueExcluded && +this.value <= minValue || +this.value < minValue ||
+            maxValueExcluded && +this.value >= maxValue || +this.value > maxValue) {
             return createDiagnostic(
-                range, `${this.displayName} should be in range [${this.minValue}, ${this.maxValue}].${example}`,
+                range, `${this.displayName} should be in range ${left}${minValue}, ${maxValue}${right}.${example}`,
             );
         }
         return undefined;

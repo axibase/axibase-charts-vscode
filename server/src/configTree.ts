@@ -12,13 +12,17 @@ import { createDiagnostic, getSetting } from "./util";
 
 /**
  * If requiredIfConditions !== null, the section will be checked for match to conditions;
- * if section matches conditions, requiredIfConditions setting is required for this section.
+ * if section matches conditions, then setting, specified in requiredIfConditions is required for this section.
  *
  * If requiredIfConditions == null, the section will be checked for applicability of any of "dependent";
- * if any dependent is declared in the section, than section will be checked for match to conditions.
+ * if any setting from dependent is declared in the section, than section will be checked for match to conditions.
  */
 const relatedSettings: Requirement[] = [
     {
+        /**
+         * If "type" is "calendar", "treemap " or "gauge" and mode is "half" or "default",
+         * "colors" and "thresholds" are applicable, and if "colors" are specified, the "thresholds" are required.
+         */
         conditions: [
             sectionMatchConditionRequired("type", ["calendar", "treemap", "gauge"]),
             sectionMatchConditionRequired("mode", ["half", "default"])
@@ -35,6 +39,10 @@ const relatedSettings: Requirement[] = [
         requiredIfConditions: "data-type"
     },
     {
+        /**
+         * If "type=chart" and "mode" is NOT "column-stack" or "column",
+         * settings "negative-style" and "current-period-style" are useless.
+         */
         conditions: [
             sectionMatchConditionUseless("type", ["chart"]),
             sectionMatchConditionUseless("mode", ["column-stack", "column"])
@@ -54,6 +62,20 @@ const relatedSettings: Requirement[] = [
             sectionMatchConditionUseless("mode", ["half", "default"])
         ],
         dependent: ["ticks", "color-range", "gradient-count"]
+    },
+    {
+        conditions: [
+            sectionMatchConditionUseless("type", ["chart"]),
+            sectionMatchConditionUseless("forecast-arima-auto", ["false"])
+        ],
+        dependent: ["forecast-arima-auto-regression-interval", "forecast-arima-d", "forecast-arima-p"]
+    },
+    {
+        conditions: [
+            sectionMatchConditionUseless("type", ["chart"]),
+            sectionMatchConditionUseless("forecast-hw-auto", ["false"])
+        ],
+        dependent: ["forecast-hw-alpha", "forecast-hw-beta", "forecast-hw-gamma"]
     },
     {
         dependent: "table", requiredIfConditions: "attribute"
@@ -139,15 +161,15 @@ class Section {
 }
 
 /**
- * checks related settings.
+ * Checks related settings.
  */
 // tslint:disable-next-line:max-classes-per-file
 export class ConfigTree {
 
     /**
      * Searches setting in the parents starting from the startSection and ending root, returns the closest one.
-     * @param settingName setting name
-     * @param startSection node of subtree to search for settingName
+     * @param settingName Setting name
+     * @param startSection Node of subtree to search for settingName
      */
     public static getSetting(startSection: Section, settingName: string): Setting | undefined {
         for (let currentSection = startSection; currentSection; currentSection = currentSection.parent) {
@@ -180,10 +202,10 @@ export class ConfigTree {
     }
 
     /**
-     * Adds section to tree. Checks section for not aapplicable settings and declares requirements for children.
+     * Adds section to tree. Checks section for non-applicable settings and declares requirements for children.
      * Doesn't alert if the section is out of order, this check is performed by SectionStack.
-     * @param range the text and the position of the text
-     * @param settings section settings
+     * @param range The text and the position of the text
+     * @param settings Section settings
      */
     public addSection(range: TextRange, settings: Setting[]) {
         const section = new Section(range, settings);
