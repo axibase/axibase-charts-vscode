@@ -12,6 +12,11 @@ interface OverrideCacheEntry {
     test(scope: SettingScope): boolean;
 }
 
+interface ValueRange {
+    value: number;
+    excluded: boolean;
+}
+
 /**
  * Holds the description of a setting and corresponding methods.
  */
@@ -55,11 +60,11 @@ export class DefaultSetting {
     /**
      * The maximum allowed value for the setting
      */
-    public maxValue: number = Infinity;
+    public maxValue: number | ValueRange = Infinity;
     /**
      * The minimum allowed value for the setting
      */
-    public minValue: number = -Infinity;
+    public minValue: number | ValueRange = -Infinity;
     /**
      * Is the setting allowed to be repeated
      */

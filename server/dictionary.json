@@ -2164,7 +2164,7 @@
             "defaultValue": true,
             "section": "series",
             "widget": "chart"
-        },        
+        },
         {
             "displayName": "filter",
             "type": "string",
@@ -2202,10 +2202,259 @@
             "widget": "treemap"
         },
         {
+            "displayName": "forecast-arima-auto",
+            "type": "boolean",
+            "example": "true",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-arima-auto-regression-interval",
+            "type": "interval",
+            "example": "1 week",
+            "section": "series",
+            "widget": "chart",
+            "excludes": ["forecast-arima-p"]
+        },
+        {
+            "displayName": "forecast-arima-d",
+            "type": "number",
+            "example": "5",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-arima-p",
+            "type": "enum",
+            "example": "1",
+            "section": "series",
+            "widget": "chart",
+            "enum": [
+                "0",
+                "1"
+            ],
+            "excludes": ["forecast-arima-auto-regression-interval"]
+        },
+        {
+            "displayName": "forecast-horizon-interval",
+            "type": "interval",
+            "example": "3 day",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-horizon-length",
+            "type": "integer",
+            "example": "100",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-horizon-start-time",
+            "type": "date",
+            "example": "2019-02-05T00:00:00Z",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-horizon-end-time",
+            "type": "date",
+            "example": "2019-02-06T00:00:00Z",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-hw-auto",
+            "type": "boolean",
+            "example": "true",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-hw-period",
+            "type": "interval",
+            "example": "1 year",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-hw-alpha",
+            "type": "number",
+            "example": "0.6",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-hw-beta",
+            "type": "number",
+            "example": "0.1",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-hw-gamma",
+            "type": "number",
+            "example": "0.1",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-include",
+            "type": "string",
+            "example": "HISTORY, FORECAST",
+            "section": "series",
+            "defaultValue": "FORECAST",
+            "enum": [
+                "FORECAST",
+                "HISTORY",
+                "RECONSTRUCTED"
+            ],
+            "widget": "chart"
+        },
+        {
             "displayName": "forecast-name",
             "type": "string",
             "example": "hw5",
-            "section": "series"
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-ssa",
+            "type": "boolean",
+            "example": "true",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
+            "displayName": "forecast-ssa-decompose-eigentriple-limit",
+            "type": "number",
+            "example": 0,
+            "section": "series",
+            "widget": "chart",
+            "defaultValue": 0
+        },
+        {
+            "displayName": "forecast-ssa-decompose-method",
+            "type": "enum",
+            "example": "TRUNCATED",
+            "section": "series",
+            "widget": "chart",
+            "defaultValue": "AUTO",
+            "enum": [
+                "FULL",
+                "TRUNCATED",
+                "AUTO"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-decompose-singular-value-threshold",
+            "type": "integer",
+            "example": 1,
+            "section": "series",
+            "widget": "chart",
+            "minValue": 0,
+            "maxValue": 100
+        },
+        {
+            "displayName": "forecast-ssa-decompose-window-length",
+            "type": "number",
+            "example": "50",
+            "section": "series",
+            "widget": "chart",
+            "minValue": {
+                "value": 0,
+                "excluded": true
+            },
+            "maxValue": 50
+        },
+        {
+            "displayName": "forecast-ssa-group-auto-count",
+            "type": "integer",
+            "example": "5",
+            "section": "series",
+            "widget": "chart",
+            "excludes": [
+                "forecast-ssa-group-manual-groups"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-group-auto-clustering-method",
+            "type": "enum",
+            "example": "NOVOSIBIRSK",
+            "section": "series",
+            "defaultValue": "HIERARCHICAL",
+            "widget": "chart",
+            "enum": [
+                "HIERARCHICAL",
+                "XMEANS",
+                "NOVOSIBIRSK"
+            ],
+            "excludes": [
+                "forecast-ssa-group-manual-groups"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-group-auto-clustering-params",
+            "type": "object",
+            "example": "{ \"v\": 0.5, \"c\": 0.45 }",
+            "section": "series",
+            "widget": "chart",
+            "excludes": [
+                "forecast-ssa-group-manual-groups"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-group-auto-stack",
+            "type": "boolean",
+            "example": "true",
+            "section": "series",
+            "widget": "chart",
+            "excludes": [
+                "forecast-ssa-group-manual-groups"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-group-auto-union",
+            "type": "string",
+            "example": "C",
+            "section": "series",
+            "widget": "chart",
+            "excludes": [
+                "forecast-ssa-group-manual-groups"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-group-manual-groups",
+            "type": "string",
+            "example": "13-",
+            "section": "series",
+            "widget": "chart",
+            "excludes": [
+                "forecast-ssa-group-auto-count",
+                "forecast-ssa-group-auto-clustering-method",
+                "forecast-ssa-group-auto-clustering-params",
+                "forecast-ssa-group-auto-stack",
+                "forecast-ssa-group-auto-union"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-reconstruct-averaging-function",
+            "type": "enum",
+            "example": "AVG",
+            "defaultValue": "MEDIAN",
+            "section": "series",
+            "widget": "chart",
+            "enum": [
+                "AVG",
+                "MEDIAN"
+            ]
+        },
+        {
+            "displayName": "forecast-ssa-reconstruct-fourier",
+            "type": "boolean",
+            "example": "true",
+            "section": "series",
+            "widget": "chart"
         },
         {
             "displayName": "forecast-style",

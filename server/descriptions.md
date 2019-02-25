@@ -449,13 +449,97 @@ Minimum row height is `10px`, maximum row height is `64px`.
   
 ## fontsize  
   
-Font size settings as a whole number  
+Font size settings as a whole number.  
+  
+## forecastarimaauto  
+  
+If `true` ARIMA parameters `p` and `d` are selected automatically.  
+  
+## forecastarimaautoregressioninterval  
+  
+Alternative parameter for `p`: `p = auto-regression-interval / interval`,
+where `interval` is the time between two sequential samples.  
+  
+## forecastarimad  
+  
+## forecastarimap  
+  
+## forecasthorizoninterval  
+  
+## forecasthorizonlength  
+  
+## forecasthorizonstarttime  
+  
+## forecasthorizonendtime  
+  
+## forecasthwauto  
+  
+If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically.  
+  
+## forecasthwperiod  
+  
+Optional. Series period (seasonality).  
+  
+## forecasthwalpha  
+  
+## forecasthwbeta  
+  
+## forecasthwgamma  
+  
+## forecastinclude  
+  
+Include input series, forecast or reconstructed series into response.  
   
 ## forecastname  
   
 Unique forecast identifier.  
 Useful when creating multiple forecasts for the same series.  
 If no forecast name is set, the default forecast is loaded.  
+  
+## forecastssa  
+  
+## forecastssadecomposeeigentriplelimit  
+  
+The maximum number of eigentriples to be derived from the trajectory matrix.
+The returned number of eigentriples is constrained by window length.
+The limit applies to eigentriples sorted by singular value in descending order.
+Default: `0` - no limit.  
+  
+## forecastssadecomposemethod  
+  
+SVD algorithm: `FULL`, `TRUNCATED`, `AUTO`.  
+  
+## forecastssadecomposesingularvaluethreshold  
+  
+Discard eigentriples if its singular value is below the specified percentage of the maximum singular value.
+If set to `0`, no eigentriples are discarded.
+If set to `100`, only the eigentriples with the largest singular value are included.  
+  
+## forecastssadecomposewindowlength  
+  
+Window length specified as percentage of the sample count in the input series.  
+  
+## forecastssagroupautocount  
+  
+## forecastssagroupautoclusteringmethod  
+  
+Method used to cluster eigentriples into groups: `HIERARCHICAL`, `XMEANS`, or `NOVOSIBIRSK`.  
+  
+## forecastssagroupautoclusteringparams  
+  
+Dictionary (map) of parameters required by given clustering method.  
+  
+## forecastssagroupautostack  
+  
+## forecastssagroupautounion  
+  
+## forecastssareconstructaveragingfunction  
+  
+Specifies how average anti-diagonals of reconstructed matrices.  
+  
+## forecastssareconstructfourier  
+  
+If `true` Fourier Transform is used in reconstruction stage of SSA, and in SVD.  
   
 ## forecaststyle  
   
