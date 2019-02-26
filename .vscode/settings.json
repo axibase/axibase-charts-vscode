@@ -7,10 +7,7 @@
 	},
 	"typescript.tsdk": "./node_modules/typescript/lib",
 	"typescript.tsc.autoDetect": "off",
-	"npm.exclude": [
-		"**/client",
-		"**/server"
-	],
+	"npm.exclude": ["**/client", "**/server"],
 	"npm.enableScriptExplorer": true,
 	"cSpell.words": [
 		"Axibase",
@@ -22,8 +19,5 @@
 		"endvar"
 	],
 	"editor.tabSize": 4,
-	"editor.insertSpaces": true,
-	"editor.suggest.localityBonus": true,
-	"axibaseCharts.hostname": "nur.axibase.com",
-	"axibaseCharts.port": 443
+	"editor.insertSpaces": true
 }
