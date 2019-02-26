@@ -64,6 +64,30 @@ function isDate(text: string): boolean {
     return calendarRegExp.test(text) || localDateRegExp.test(text) || zonedDateRegExp.test(text);
 }
 
+interface SpecificValueCheck {
+    errMsg: string;
+    check: (value: string) => boolean;
+}
+
+const specificValueChecksMap: Map<string, SpecificValueCheck> = new Map([
+    ["forecastssagroupmanualgroups", {
+        check: (value: string) => {
+            const regex = /^[\d-]+$/;
+            const groups = value.split(/\s*,\s*/);
+            return groups.some(g => !regex.test(g));
+        },
+        errMsg: "Incorrect group syntax"
+    }],
+    ["forecastssagroupautounion", {
+        check: (value: string) => {
+            const regex = /^[a-z-]+$/;
+            const groups = value.split(/\s*,\s*/);
+            return groups.some(g => !regex.test(g));
+        },
+        errMsg: "Incorrect group union syntax"
+    }]
+]);
+
 /**
  * In addition to DefaultSetting contains specific fields.
  */
@@ -92,7 +116,6 @@ export class Setting extends DefaultSetting {
     public constructor(setting: DefaultSetting) {
         super(setting);
     }
-
     /**
      * Checks the type of the setting and creates a corresponding diagnostic
      * @param range where the error should be displayed
@@ -115,6 +138,11 @@ export class Setting extends DefaultSetting {
                         result = createDiagnostic(range,
                             `${this.displayName} must contain only the following:\n * ${enumList}`);
                     }
+                    break;
+                }
+                const specCheck = specificValueChecksMap.get(this.name);
+                if (specCheck && specCheck.check(this.value)) {
+                    result = createDiagnostic(range, specCheck.errMsg);
                 }
                 break;
             }

@@ -2214,7 +2214,9 @@
             "example": "1 week",
             "section": "series",
             "widget": "chart",
-            "excludes": ["forecast-arima-p"]
+            "excludes": [
+                "forecast-arima-p"
+            ]
         },
         {
             "displayName": "forecast-arima-d",
@@ -2233,21 +2235,32 @@
                 "0",
                 "1"
             ],
-            "excludes": ["forecast-arima-auto-regression-interval"]
+            "excludes": [
+                "forecast-arima-auto-regression-interval"
+            ]
         },
         {
             "displayName": "forecast-horizon-interval",
             "type": "interval",
             "example": "3 day",
             "section": "series",
-            "widget": "chart"
+            "widget": "chart",
+            "excludes": [
+                "forecast-horizon-length",
+                "forecast-horizon-end-time"
+            ]
         },
         {
             "displayName": "forecast-horizon-length",
             "type": "integer",
             "example": "100",
             "section": "series",
-            "widget": "chart"
+            "widget": "chart",
+            "minValue": 0,
+            "excludes": [
+                "forecast-horizon-interval",
+                "forecast-horizon-end-time"
+            ]
         },
         {
             "displayName": "forecast-horizon-start-time",
@@ -2261,7 +2274,11 @@
             "type": "date",
             "example": "2019-02-06T00:00:00Z",
             "section": "series",
-            "widget": "chart"
+            "widget": "chart",
+            "excludes": [
+                "forecast-horizon-interval",
+                "forecast-horizon-length"
+            ]
         },
         {
             "displayName": "forecast-hw-auto",
@@ -2331,7 +2348,8 @@
             "example": 0,
             "section": "series",
             "widget": "chart",
-            "defaultValue": 0
+            "defaultValue": 0,
+            "minValue": 0
         },
         {
             "displayName": "forecast-ssa-decompose-method",
@@ -2373,9 +2391,7 @@
             "example": "5",
             "section": "series",
             "widget": "chart",
-            "excludes": [
-                "forecast-ssa-group-manual-groups"
-            ]
+            "minValue": 0
         },
         {
             "displayName": "forecast-ssa-group-auto-clustering-method",
@@ -2410,7 +2426,8 @@
             "section": "series",
             "widget": "chart",
             "excludes": [
-                "forecast-ssa-group-manual-groups"
+                "forecast-ssa-group-manual-groups",
+                "forecast-ssa-group-auto-union"
             ]
         },
         {
@@ -2420,7 +2437,8 @@
             "section": "series",
             "widget": "chart",
             "excludes": [
-                "forecast-ssa-group-manual-groups"
+                "forecast-ssa-group-manual-groups",
+                "forecast-ssa-group-auto-stack"
             ]
         },
         {
@@ -2430,7 +2448,6 @@
             "section": "series",
             "widget": "chart",
             "excludes": [
-                "forecast-ssa-group-auto-count",
                 "forecast-ssa-group-auto-clustering-method",
                 "forecast-ssa-group-auto-clustering-params",
                 "forecast-ssa-group-auto-stack",
