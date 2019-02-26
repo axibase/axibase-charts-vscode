@@ -14,7 +14,7 @@ import { createDiagnostic, getSetting } from "./util";
  * If requiredIfConditions !== null, the section will be checked for match to conditions;
  * if section matches conditions, then setting, specified in requiredIfConditions is required for this section.
  *
- * If requiredIfConditions == null, the section will be checked for applicability of any of "dependent";
+ * If requiredIfConditions == null, the section will be checked for applicability of any of dependent;
  * if any setting from dependent is declared in the section, than section will be checked for match to conditions.
  */
 const relatedSettings: Requirement[] = [
@@ -38,6 +38,13 @@ const relatedSettings: Requirement[] = [
         dependent: "forecast-style",
         requiredIfConditions: "data-type"
     },
+     {
+         conditions: [
+             sectionMatchConditionRequired("type", ["chart"])
+         ],
+         dependent: "forecast-ssa-group-auto-count",
+         requiredIfConditions: "forecast-ssa-decompose-eigentriple-limit"
+     },
     {
         /**
          * If "type=chart" and "mode" is NOT "column-stack" or "column",
@@ -352,12 +359,29 @@ export class ConfigTree {
             if (this.sectionMatchConditions(section, req.conditions)) {
                 const required = req.requiredIfConditions;
                 const checkedSetting = ConfigTree.getSetting(section, required);
-                if (checkedSetting === undefined) {
+                const defaultValue = getSetting(required).defaultValue;
+                if (checkedSetting == null && defaultValue == null) {
                     this.diagnostics.push(createDiagnostic(section.range.range,
                         `${required} is required if ${req.dependent} is specified`));
-                } else if (required === "thresholds") {
-                    const colorsSetting = ConfigTree.getSetting(section, "colors");
-                    this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
+                    return;
+                }
+
+                switch (required) {
+                    case "thresholds": {
+                        const colorsSetting = ConfigTree.getSetting(section, "colors");
+                        this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
+                        break;
+                    }
+                    case "forecast-ssa-decompose-eigentriple-limit": {
+                        const groupAutoCount = ConfigTree.getSetting(section, "forecast-ssa-group-auto-count");
+                        const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
+                        if (eigentripleLimitValue <= groupAutoCount.value) {
+                            this.diagnostics.push(createDiagnostic(groupAutoCount.textRange,
+                                `forecast-ssa-group-auto-count ` +
+                                `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`));
+                        }
+                        break;
+                    }
                 }
             }
         }
