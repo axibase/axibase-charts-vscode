@@ -1,5 +1,9 @@
 # Change Log
 
+## `v.1.0.16`
+
+* Added `forecast` family settings support.
+
 ## `v.1.0.15`
 
 * Validator: underscore in percentile is deprecated.
