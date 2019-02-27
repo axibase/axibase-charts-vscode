@@ -319,3 +319,29 @@ forecast-ssa-decompose-eigentriple-limit = 6`;
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 });
+
+suite("Related forecast settings checks: forecast-horizon-*", () => {
+    test("Incorrect: only forecast-horizon-start-time", () => {
+        const conf = `${config}
+forecast-horizon-start-time = now - 2*day`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, [createDiagnostic(
+            Range.create(Position.create(6, 1),
+                Position.create(6, "series".length + 1)),
+            `forecast-horizon-start-time has effect only with one of the following:
+ * forecast-horizon-end-time
+ * forecast-horizon-interval
+ * forecast-horizon-length`,
+            DiagnosticSeverity.Error)], `Config: \n${conf}`);
+    });
+
+    test("Correct: forecast-horizon-start-time and forecast-horizon-end-time", () => {
+        const conf = `${config}
+forecast-horizon-end-time = now
+forecast-horizon-start-time = now - 2*day`;
+        let validator = new Validator(conf);
+        let diags = validator.lineByLine();
+        assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
+    });
+});
