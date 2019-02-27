@@ -521,9 +521,8 @@ Include input series, forecast or reconstructed series into response.
   
 ## forecastname  
   
-Unique forecast identifier.  
-Useful when creating multiple forecasts for the same series.  
-If no forecast name is set, the default forecast is loaded.  
+[Forecast name](https://axibase.com/docs/atsd/api/data/series/query.html#forecast-filter) when `data-type` setting is set to  `forecast`, `forecast_deviation`, `lower_confidence`, `upper_confidence`.
+If no forecast name is specified, the [default series forecast](https://axibase.com/docs/atsd/forecasting/#persistence-settings) is loaded.  
 
 ## forecastscoreinterval  
   
