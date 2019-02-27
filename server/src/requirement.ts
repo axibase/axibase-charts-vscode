@@ -80,4 +80,6 @@ export interface Requirement {
     dependent: string | string[];
     // this setting will be required if the conditions are satisfied
     requiredIfConditions?: string;
+    // at least one of these settings required if the conditions are satisfied
+    requiredAnyIfConditions?: string[];
 }

@@ -2031,7 +2031,8 @@
         {
             "displayName": "end-time",
             "type": "date",
-            "example": "previous_working_day"
+            "example": "previous_working_day",
+            "section": "widget"
         },
         {
             "displayName": "end-working-minutes",
@@ -7082,7 +7083,8 @@
         {
             "displayName": "start-time",
             "type": "date",
-            "example": "2017-04-01T10:15:00Z"
+            "example": "2017-04-01T10:15:00Z",
+            "section": "widget"
         },
         {
             "displayName": "start-working-minutes",

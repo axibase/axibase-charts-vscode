@@ -11,11 +11,15 @@ import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
 /**
- * If requiredIfConditions !== null, the section will be checked for match to conditions;
- * if section matches conditions, then setting, specified in requiredIfConditions is required for this section.
+ * If `requiredIfConditions` !== null OR `requiredAnyIfConditions` !== null,
+ * the section will be checked for match to `conditions`; if section matches conditions, then:
+ *  1) setting, specified in `requiredIfConditions` is required for this section;
+ *  2) required at least one setting from `requiredAnyIfConditions`.
+ * `requiredIfConditions` can not be specified simultaneously with `requiredAnyIfConditions`.
  *
- * If requiredIfConditions == null, the section will be checked for applicability of any of dependent;
- * if any setting from dependent is declared in the section, than section will be checked for match to conditions.
+ * If `requiredIfConditions` == null AND `requiredAnyIfConditions` == null,
+ * the section will be checked for applicability of any of `dependent`;
+ * if any setting from `dependent` is declared in the section, then section will be checked for match to `conditions`.
  */
 const relatedSettings: Requirement[] = [
     {
@@ -38,13 +42,25 @@ const relatedSettings: Requirement[] = [
         dependent: "forecast-style",
         requiredIfConditions: "data-type"
     },
-     {
-         conditions: [
-             sectionMatchConditionRequired("type", ["chart"])
-         ],
-         dependent: "forecast-ssa-group-auto-count",
-         requiredIfConditions: "forecast-ssa-decompose-eigentriple-limit"
-     },
+    {
+        conditions: [
+            sectionMatchConditionRequired("type", ["chart"])
+        ],
+        dependent: "forecast-ssa-group-auto-count",
+        requiredIfConditions: "forecast-ssa-decompose-eigentriple-limit"
+    },
+    {
+        /**
+         * If "type=chart" and "forecast-horizon-start-time" is specified,
+         * any of "forecast-horizon-end-time", "forecast-horizon-interval",
+         * "forecast-horizon-length" is required in [series].
+         */
+        conditions: [
+            sectionMatchConditionRequired("type", ["chart"])
+        ],
+        dependent: "forecast-horizon-start-time",
+        requiredAnyIfConditions: ["forecast-horizon-end-time", "forecast-horizon-interval", "forecast-horizon-length"]
+    },
     {
         /**
          * If "type=chart" and "mode" is NOT "column-stack" or "column",
@@ -211,7 +227,7 @@ export class ConfigTree {
     /**
      * Adds section to tree. Checks section for non-applicable settings and declares requirements for children.
      * Doesn't alert if the section is out of order, this check is performed by SectionStack.
-     * @param range The text and the position of the text
+     * @param range The text (name of section) and the position of the text
      * @param settings Section settings
      */
     public addSection(range: TextRange, settings: Setting[]) {
@@ -352,35 +368,45 @@ export class ConfigTree {
     }
 
     /**
-     * Adds Diagnostic if section mathes condifitons and doesn't contain required ("checked") setting.
+     * Adds Diagnostic if section matches condifitons and doesn't contain required ("checked") setting.
      */
     private checkSection(requirements: Requirement[], section: Section) {
         for (const req of requirements) {
             if (this.sectionMatchConditions(section, req.conditions)) {
-                const required = req.requiredIfConditions;
-                const checkedSetting = ConfigTree.getSetting(section, required);
-                const defaultValue = getSetting(required).defaultValue;
-                if (checkedSetting == null && defaultValue == null) {
-                    this.diagnostics.push(createDiagnostic(section.range.range,
-                        `${required} is required if ${req.dependent} is specified`));
-                    return;
-                }
-
-                switch (required) {
-                    case "thresholds": {
-                        const colorsSetting = ConfigTree.getSetting(section, "colors");
-                        this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
-                        break;
+                if (req.requiredIfConditions) {
+                    const required = req.requiredIfConditions;
+                    const checkedSetting = ConfigTree.getSetting(section, required);
+                    const defaultValue = getSetting(required).defaultValue;
+                    if (checkedSetting == null && defaultValue == null) {
+                        this.diagnostics.push(createDiagnostic(section.range.range,
+                            `${required} is required if ${req.dependent} is specified`));
+                        return;
                     }
-                    case "forecast-ssa-decompose-eigentriple-limit": {
-                        const groupAutoCount = ConfigTree.getSetting(section, "forecast-ssa-group-auto-count");
-                        const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
-                        if (eigentripleLimitValue <= groupAutoCount.value) {
-                            this.diagnostics.push(createDiagnostic(groupAutoCount.textRange,
-                                `forecast-ssa-group-auto-count ` +
-                                `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`));
+
+                    switch (required) {
+                        case "thresholds": {
+                            const colorsSetting = ConfigTree.getSetting(section, "colors");
+                            this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
+                            break;
                         }
-                        break;
+                        case "forecast-ssa-decompose-eigentriple-limit": {
+                            const groupAutoCount = ConfigTree.getSetting(section, "forecast-ssa-group-auto-count");
+                            const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
+                            if (eigentripleLimitValue <= groupAutoCount.value) {
+                                this.diagnostics.push(createDiagnostic(groupAutoCount.textRange,
+                                    `forecast-ssa-group-auto-count ` +
+                                    `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`));
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    const anyRequiredIsSpecified = req.requiredAnyIfConditions.some(
+                        reqSetting => ConfigTree.getSetting(section, reqSetting) != null);
+                    if (!anyRequiredIsSpecified) {
+                        this.diagnostics.push(createDiagnostic(section.range.range,
+                            `${req.dependent} has effect only with one of the following:
+ * ${req.requiredAnyIfConditions.join("\n * ")}`));
                     }
                 }
             }
@@ -434,13 +460,29 @@ export class ConfigTree {
         }
     }
 
+    /**
+     * @param requirement Requirement for `dependent` setting.
+     * @param section Section, where `dependent` is declared.
+     * @param dependent Setting, which requires other settings or which must be checked for applicability.
+     */
     private checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
-        if (requirement.requiredIfConditions === undefined) {
+        if (requirement.requiredIfConditions == null && requirement.requiredAnyIfConditions == null) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
-        const required = getSetting(requirement.requiredIfConditions);
-        const sectionNames = required.section;
+        let requiredSetting;
+        if (requirement.requiredIfConditions) {
+            requiredSetting = getSetting(requirement.requiredIfConditions);
+        } else {
+            /**
+             * If requirement.requiredIfConditions == null, then requiredAnyIfConditions != null.
+             * It's supposed that all settings from `requiredAnyIfConditions` have the same sections,
+             * that's why only first section is used here.
+             */
+            requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
+        }
+
+        const sectionNames = requiredSetting.section;
         if (!sectionNames) {
             return;
         }
