@@ -72,14 +72,14 @@ interface SpecificValueCheck {
 const specificValueChecksMap: Map<string, SpecificValueCheck> = new Map([
     ["forecastssagroupmanualgroups", {
         check: (value: string) => {
-            const regex = /^[\d,;-]+$/;
+            const regex = /^[\d\s,;-]+$/;
             return !regex.test(value);
         },
         errMsg: "Incorrect group syntax"
     }],
     ["forecastssagroupautounion", {
         check: (value: string) => {
-            const regex = /^[a-z,;-]+$/;
+            const regex = /^[a-z\s,;-]+$/;
             return !regex.test(value);
         },
         errMsg: "Incorrect group union syntax"

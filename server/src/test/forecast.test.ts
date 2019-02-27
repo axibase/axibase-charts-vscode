@@ -106,9 +106,9 @@ forecast-ssa-group-manual-groups = 1,2-5`;
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Correct: value = 1;2-5", () => {
+    test("Correct: value = 1; 2-5", () => {
         const conf = `${config}
-forecast-ssa-group-manual-groups = 1;2-5`;
+forecast-ssa-group-manual-groups = 1; 2-5`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);

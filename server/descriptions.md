@@ -494,23 +494,26 @@ Generate a Holt-Winters forecast using optimal settings.
 If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically best on scoring.
 If set to `false`, parameters `alpha`, `beta`, `gamma` are required.  
   
+## forecasthwalpha  
+  
+Holt-Winters `alpha` (data) parameter.
+Possible values: `[0, 1]`.  
+  
+## forecasthwbeta  
+  
+Holt-Winters `beta` (trend) parameter.
+Possible values: `[0, 1]`.  
+  
+## forecasthwgamma  
+  
+Holt-Winters `gamma` (seasonality) parameter.
+Possible values: `[0, 1]`.  
+  
 ## forecasthwperiod  
   
 Series period (seasonality) parameter.
 The interval is specified as the number of [time units](https://axibase.com/docs/atsd/api/data/series/time-unit.html).
 Format: `count time_unit`.
-  
-## forecasthwalpha  
-  
-Holt-Winters `alpha` parameter.  
-  
-## forecasthwbeta  
-  
-Holt-Winters `beta` parameter.  
-  
-## forecasthwgamma  
-  
-Holt-Winters `gamma` parameter.  
   
 ## forecastinclude  
   
@@ -586,11 +589,11 @@ Build groups recursively, starting with the group `A` with maximum eigenvalue, t
   
 ## forecastssagroupautounion  
   
-Join eigenvectors from automatically created groups into custom groups. Multiple custom groups are separated using semi-colon. Joined groups are listed using comma as a separator and hyphen for range. For example, custom group `A,B,D` contains eigenvectors from automatic groups `A`,`B` and `D`. Custom group `A,C-E` contains eigenvectors from automatic groups `A`,`C`,`D`,`E`.  
+Join eigenvectors from automatically created groups into custom groups. Multiple custom groups are separated using comma. Groups within the custom group are enumerated using semi-colon as a separator or hyphen for range. For example, custom group `A;B;D` contains eigenvectors from automatic groups `A`, `B` and `D`. Custom group `A;C-E` contains eigenvectors from automatic groups `A`,`C`,`D`,`E`.  
   
 ## forecastssagroupmanualgroups  
   
-Join eigenvectors using their index into custom groups. Multiple custom groups are separated using semi-colon. Joined indexes are enumerated using comma as a separator and hyphen for range. For example, custom group `1,3-6` contains eigenvectors with indexes `1`,`3`,`4`,`5` and `6`.  
+Join eigenvectors using their index into custom groups. Multiple custom groups are separated using comma. Eigenvectors within the same group are enumerated using semi-colon as a separator or hyphen for range. For example, custom group `1;3-6` contains eigenvectors with indexes `1`, `3`, `4`, `5` and `6`.  
   
 ## forecastssareconstructaveragingfunction  
   
