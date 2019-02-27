@@ -453,38 +453,64 @@ Font size settings as a whole number.
   
 ## forecastarimaauto  
   
-If `true` ARIMA parameters `p` and `d` are selected automatically.  
+Generate an ARIMA forecast using optimal settings.
+If `true` ARIMA parameters `p` and `d` are selected automatically best on scoring.
+If set to `false`, parameters `p`, `d` are required.
   
 ## forecastarimaautoregressioninterval  
   
-Alternative parameter for `p`: `p = auto-regression-interval / interval`,
-where `interval` is the time between two sequential samples.  
+Alternative parameter for `p` where `p` is calculated as `auto-regression-interval / interval`.
+Specified as the number of [time units](https://axibase.com/docs/atsd/api/data/series/time-unit.html).
+Format: `count time_unit`.  
   
 ## forecastarimad  
   
+Integration parameter `d`, a number of `0` or `1`.  
+  
 ## forecastarimap  
+  
+Auto-regression parameter `p`.  
   
 ## forecasthorizoninterval  
   
+Generate a forecast for the specified interval into the future starting with last sample of the loaded series.
+The interval is specified as the number of [time units](https://axibase.com/docs/atsd/api/data/series/time-unit.html).  
+  
 ## forecasthorizonlength  
   
-## forecasthorizonstarttime  
+Generate a forecast for the specified number of samples into the future.  
   
 ## forecasthorizonendtime  
   
+Generate a forecast starting with last sample of the loaded series and until the specified date in the future.  
+  
+## forecasthorizonstarttime  
+  
+Generate a forecast for the specified interval into the future starting with specified date instead of the last sample of the loaded series.  
+  
 ## forecasthwauto  
   
-If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically.  
+Generate a Holt-Winters forecast using optimal settings.
+If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically best on scoring.
+If set to `false`, parameters `alpha`, `beta`, `gamma` are required.  
   
 ## forecasthwperiod  
   
-Optional. Series period (seasonality).  
+Series period (seasonality) parameter.
+The interval is specified as the number of [time units](https://axibase.com/docs/atsd/api/data/series/time-unit.html).
+Format: `count time_unit`.
   
 ## forecasthwalpha  
   
+Holt-Winters `alpha` parameter.  
+  
 ## forecasthwbeta  
   
+Holt-Winters `beta` parameter.  
+  
 ## forecasthwgamma  
+  
+Holt-Winters `gamma` parameter.  
   
 ## forecastinclude  
   
@@ -495,35 +521,60 @@ Include input series, forecast or reconstructed series into response.
 Unique forecast identifier.  
 Useful when creating multiple forecasts for the same series.  
 If no forecast name is set, the default forecast is loaded.  
+
+## forecastscoreinterval  
+  
+Interval for scoring the produced forecasts ending with the last sample of the input series.
+The interval is specified as the number of [time units](https://axibase.com/docs/atsd/api/data/series/time-unit.html).
+Format: `count time_unit`.
+For SSA, the default value is the minimum of `forecast-horizon-interval` and `1/3` of the loaded series duration.
+For ARIMA and Holt-Winters the default value is `1/4` of the loaded series duration.  
   
 ## forecastssa  
   
+Generate an SSA (singular spectrum analysis) forecast.  
+  
 ## forecastssadecomposeeigentriplelimit  
   
-The maximum number of eigentriples to be derived from the trajectory matrix.
-The returned number of eigentriples is constrained by window length.
-The limit applies to eigentriples sorted by singular value in descending order.
-Default: `0` - no limit.  
+Maximum number of eigenvectors extracted from the trajectory matrix during the singular value decomposition (SVD).
+Possible values: between `0` and `500`.
+If set to `0`, the count is determined automatically.  
   
 ## forecastssadecomposemethod  
   
-SVD algorithm: `FULL`, `TRUNCATED`, `AUTO`.  
+The algorithm applied in singular value decomposition (SVD) of the trajectory matrix to extract eigenvectors.
+Possible values: `FULL`, `TRUNCATED`, `AUTO`.  
   
 ## forecastssadecomposesingularvaluethreshold  
   
-Discard eigentriples if its singular value is below the specified percentage of the maximum singular value.
-If set to `0`, no eigentriples are discarded.
-If set to `100`, only the eigentriples with the largest singular value are included.  
+Threshold, specified in percent, to discard eigenvectors. Eigenvector is discarded if square root of its eigenvalue is below square root of sum of all eigenvalues multiplied by the threshold.
+If set to `0`, no eigenvectors are discarded.
+If set to `100`, only the eigenvector with the largest eigenvalue is included.  
   
 ## forecastssadecomposewindowlength  
   
-Window length specified as percentage of the sample count in the input series.  
+Width of the trajectory matrix (number of columns), specified as the percentage of the sample count in the input series.
+Possible values: between `0` and `50`.  
+  
+## forecastssaforecastbase  
+  
+Input series to which the recurrent formula is applied when calculating the forecast.
+Possible values: `RECONSTRUCTED`, `ORIGINAL`.  
+  
+## forecastssaforecastmethod  
+  
+Forecast calculation method.
+Possible values: `RECURRENT`, `VECTOR`.  
   
 ## forecastssagroupautocount  
   
+Maximum number of eigenvector groups. The eigenvectors are placed into groups based on the clustering parameter in Auto mode, or using eigenvector indexes in Manual mode. The groups are sorted by maximum eigenvalue in descending order and are named using letters `A`, `B`, `C` etc.
+If set to `0`, only one group is returned.  
+  
 ## forecastssagroupautoclusteringmethod  
   
-Method used to cluster eigentriples into groups: `HIERARCHICAL`, `XMEANS`, or `NOVOSIBIRSK`.  
+Algorithm used to place eigenvectors into groups.
+Possible values: `HIERARCHICAL`, `XMEANS`, or `NOVOSIBIRSK`.  
   
 ## forecastssagroupautoclusteringparams  
   
@@ -531,15 +582,24 @@ Dictionary (map) of parameters required by given clustering method.
   
 ## forecastssagroupautostack  
   
+Build groups recursively, starting with the group `A` with maximum eigenvalue, to view the cumulative result of incrementally added eigenvectors. In enabled, group `A` contains its own eigenvectors. Group `B` contains its own eigenvectors as well as eigenvectors from group `A`. Group `C` includes its own eigenvectors as well as eigenvectors from group `A` and `B`, and etc.  
+  
 ## forecastssagroupautounion  
+  
+Join eigenvectors from automatically created groups into custom groups. Multiple custom groups are separated using semi-colon. Joined groups are listed using comma as a separator and hyphen for range. For example, custom group `A,B,D` contains eigenvectors from automatic groups `A`,`B` and `D`. Custom group `A,C-E` contains eigenvectors from automatic groups `A`,`C`,`D`,`E`.  
+  
+## forecastssagroupmanualgroups  
+  
+Join eigenvectors using their index into custom groups. Multiple custom groups are separated using semi-colon. Joined indexes are enumerated using comma as a separator and hyphen for range. For example, custom group `1,3-6` contains eigenvectors with indexes `1`,`3`,`4`,`5` and `6`.  
   
 ## forecastssareconstructaveragingfunction  
   
-Specifies how average anti-diagonals of reconstructed matrices.  
+Averaging function to calculate anti-diagonal elements of the reconstructed matrix.
+Possible values: `AVG`, `MEDIAN`.  
   
 ## forecastssareconstructfourier  
   
-If `true` Fourier Transform is used in reconstruction stage of SSA, and in SVD.  
+Use Fourier transform in the reconstruction stage and in SVD (singular value decomposition).  
   
 ## forecaststyle  
   

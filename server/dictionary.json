@@ -2337,6 +2337,13 @@
             "widget": "chart"
         },
         {
+            "displayName": "forecast-score-interval",
+            "type": "interval",
+            "example": "1 day",
+            "section": "series",
+            "widget": "chart"
+        },
+        {
             "displayName": "forecast-ssa",
             "type": "boolean",
             "example": "true",
@@ -2385,6 +2392,23 @@
                 "excluded": true
             },
             "maxValue": 50
+        },
+        {
+            "displayName": "forecast-ssa-forecast-base",
+            "type": "enum",
+            "example": "RECONSTRUCTED",
+            "section": "series",
+            "widget": "chart",
+            "enum": ["RECONSTRUCTED", "ORIGINAL"]
+        },
+        {
+            "displayName": "forecast-ssa-forecast-method",
+            "type": "enum",
+            "example": "RECURRENT",
+            "section": "series",
+            "widget": "chart",
+            "defaultValue": "RECURRENT",
+            "enum": ["RECURRENT", "VECTOR"]
         },
         {
             "displayName": "forecast-ssa-group-auto-count",
