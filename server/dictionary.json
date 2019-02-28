@@ -2379,7 +2379,10 @@
             "section": "series",
             "widget": "chart",
             "minValue": 0,
-            "maxValue": 100
+            "maxValue": {
+                "value": 100,
+                "excluded": true
+            }
         },
         {
             "displayName": "forecast-ssa-decompose-window-length",
@@ -2399,7 +2402,10 @@
             "example": "RECONSTRUCTED",
             "section": "series",
             "widget": "chart",
-            "enum": ["RECONSTRUCTED", "ORIGINAL"]
+            "enum": [
+                "RECONSTRUCTED",
+                "ORIGINAL"
+            ]
         },
         {
             "displayName": "forecast-ssa-forecast-method",
@@ -2408,7 +2414,10 @@
             "section": "series",
             "widget": "chart",
             "defaultValue": "RECURRENT",
-            "enum": ["RECURRENT", "VECTOR"]
+            "enum": [
+                "RECURRENT",
+                "VECTOR"
+            ]
         },
         {
             "displayName": "forecast-ssa-group-auto-count",
@@ -2458,7 +2467,7 @@
         {
             "displayName": "forecast-ssa-group-auto-union",
             "type": "string",
-            "example": "C",
+            "example": "A;C-E , B;F-",
             "section": "series",
             "widget": "chart",
             "excludes": [
@@ -2469,7 +2478,7 @@
         {
             "displayName": "forecast-ssa-group-manual-groups",
             "type": "string",
-            "example": "13-",
+            "example": "1;3-6 , 2;7-",
             "section": "series",
             "widget": "chart",
             "excludes": [
@@ -8163,6 +8172,7 @@
         {
             "displayName": "transformation-order",
             "type": "string",
+            "defaultValue": "none",
             "section": "series",
             "example": "aggregate, interpolate",
             "enum": [

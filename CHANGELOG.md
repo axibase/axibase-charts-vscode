@@ -1,5 +1,9 @@
 # Change Log
 
+## `v.1.0.17`
+
+* Improved hovers for forecasts.
+
 ## `v.1.0.16`
 
 * Added `forecast` family settings support.
@@ -9,10 +13,9 @@
 * Validator: underscore in percentile is deprecated.
 * Added `data-labels` setting.
 
-
 ## `v.1.0.14`
 
-* Revert validator error causing false alert on `colors` setting.
+* Revert validator error causing incorrect alert on `colors` setting.
 
 ## `v.1.0.13`
 
@@ -38,8 +41,8 @@
   * Allow `rgb()` function in color settings.
   * Check correlated settings: `thresholds` and `colors`.
   * Raise error on plural time units.
-  * Remove false `csv` warning.
-  * Remove false warnings on unknown variables.
+  * Remove incorrect `csv` warning.
+  * Remove incorrect warnings on unknown variables.
 
 * Diagnostic messages:
   * Display allowed values based on widget type.
