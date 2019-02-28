@@ -8,7 +8,7 @@ import {
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
-import { requiredSectionSettingsMap, widgetRequirementsByType } from "./resources";
+import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
@@ -960,6 +960,35 @@ export class Validator {
     }
 
     /**
+     * Return true if the setting is allowed to be defined in the current section.
+     * @param setting The setting to be checked.
+     */
+    private isAllowedInSection(setting: Setting): boolean {
+        if (setting.section == null || this.currentSection == null) {
+            return true;
+        }
+        const currDepth: number = sectionDepthMap[this.currentSection.text];
+        if (setting.name === "mode") {
+            if (this.currentWidget == null) {
+                return true;
+            }
+            if (this.currentWidget === "chart") {
+                if (setting.value === "column-stack") {
+                    return currDepth <= sectionDepthMap["widget"];
+                }
+                return currDepth <= sectionDepthMap["series"];
+            }
+        }
+        if (Array.isArray(setting.section)) {
+            return setting.section.some(s => currDepth <= sectionDepthMap[s]);
+        } else {
+            const reqDepth: number = sectionDepthMap[setting.section];
+            return currDepth <= reqDepth;
+        }
+
+    }
+
+    /**
      * Processes a regular setting which is defined not in tags/keys section
      */
     private handleRegularSetting(): void {
@@ -969,6 +998,13 @@ export class Validator {
             return;
         }
         this.addSettingValue(setting);
+
+        if (!this.isAllowedInSection(setting)) {
+            this.result.push(createDiagnostic(
+                setting.textRange,
+                `${setting.displayName} is not allowed here.`, DiagnosticSeverity.Error,
+            ));
+        }
 
         if (setting.name === "type") {
             this.currentWidget = this.match[3];
