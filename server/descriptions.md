@@ -242,6 +242,10 @@ Apply CSS styles to values of the current period, such as the most recent hour, 
   
 Information about the last time series value next to the image of the corresponding vertex.  
   
+## datalabels  
+  
+Display values inside colored rectangles formatted according to [format](https://github.com/axibase/charts/blob/master/widgets/shared/README.md#format) setting.  
+  
 ## datatype  
   
 Define current series data type.  
@@ -432,11 +436,8 @@ Useful when exact tags are not known in advance.
   
 ## fillvalue  
   
-Apply interpolation mode to a computed series if the values are irregularly spaced.  
-Set to `true` to fill missing samples with interpolated values.  
-Detailed values are filled in using `linear` interpolation.  
-Aggregated periods are filled with `previous` values.  
-If `fill-value = false`, missing samples are filled with `0` or `null`.  
+Interpolates a missing value for the given timestamp when merging multiple series with different timestamps.
+Possible values: `false`, `true`.  
   
 ## filterrange  
   
@@ -454,7 +455,7 @@ Font size settings as a whole number.
 ## forecastarimaauto  
   
 Generate an ARIMA forecast using optimal settings.
-If `true` ARIMA parameters `p` and `d` are selected automatically best on scoring.
+If `true`, ARIMA parameters `p` and `d` are selected automatically based on scoring.
 If set to `false`, parameters `p`, `d` are required.
   
 ## forecastarimaautoregressioninterval  
@@ -491,7 +492,7 @@ Generate a forecast for the specified interval into the future starting with spe
 ## forecasthwauto  
   
 Generate a Holt-Winters forecast using optimal settings.
-If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically best on scoring.
+If `true` Holt-Winters parameters `alpha`, `beta`, `gamma` are selected automatically based on scoring.
 If set to `false`, parameters `alpha`, `beta`, `gamma` are required.  
   
 ## forecasthwalpha  
@@ -549,14 +550,15 @@ Possible values: `FULL`, `TRUNCATED`, `AUTO`.
   
 ## forecastssadecomposesingularvaluethreshold  
   
-Threshold, specified in percent, to discard eigenvectors. Eigenvector is discarded if square root of its eigenvalue is below square root of sum of all eigenvalues multiplied by the threshold.
-If set to `0`, no eigenvectors are discarded.
-If set to `100`, only the eigenvector with the largest eigenvalue is included.  
+Threshold, specified in percent, to discard small eigenvectors. Eigenvector with eigenvalue λ is discarded if √λ is less than the specified % of √ sum of all eigenvalues.
+Discard if `√λ ÷ √ (∑ λi) < threshold ÷ 100`.
+If threshold is `0`, no vectors are discarded.
+Possible values: `[0, 100)`.  
   
 ## forecastssadecomposewindowlength  
   
-Width of the trajectory matrix (number of columns), specified as the percentage of the sample count in the input series.
-Possible values: between `0` and `50`.  
+Height (row count) of the trajectory matrix, specified as the % of the sample count in the input series.
+Possible values: `(0, 50]`.  
   
 ## forecastssaforecastbase  
   
@@ -570,7 +572,7 @@ Possible values: `RECURRENT`, `VECTOR`.
   
 ## forecastssagroupautocount  
   
-Maximum number of eigenvector groups. The eigenvectors are placed into groups based on the clustering parameter in Auto mode, or using eigenvector indexes in Manual mode. The groups are sorted by maximum eigenvalue in descending order and are named using letters `A`, `B`, `C` etc.
+Maximum number of eigenvector groups. The eigenvectors are placed into groups by the clustering method in Auto mode, or using by enumerating eigenvector indexes in Manual mode. The groups are sorted by maximum eigenvalue in descending order and are named with letters `A`, `B`, `C` etc.
 If set to `0`, only one group is returned.  
   
 ## forecastssagroupautoclusteringmethod  
@@ -1469,6 +1471,13 @@ Maximum size of all rectangles combined
   
 Define the total value explicitly, otherwise it is computed as the sum of all series values.  
 `total-value` can be calculated by referencing other series similar to computed series.  
+  
+## transformationorder  
+  
+[`transformation-order`](https://axibase.com/docs/atsd/api/data/series/query.html#transformations) controls the sequence of data modification procedures.
+Default sequence: `interpolate`, `group`, `rate`, `aggregate`, `smooth`, `downsample`, `forecast`, `none`.
+If set to `none`, the default sequence is used.
+If specified, the `server-aggregate` setting is set to `true` by default.  
   
 ## transpose  
   
