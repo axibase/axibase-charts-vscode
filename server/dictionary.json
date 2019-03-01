@@ -4,7 +4,7 @@
         {
             "displayName": "add-meta",
             "type": "boolean",
-            "section": "configuration",
+            "section": "series",
             "example": true,
             "defaultValue": false
         },
@@ -1630,7 +1630,7 @@
             "displayName": "enabled",
             "type": "string",
             "example": false,
-            "section": "widget",
+            "section": "series",
             "script": {
                 "returnValue": "boolean",
                 "fields": [
@@ -3311,7 +3311,7 @@
             "displayName": "label-format",
             "type": "string",
             "example": "tagName",
-            "section": "widget"
+            "section": "series"
         },
         {
             "displayName": "last",
@@ -8253,7 +8253,7 @@
             "type": "string",
             "example": "Math.max(0, value('alias'))",
             "multiLine": true,
-            "section": "series",
+            "section": "option",
             "script": {
                 "returnValue": "number",
                 "fields": [
