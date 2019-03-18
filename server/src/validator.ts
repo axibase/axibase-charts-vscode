@@ -757,8 +757,8 @@ export class Validator {
         const line: string = this.getCurrentLine();
         // groups are used in addToStringMap
         this.match = /(^\s*for\s+)(\w+)\s+in\s*/m.exec(line);
-        if (this.match !== null) {
-            const collection = line.split(/in\s*/)[1].trim();
+        if (this.match != null) {
+            const collection = line.substring(this.match[0].length).trim();
             if (collection !== "") {
                 const regs: RegExp[] = [
                     /^Object\.keys\((\w+)(?:\.\w+)*\)$/i, // Object.keys(apps), Object.keys(apps.tags)
