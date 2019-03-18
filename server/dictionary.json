@@ -2545,7 +2545,7 @@
                     "value": "thousands"
                 }
             ],
-            "section": "widget",
+            "section": "series",
             "script": {
                 "returnValue": "string",
                 "fields": [
@@ -3972,7 +3972,7 @@
             "type": "boolean",
             "example": false,
             "defaultValue": true,
-            "section": "widget"
+            "section": "series"
         },
         {
             "displayName": "max-font-size",

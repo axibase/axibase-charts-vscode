@@ -235,6 +235,46 @@ for dm in host[2]
 endfor`,
             [],
         ),
+        new Test(
+            "Correct: inline declaration",
+            `for widgetType in ['chart', 'calendar']
+            do something
+  endfor`,
+            [],
+        ),
+        new Test(
+            "Incorrect: inline declaration, broken array",
+            `for widgetType in ['chart', 'calendar'
+            do something
+  endfor`,
+            [createDiagnostic(
+                Range.create(
+                    0, "for widgetType in ".length, 0, "for widgetType in ".length + "['chart', 'calendar'".length,
+                ),
+                "Incorrect collection declaration.",
+            )],
+        ),
+        new Test(
+            "Correct: call values() on csv",
+            `csv hosts = Name,Region
+    nurswgvml006,EUR
+  endcsv
+  for opt in hosts.values('Name')
+    do something
+  endfor`,
+            [],
+        ),
+        new Test(
+            "Incorrect: call values() on undeclared csv",
+            `for opt in hosts.values('Name')
+    do something
+  endfor`, [createDiagnostic(
+      Range.create(
+          0, "for opt in ".length, 0, "for opt in ".length + "hosts".length,
+      ),
+      "hosts is unknown.",
+  )]
+        )
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });

@@ -20,7 +20,7 @@ mode = column-stack`;
         assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "mode".length)),
-            "mode is not allowed here.", DiagnosticSeverity.Error,
+            "mode setting is not allowed here.", DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
     });
 

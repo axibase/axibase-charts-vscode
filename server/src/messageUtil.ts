@@ -36,3 +36,6 @@ export const uselessScope: MessageFactoryMethod = (found: string, msg: string): 
 export const incorrectColors: MessageFactoryMethod = (found: string, msg: string): string =>
 `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
 Current: ${found}, expected: ${msg}`;
+
+export const illegalSetting: MessageFactoryMethod = (found: string): string =>
+  `${found} setting is not allowed here.`;

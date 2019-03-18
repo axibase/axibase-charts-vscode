@@ -6,7 +6,8 @@ import {
     settingNameInTags,
     settingsWithWhitespaces,
     tagNameWithWhitespaces,
-    unknownToken
+    unknownToken,
+    illegalSetting
 } from "./messageUtil";
 import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
@@ -754,49 +755,55 @@ export class Validator {
      */
     private handleFor(): void {
         const line: string = this.getCurrentLine();
-        this.match = /(^\s*for\s+)(\w+)\s+in/m.exec(line);
+        // groups are used in addToStringMap
+        this.match = /(^\s*for\s+)(\w+)\s+in\s*/m.exec(line);
         if (this.match !== null) {
-            const matching: RegExpExecArray = this.match;
-            // tslint:disable-next-line:max-line-length
-            this.match = /^([ \t]*for[ \t]+\w+[ \t]+in[ \t]+)(?:Object\.keys\((\w+)(?:\.\w+)*\)|(\w+))[\[\]\d]*$/im.exec(line);
-            /**
-             * First part "^([ \t]*for[ \t]+\w+[ \t]+in[ \t]+)" mathes "for <alias> in", for example "for agent in".
-             * Second part "(?:Object\.keys\((\w+)(?:\.\w+)*\)|(\w+))[\[\]\d]*$"
-             * matches variable "apps" in the following cases:
-             * 1) for agent in Object.keys(apps)
-             * 2) for agent in Object.keys(apps.tags)
-             * 3) for agent in apps
-             * 4) for agent in apps[2]
-             */
-            if (this.match !== null) {
-                const [, forIn, key, collection] = this.match;
-                const range: Range = Range.create(
-                    this.currentLineNumber, forIn.length,
-                    this.currentLineNumber, forIn.length,
-                );
-                let variable: string;
-                if (key !== undefined) {
-                    range.start.character += "Object.keys(".length;
-                    range.end.character += "Object.keys(".length;
-                    variable = key;
-                } else {
-                    variable = collection;
+            const collection = line.split(/in\s*/)[1].trim();
+            if (collection !== "") {
+                const regs: RegExp[] = [
+                    /^Object\.keys\((\w+)(?:\.\w+)*\)$/i, // Object.keys(apps), Object.keys(apps.tags)
+                    /^(\w+)\.values\((["'])\w+\2\)$/i, // hosts.values('SID')
+                    /^(\w+)(\[\d+\])*$/i // apps, apps[1]
+                ];
+                let varName;
+                for (const regex of regs) {
+                    const matched = regex.exec(collection);
+                    varName = matched ? matched[1] : null;
+                    if (varName) break;
                 }
-                range.end.character += variable.length;
-                if (!isInMap(variable, this.variables)) {
-                    const message: string = unknownToken(variable);
-                    this.result.push(createDiagnostic(range, message));
+                if (!varName) {
+                    try {
+                        /**
+                         * Check for inline declaration, for example:
+                         * for widgetType in ['chart', 'calendar']
+                         */
+                        new Function(`return ${collection}`);
+                    } catch (err) {
+                        const start = line.indexOf(collection);
+                        const end = start + collection.length;
+                        this.result.push(createDiagnostic(Range.create(
+                            this.currentLineNumber, start,
+                            this.currentLineNumber, end
+                        ), "Incorrect collection declaration."));
+                    }
+                } else if (!isInMap(varName, this.variables)) {
+                    const message: string = unknownToken(varName);
+                    const start = line.lastIndexOf(varName);
+                    this.result.push(createDiagnostic(Range.create(
+                        this.currentLineNumber, start,
+                        this.currentLineNumber, start + varName.length
+                    ), message));
                 }
             } else {
+                const start = this.match[0].indexOf("in");
                 this.result.push(createDiagnostic(
                     Range.create(
-                        Position.create(this.currentLineNumber, matching[0].length - "in".length),
-                        Position.create(this.currentLineNumber, matching[0].length),
+                        Position.create(this.currentLineNumber, line.indexOf("in")),
+                        Position.create(this.currentLineNumber, start + "in".length),
                     ),
                     "Empty 'in' statement",
                 ));
             }
-            this.match = matching;
             this.addToStringMap(this.variables, "forVariables");
         }
     }
@@ -1002,7 +1009,7 @@ export class Validator {
         if (!this.isAllowedInSection(setting)) {
             this.result.push(createDiagnostic(
                 setting.textRange,
-                `${setting.displayName} is not allowed here.`, DiagnosticSeverity.Error,
+                illegalSetting(setting.displayName), DiagnosticSeverity.Error,
             ));
         }
 
