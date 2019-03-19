@@ -1,5 +1,9 @@
 # Change Log
 
+## `v.1.0.18`
+
+* Validation for settings that not allowed in certain sections.
+
 ## `v.1.0.17`
 
 * Improved hovers for forecasts.
