@@ -1,12 +1,16 @@
 # Change Log
 
+## `v.1.0.18`
+
+* Removed aggressive validation for settings that allowed in various sections.
+
 ## `v.1.0.17`
 
-* Improved hovers for forecasts.
+* Improved mouse-over tootips for forecasts.
 
 ## `v.1.0.16`
 
-* Added `forecast` family settings support.
+* Added `forecast` settings.
 
 ## `v.1.0.15`
 
