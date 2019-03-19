@@ -1,6 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { DefaultSetting } from "./defaultSetting";
 import { createDiagnostic } from "./util";
+import { illegalSetting } from "./messageUtil";
 
 export const intervalUnits: string[] = [
     "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
@@ -172,7 +173,7 @@ export class Setting extends DefaultSetting {
                 const index: number = this.findIndexInEnum(this.value);
                 // Empty enum means that the setting is not allowed
                 if (this.enum.length === 0) {
-                    result = createDiagnostic(range, `${this.displayName} setting is not allowed here.`);
+                    result = createDiagnostic(range, illegalSetting(this.displayName));
                 } else if (index < 0) {
                     if (/percentile/.test(this.value) && /statistic/.test(this.name)) {
                         result = this.checkPercentile(range);

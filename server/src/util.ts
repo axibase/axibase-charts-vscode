@@ -10,7 +10,7 @@ const DIAGNOSTIC_SOURCE: string = "Axibase Charts";
  * @returns true if at least one value in map is/contains the wanted value
  */
 export function isInMap<T>(value: T, map: Map<string, T[]> | Map<string, T[][]>): boolean {
-    if (value === undefined) {
+    if (value == undefined) {
         return false;
     }
     for (const array of map.values()) {
