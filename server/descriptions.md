@@ -628,7 +628,7 @@ Disable column name formatting.
   
 ## parsenumbers  
   
-If `true`, process column value as number. Default `format` is [`precise(6)`](https://axibase.com/docs/charts/syntax/format-settings.html#precise).  
+If `true`, column values are processed as numbers.
   
 ## formatsize  
   
