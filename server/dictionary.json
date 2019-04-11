@@ -2598,6 +2598,16 @@
                     {
                         "name": "json",
                         "type": "function"
+                    },
+                    {
+                        "name": "precise",
+                        "type": "function",
+                        "args": [
+                            {
+                                "name": "n",
+                                "type": "number"
+                            }
+                        ]
                     }
                 ]
             }
@@ -2730,13 +2740,6 @@
             "displayName": "format-headers",
             "type": "boolean",
             "example": true,
-            "section": "column",
-            "widget": "property"
-        },
-        {
-            "displayName": "format-numbers",
-            "type": "boolean",
-            "example": false,
             "section": "column",
             "widget": "property"
         },
@@ -5360,6 +5363,14 @@
             "section": "node",
             "type": "string",
             "example": "manager_1"
+        },
+        {
+            "displayName": "parse-numbers",
+            "type": "boolean",
+            "example": true,
+            "section": "column",
+            "widget": "property",
+            "defaultValue": false
         },
         {
             "displayName": "path",
