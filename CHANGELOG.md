@@ -1,5 +1,10 @@
 # Change Log
 
+## `v 1.0.19`
+
+* Added settings: `parse-numbers`, `precise(n)`
+* Settings description is synchronized with documentation
+
 ## `v.1.0.18`
 
 * Removed aggressive validation for settings that allowed in various sections.
