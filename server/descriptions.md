@@ -244,7 +244,7 @@ Information about the last time series value next to the image of the correspond
   
 ## datalabels  
   
-Display values inside colored rectangles formatted according to [format](https://github.com/axibase/charts/blob/master/widgets/shared/README.md#format) setting.  
+Display values inside colored rectangles formatted according to [format](https://axibase.com/docs/charts/widgets/shared/#format) setting.  
   
 ## datatype  
   
@@ -391,12 +391,12 @@ The setting supports [calendar](https://axibase.com/docs/atsd/shared/calendar.ht
   
 Define multiple entities with one setting.  
 If both `entity` and `entities` are specified, the former takes precedence.  
-Support `?` and `*` [wildcards](https://github.com/axibase/charts/blob/master/syntax/wildcards.md)|  
+Support `?` and `*` [wildcards](https://axibase.com/docs/charts/syntax/wildcards.html)|  
   
 ## entity  
   
 Define the Entity.  
-Supports `?` and `*` [wildcards](https://github.com/axibase/charts/blob/master/syntax/wildcards.md)  
+Supports `?` and `*` [wildcards](https://axibase.com/docs/charts/syntax/wildcards.html)  
   
 ## entityexpression  
   
@@ -612,7 +612,7 @@ CSS styles applied to forecasts in `column` and `column-stack` modes.
 ## format  
   
 Display series with the appropriate unit of measurement.  
-See [Format Settings](https://github.com/axibase/charts/blob/master/syntax/format-settings.md) for complete syntax.  
+See [Format Settings](https://axibase.com/docs/charts/syntax/format-settings.html) for complete syntax.  
   
 ## formataxis  
   
@@ -626,9 +626,9 @@ Counter format.
   
 Disable column name formatting.  
   
-## formatnumbers  
+## parsenumbers  
   
-Disable number formatting.  
+If `true`, process column value as number. Default `format` is [`precise(6)`](https://axibase.com/docs/charts/syntax/format-settings.html#precise).  
   
 ## formatsize  
   
@@ -674,7 +674,7 @@ Assign a group period to a series for computing [group](https://axibase.com/docs
 ## groupstatistic  
   
 Assign a group statistic function to the series.  
-See [Aggregators](https://github.com/axibase/charts/blob/master/configuration/aggregators.md) for more information.  
+See [Aggregators](https://axibase.com/docs/charts/configuration/aggregators.html) for more information.  
   
 ## headerstyle  
   
@@ -795,7 +795,7 @@ Text on label.
 ## labelformat  
   
 Label series using text and placeholders.  
-See [Label Formating](https://github.com/axibase/charts/blob/master/syntax/label-formatting.md).  
+See [Label Formating](https://axibase.com/docs/charts/syntax/label-formatting.html#label-formatting).  
   
 ## last  
   
@@ -944,7 +944,7 @@ Key by which columns are grouped into rows.
   
 ## mergefields  
   
-Combine series into series grouped based on field. Applies only in `multiple-series` mode. Series which use [wildcard](https://github.com/axibase/charts/blob/master/syntax/wildcards.md), `entities`, `entityGroup` settings or comma-separated tag values are treated as multiple series by default.  
+Combine series into series grouped based on field. Applies only in `multiple-series` mode. Series which use [wildcard](https://axibase.com/docs/charts/syntax/wildcards.html), `entities`, `entityGroup` settings or comma-separated tag values are treated as multiple series by default.  
 Possible values:  
 `entity`: All series with the same entity are combined.  
 `{tag-name}`: All series with the same value of tag `{tag-name}` are combined.  
@@ -1012,7 +1012,7 @@ Disable moving average to set aggregation period based on calendar.
   
 ## multiplecolumn  
   
-Applies to [wildcard](https://github.com/axibase/charts/blob/master/syntax/wildcards.md) series.  
+Applies to [wildcard](https://axibase.com/docs/charts/syntax/wildcards.html#wildcards) series.  
 Default value: `false`.  
 If `true`, series with the same entity and tags are grouped in the same column.  
 This applies to derived series which are placed in the same column alongside the underlying series.  
@@ -1102,7 +1102,7 @@ Specifies an action to be performed when the user selects a series. For a Calend
   
 ## onseriesdoubleclick  
   
-Disable [double click functionality](https://github.com/axibase/charts/blob/master/widgets/pie-chart/README.md#syntax) in the widget.  
+Disable [double click functionality](https://axibase.com/docs/charts/widgets/pie-chart/#on-series-double-click) in the widget.  
   
 ## options  
   
@@ -1364,7 +1364,7 @@ The setting supports [calendar](https://axibase.com/docs/atsd/shared/calendar.ht
 ## statistic  
   
 Apply aggregation statistical functions.  
-See [Aggregators](https://github.com/axibase/charts/blob/master/configuration/aggregators.md) for more information.  
+See [Aggregators](https://axibase.com/docs/charts/configuration/aggregators.html) for more information.  
   
 ## statistics  
   
