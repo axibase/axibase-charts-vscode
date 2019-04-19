@@ -319,7 +319,7 @@ column-time = null`,
       [], FormattingOptions.create(2, true),
     ),
     new Test(
-      "[series] is child of [column] with [tags]",
+      "[series] at the same indent as [column] and [tags]",
       `
 [configuration]
   entity = a
@@ -328,15 +328,15 @@ column-time = null`,
     type = bar
     [column]
       label-format = tags.instance
-      [tags]
-        instance = *
-      [series]
-        metric = collectd.df.df_complex.reserved
-        color = brown`,
+    [tags]
+      instance = *
+    [series]
+      metric = collectd.df.df_complex.reserved
+      color = brown`,
       [], FormattingOptions.create(2, true),
     ),
     new Test(
-      "[series] is child of [column] with [tags] (empty line after tags)",
+      "[series] at the same indent as [column] and [tags] (empty line after tags)",
       `
 [configuration]
   entity = a
@@ -345,12 +345,12 @@ column-time = null`,
     type = bar
     [column]
       label-format = tags.instance
-      [tags]
-        instance = *
+    [tags]
+      instance = *
 
-      [series]
-        metric = collectd.df.df_complex.reserved
-        color = brown`,
+    [series]
+      metric = collectd.df.df_complex.reserved
+      color = brown`,
       [], FormattingOptions.create(2, true),
     ),
     new Test(
@@ -363,9 +363,9 @@ column-time = null`,
     type = bar
     [column]
       column-label-format = tags.instance
-      [series]
-        metric = collectd.cpu.cpu.wait
-        metric-label = wait
+    [series]
+      metric = collectd.cpu.cpu.wait
+      metric-label = wait
   [widget]
     type = chart`,
       [], FormattingOptions.create(2, true),
@@ -381,17 +381,17 @@ column-time = null`,
       if site ! = "DefaultWebSite"
         [column]
           label = @{site}
-          [series]
-            metric = iis.errors
-            [tags]
-              "type" = locked
-              site = @{site}
+        [series]
+          metric = iis.errors
+          [tags]
+            "type" = locked
+            site = @{site}
 
-          [series]
-            metric = iis.errors
-            [tags]
-              "type" = notfound
-              site = @{site}
+        [series]
+          metric = iis.errors
+          [tags]
+            "type" = notfound
+            site = @{site}
 
       endif
     endfor`,
