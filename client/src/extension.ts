@@ -17,17 +17,15 @@ import {
     Range,
     TextDocument,
     Uri,
-    ViewColumn,
     window,
     workspace,
-    WorkspaceConfiguration,
+    WorkspaceConfiguration
 } from "vscode";
 import {
-    ForkOptions, LanguageClient, LanguageClientOptions, ServerOptions, TransportKind,
+    ForkOptions, LanguageClient, LanguageClientOptions, ServerOptions, TransportKind
 } from "vscode-languageclient";
 import { AxibaseChartsProvider, IConnectionDetails } from "./axibaseChartsProvider";
 import { statusFamily, StatusFamily, userAgent } from "./util";
-
 const configSection: string = "axibaseCharts";
 export const languageId: string = "axibasecharts";
 const errorMessage: string = "Configure connection properties in VSCode > Preferences > Settings. Open Settings," +
@@ -57,7 +55,10 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
-        documentSelector: [{ language: languageId }],
+        documentSelector: [{
+            language: languageId,
+            scheme: "file"
+        }],
         outputChannelName: "Axibase Charts",
         synchronize: {
             // Notify the server about file changes to ".clientrc files contain in the workspace
@@ -103,46 +104,46 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
     client.start();
 
     let provider: AxibaseChartsProvider | undefined;
-    context.subscriptions.push(workspace.onDidSaveTextDocument((document: TextDocument) => {
-        if (provider && provider.document.uri === document.uri) {
-            provider.update();
+    context.subscriptions.push(workspace.onDidChangeTextDocument((event) => {
+        if (event.document.languageId === languageId &&
+            provider && !provider.panelDisposed) {
+            provider.updateWebviewContent(event.document);
         }
     }));
+
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {
-        if (window.activeTextEditor && window.activeTextEditor.document.languageId === languageId && provider) {
-            provider.document = window.activeTextEditor.document;
+        if (window.activeTextEditor &&
+            window.activeTextEditor.document.languageId === languageId &&
+            provider && !provider.panelDisposed) {
+            provider.updateWebviewContent(window.activeTextEditor.document);
         }
     }));
+
     context.subscriptions.push(commands.registerCommand(`${languageId}.showPortal`, async (): Promise<void> => {
         if (!window.activeTextEditor) {
             return Promise.resolve();
         }
 
+        const document: TextDocument = window.activeTextEditor.document;
+        if (document.languageId !== languageId) {
+            return Promise.resolve();
+        }
+        /**
+         * One provider and one panel for all configs, only panel.webview.html is changed.
+         */
         if (!provider) {
-            const document: TextDocument = window.activeTextEditor.document;
-            if (document.languageId !== languageId) {
-                return Promise.resolve();
-            }
             let details: IConnectionDetails;
             try {
                 details = await constructConnection();
             } catch (err) {
                 window.showErrorMessage(err);
-
                 return Promise.resolve();
             }
-
-            provider = new AxibaseChartsProvider(details, document, context.asAbsolutePath);
-
-            context.subscriptions.push(workspace.registerTextDocumentContentProvider("axibaseCharts", provider));
-            provider.update();
+            provider = new AxibaseChartsProvider(details, context);
         }
-        const tabLabel = "Preview Portal";
-        commands.executeCommand("vscode.previewHtml", AxibaseChartsProvider.previewUri, ViewColumn.Two, tabLabel)
-            .then(() => {
-                provider.update();
-            });
+        provider.updateWebviewContent(document);
     }));
+
     context.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent): Promise<void> => {
             if (e.affectsConfiguration(configSection) && provider) {
@@ -178,7 +179,9 @@ export const deactivate: () => Thenable<void> = (): Thenable<void> => {
 };
 
 /**
- * Constructs connection details based on the extension configuration and an input box
+ * Constructs connection details based on the extension configuration and an input box:
+ * tries to connect to server and get cookies, triggers window with error message
+ * if any connection error has been occurred, otherwise triggers inform window.
  */
 const constructConnection: () => Promise<IConnectionDetails> = async (): Promise<IConnectionDetails> => {
     const config: WorkspaceConfiguration = workspace.getConfiguration(configSection);
@@ -287,7 +290,7 @@ function handleResponse(
     const family: StatusFamily = statusFamily(res.statusCode);
     if (family === StatusFamily.CLIENT_ERROR || family === StatusFamily.SERVER_ERROR) {
         if (res.statusCode === 401) {
-            return reject(new Error(`Login failed with status code ${res.statusCode}`));
+            return reject(new Error(`Login failed with status code ${res.statusCode} ${res.statusMessage}`));
         } else {
             return reject(new Error(`Unexpected Response Code ${res.statusCode}`));
         }

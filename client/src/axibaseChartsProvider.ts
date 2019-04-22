@@ -1,6 +1,6 @@
 import { join } from "path";
 import {
-    Event, EventEmitter, TextDocument, TextDocumentContentProvider, Uri, workspace,
+    ExtensionContext, TextDocument, Uri, ViewColumn, WebviewPanel, window, workspace
 } from "vscode";
 import { languageId } from "./extension";
 
@@ -10,72 +10,76 @@ export interface IConnectionDetails {
     url: string;
 }
 
-export class AxibaseChartsProvider implements TextDocumentContentProvider {
-    /**
-     * Sets the working document and fires update() event
-     */
-    public set document(document: TextDocument) {
-        this.innerDocument = document;
-        this.update();
-    }
+/**
+ * Stores connection details and extension context, creates WebviewPanel and sets it's content.
+ */
+export class AxibaseChartsProvider {
+    public panelDisposed: boolean = false;
 
-    public get document(): TextDocument {
-        return this.innerDocument;
-    }
-
-    public get onDidChange(): Event<Uri> {
-        return this.onDidChangeEmitter.event;
-    }
-
-    public static readonly previewUri: Uri = Uri.parse("axibaseCharts://authority/axibaseCharts");
     private readonly absolutePath: (path: string) => string;
-
     private atsd!: boolean;
-    private innerDocument: TextDocument;
     private jsessionid: string | undefined;
-    private readonly onDidChangeEmitter: EventEmitter<Uri>;
     private text: string | undefined;
     private url!: string;
+    private panel: WebviewPanel;
+    private context: ExtensionContext;
 
-    public constructor(details: IConnectionDetails, document: TextDocument,
-                       absolutePath: (path: string) => string) {
-        if (document.languageId !== languageId) {
-            throw new Error("Incorrect language");
-        }
-        this.onDidChangeEmitter = new EventEmitter<Uri>();
-        this.innerDocument = document;
+    public constructor(details: IConnectionDetails, context: ExtensionContext) {
         this.updateSettings(details);
-        this.absolutePath = absolutePath;
+        this.absolutePath = context.asAbsolutePath;
+        this.context = context;
+        this.createPanel();
     }
 
     /**
-     * Applies the new settings to the current preview
-     * @param details new settings
+     * Applies new connection settings to the provider.
+     * Triggers html content update.
+     * @param details New connection settings.
      */
     public changeSettings(details: IConnectionDetails): void {
         this.updateSettings(details);
-        this.update();
+        this.updateWebviewContent();
+    }
+
+    public createPanel() {
+        this.panel = window.createWebviewPanel(
+            languageId,
+            `Preview Portal`,
+            ViewColumn.Two,
+            {
+                // Allow <script>s in the webview content.
+                enableScripts: true,
+                // Allow the access to resources only in extension's resources directory.
+                localResourceRoots: [Uri.file(this.absolutePath(join("client/resources")))]
+            }
+        );
+
+        // The panel was closed.
+        this.panel.onDidDispose(
+            () => {
+                this.panelDisposed = true;
+            },
+            null,
+            this.context.subscriptions
+        );
+        this.panelDisposed = false;
     }
 
     /**
-     * Provides html code to preview the configuration
+     * Sets html for WebviewPanel.
+     * @param document Document, which content must be used as config for portal.
      */
-    public provideTextDocumentContent(): string {
-        this.text = deleteComments(this.innerDocument.getText());
-        this.clearUrl();
-        this.replaceImports();
-
-        this.addUrl();
-        const html: string = this.getHtml();
-
-        return html;
-    }
-
-    /**
-     * Fires onDidChange to inform all listeners
-     */
-    public update(): void {
-        this.onDidChangeEmitter.fire(AxibaseChartsProvider.previewUri);
+    public updateWebviewContent(document?: TextDocument): void {
+        if (document) {
+            this.text = deleteComments(document.getText());
+            this.clearUrl();
+            this.replaceImports();
+            this.addUrl();
+        }
+        if (this.panelDisposed) {
+            this.createPanel();
+        }
+        this.panel.webview.html = this.getHtml();
     }
 
     /**
@@ -118,7 +122,9 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
      * @param resource path to a resource
      */
     private extensionPath(resource: string): string {
-        return this.absolutePath(join("client", resource));
+        return Uri.file(
+            this.absolutePath(join("client", resource))
+        ).with({ scheme: "vscode-resource" }).toString();
     }
 
     /**
@@ -128,7 +134,9 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         const theme: string | undefined = workspace.getConfiguration("workbench")
             .get("colorTheme");
         let darkTheme: string = "";
+        let textColor = "black";
         if (theme && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme)) {
+            textColor = "white";
             darkTheme = `<link rel="stylesheet"
             href="${this.extensionPath("resources/css/black.css")}">`;
         }
@@ -149,7 +157,8 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 	    window.previewOptions = ${JSON.stringify({
             jsessionid: this.jsessionid,
             text: this.text,
-            url: this.url,
+            textColor,
+            url: this.url
         })};
 	</script>
 	<script src="${this.resource("portal_init.js")}"></script>
@@ -171,7 +180,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     /**
      * Adds the ATSD URL to the import statements
      * For example, `import fred = fred.js` becomes
-     * `import fred = https://nur.axibase.com/portal/resource/scripts/fred.js`
+     * `import fred = https://axibase.com/portal/resource/scripts/fred.js`
      */
     private replaceImports(): void {
         if (!this.text) {
@@ -192,7 +201,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     }
 
     /**
-     * Generates the path to a resource.
+     * Generates the path to a resource at serever.
      * @param resource name of a static resource
      */
     private resource(resource: string): string {
