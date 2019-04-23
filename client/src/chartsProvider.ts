@@ -13,73 +13,73 @@ export interface IConnectionDetails {
 /**
  * Stores connection details and extension context, creates WebviewPanel and sets it's content.
  */
-export class AxibaseChartsProvider {
-    public panelDisposed: boolean = false;
-
+export class ChartsProvider {
     private readonly absolutePath: (path: string) => string;
     private atsd!: boolean;
     private jsessionid: string | undefined;
     private text: string | undefined;
     private url!: string;
-    private panel: WebviewPanel;
-    private context: ExtensionContext;
 
-    public constructor(details: IConnectionDetails, context: ExtensionContext) {
-        this.updateSettings(details);
-        this.absolutePath = context.asAbsolutePath;
-        this.context = context;
-        this.createPanel();
-    }
-
-    /**
-     * Applies new connection settings to the provider.
-     * Triggers html content update.
-     * @param details New connection settings.
-     */
-    public changeSettings(details: IConnectionDetails): void {
-        this.updateSettings(details);
-        this.updateWebviewContent();
+    public constructor(absolutePath: (path: string) => string) {
+        this.absolutePath = absolutePath;
     }
 
     public createPanel() {
-        this.panel = window.createWebviewPanel(
+        const panel = window.createWebviewPanel(
             languageId,
-            `Preview Portal`,
+            "Preview Portal",
             ViewColumn.Two,
             {
                 // Allow <script>s in the webview content.
                 enableScripts: true,
                 // Allow the access to resources only in extension's resources directory.
-                localResourceRoots: [Uri.file(this.absolutePath(join("client/resources")))]
+                localResourceRoots: [this.getUri("resources")]
             }
         );
-
-        // The panel was closed.
-        this.panel.onDidDispose(
-            () => {
-                this.panelDisposed = true;
-            },
-            null,
-            this.context.subscriptions
-        );
-        this.panelDisposed = false;
+        return panel;
     }
 
     /**
-     * Sets html for WebviewPanel.
+     * Prepares html for WebviewPanel.
      * @param document Document, which content must be used as config for portal.
      */
-    public updateWebviewContent(document?: TextDocument): void {
+    public getWebviewContent(document?: TextDocument): string {
+        if (this.url == null) {
+            /**
+             * Unable to connect to ATSD after changes in settings, see onDidChangeConfiguration.
+             */
+            return `<h3>Unable to connect to ASTD</h3>
+<p>Check connection <a href="https://github.com/axibase/axibase-charts-vscode#live-preview"> settings</a>.</p>`;
+        }
         if (document) {
             this.text = deleteComments(document.getText());
             this.clearUrl();
             this.replaceImports();
             this.addUrl();
         }
-        if (this.panelDisposed) {
-            this.createPanel();
+        return this.getHtml();
+    }
+
+    /**
+     * Updates the provider state
+     * @param details new connection details
+     */
+    public updateSettings(details: IConnectionDetails): void {
+        if (!details) {
+            /**
+             * Unable to connect to ATSD after changes in settings, see onDidChangeConfiguration.
+             */
+            this.url = this.jsessionid = this.atsd = null;
+            return;
         }
-        this.panel.webview.html = this.getHtml();
+        this.url = details.url;
+        if (details.cookie) {
+            this.jsessionid = details.cookie[0].split(";")[0]
+                .split("=")[1];
+        } else {
+            this.jsessionid = undefined;
+        }
+        this.atsd = details.atsd;
     }
 
     /**
@@ -116,15 +116,21 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
             this.url = this.url.substr(0, match.index);
         }
     }
-
+    /**
+     * Returns path to local resource as Uri.
+     * @param resource
+     */
+    private getUri(resource: string): Uri {
+        return Uri.file(
+            this.absolutePath(join("client", resource))
+        );
+    }
     /**
      * Generates the path to a resource on the local filesystem
      * @param resource path to a resource
      */
     private extensionPath(resource: string): string {
-        return Uri.file(
-            this.absolutePath(join("client", resource))
-        ).with({ scheme: "vscode-resource" }).toString();
+        return this.getUri(resource).with({ scheme: "vscode-resource" }).toString();
     }
 
     /**
@@ -134,9 +140,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         const theme: string | undefined = workspace.getConfiguration("workbench")
             .get("colorTheme");
         let darkTheme: string = "";
-        let textColor = "black";
         if (theme && /[Bb]lack|[Dd]ark|[Nn]ight/.test(theme)) {
-            textColor = "white";
             darkTheme = `<link rel="stylesheet"
             href="${this.extensionPath("resources/css/black.css")}">`;
         }
@@ -151,13 +155,24 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 	  .portalPage body {
 		padding: 0;
 		background: var(--vscode-editor-background);
-	  }
+      }
+
+      body.vscode-light {
+        color: black;
+      }
+
+      body.vscode-dark {
+        color: white;
+      }
+
+      body.vscode-high-contrast {
+        color: red;
+      }
 	</style>
 	<script>
 	    window.previewOptions = ${JSON.stringify({
             jsessionid: this.jsessionid,
             text: this.text,
-            textColor,
             url: this.url
         })};
 	</script>
@@ -201,7 +216,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
     }
 
     /**
-     * Generates the path to a resource at serever.
+     * Generates the path to a resource at server.
      * @param resource name of a static resource
      */
     private resource(resource: string): string {
@@ -211,21 +226,6 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         const resourcePath: string = `${cssType ? cssPath : jsPath}/${resource}`;
 
         return `${resourcePath}${this.jsessionid ? `;jsessionid=${this.jsessionid}` : ""}`;
-    }
-
-    /**
-     * Updates the provider state
-     * @param details new connection details
-     */
-    private updateSettings(details: IConnectionDetails): void {
-        this.url = details.url;
-        if (details.cookie) {
-            this.jsessionid = details.cookie[0].split(";")[0]
-                .split("=")[1];
-        } else {
-            this.jsessionid = undefined;
-        }
-        this.atsd = details.atsd;
     }
 }
 

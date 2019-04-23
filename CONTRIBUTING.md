@@ -20,7 +20,7 @@ The **Server** part includes but is not limited to:
 The **Client** part includes but is not limited to:
 
 * [`extension`](client/src/extension.ts): The entry point of the extension. Calls a language server.
-* [`axibaseChartsProvider`](client/src/axibaseChartsProvider.ts#L16): Provides functionality for [Webview API](https://code.visualstudio.com/api/extension-guides/webview): creates `WebviewPanel` and manages it's HTML content to allow preview portals.
+* [`chartsProvider`](client/src/chartsProvider.ts#L16): Provides functionality for [Webview API](https://code.visualstudio.com/api/extension-guides/webview): creates `WebviewPanel` and manages it's HTML content to allow preview portals.
 
 #### [axibasecharts.showPortal](client/src/extension.ts#L119)
 
