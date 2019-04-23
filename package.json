@@ -3,7 +3,7 @@
   "displayName": "Axibase Charts",
   "description": "Axibase Charts syntax validation and highlighting extension",
   "author": "Axibase Developers",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "license": "Apache-2.0",
   "icon": "images/icon.png",
   "repository": {
@@ -35,7 +35,7 @@
         "axibaseCharts.username": {
           "type": "string",
           "default": null,
-          "description": "Enter user name. Leave empty if api.guest.access.enabled is true."
+          "markdownDescription": "Enter user name. Leave empty if [api.guest.access.enabled](https://axibase.com/docs/atsd/administration/user-authentication.html#guest-access-to-data-api) is true."
         },
         "axibaseCharts.protocol": {
           "type": "string",

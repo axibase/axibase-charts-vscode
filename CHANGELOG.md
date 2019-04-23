@@ -1,9 +1,13 @@
 # Change Log
 
+## `v.1.0.20`
+
+* Migrated to new vscode Webview API.
+
 ## `v 1.0.19`
 
-* Added settings: `parse-numbers`, `precise(n)`
-* Settings description is synchronized with documentation
+* Added settings: `parse-numbers`, `precise(n)`.
+* Settings description is synchronized with documentation.
 
 ## `v.1.0.18`
 
