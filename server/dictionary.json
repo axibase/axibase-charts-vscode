@@ -557,7 +557,7 @@
             "displayName": "axis",
             "type": "enum",
             "defaultValue": "left",
-            "section": "widget",
+            "section": "series",
             "example": "right",
             "enum": [
                 "right",

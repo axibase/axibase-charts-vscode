@@ -165,24 +165,6 @@ export class Formatter {
                 break;
             }
             case 3: { // [series], [dropdown], [column], ...
-                if (this.lastAddedParent.name === "column" && this.currentSection.name === "series") {
-                    /**
-                     * If parent of [series] is [column], i.e:
-                     *
-                     * [column]
-                     *   ...
-                     *     [series]
-                     *       ...
-                     * change only indent, leave parent name as is.
-                     */
-                    this.currentIndent = this.lastAddedParent.indent;
-                    this.lastAddedParent.indent = this.currentIndent;
-                    this.increaseIndent();
-                    if (this.insideKeyword && this.currentIndent.length <= this.lastKeywordIndent.length) {
-                        this.currentIndent = this.lastKeywordIndent;
-                    }
-                    break;
-                }
                 if (isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
                     this.currentIndent = this.previousSection.indent;
                     this.increaseIndent();
@@ -198,7 +180,13 @@ export class Formatter {
                 if (this.insideKeyword && this.currentIndent.length <= this.lastKeywordIndent.length) {
                     this.currentIndent = this.lastKeywordIndent;
                 }
-                this.lastAddedParent = { name: this.currentSection.name, indent: this.currentIndent };
+                if (["series", "dropdown"].includes(this.currentSection.name)) {
+                    /**
+                     * Change parent only if current is [series] or [dropdown],
+                     * because only they could have child sections ([tag/tags] or [option]).
+                     */
+                    this.lastAddedParent = { name: this.currentSection.name, indent: this.currentIndent };
+                }
                 break;
             }
             case 4: { // [option], [properties], [tags]

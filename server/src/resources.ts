@@ -146,7 +146,7 @@ export const widgetRequirementsByType: Map<string, SectionRequirements> = new Ma
  */
 export const parentSections: Map<string, string[]> = new Map([
     ["widget", ["group", "configuration"]],
-    ["series", ["widget", "column", "link"]],
+    ["series", ["widget", "link"]],
     ["tag", ["series"]],
     ["tags", ["series"]],
     ["column", ["widget"]],

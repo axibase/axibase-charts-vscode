@@ -4,7 +4,7 @@
 
 [![](https://vsmarketplacebadge.apphb.com/version-short/Axibase.axibasecharts-syntax.svg)](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax)
 
-**Axibase Charts** extension for Microsoft [Visual Studio Code](https://code.visualstudio.com/) is a design tool that simplifies portal development and data exploration using the [Axibase Charts](https://github.com/axibase/charts/blob/master/README.md) library of declarative graphics.
+**Axibase Charts** extension for Microsoft [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax) is a design tool that simplifies portal development and data exploration using the [Axibase Charts](https://axibase.com/docs/charts/) library of declarative graphics.
 
 The extension implements the following functionality:
 
@@ -41,7 +41,7 @@ Include VSCode and extension version when opening issues on Github.
 
 ## Introduction
 
-Build portals with [Axibase Charts](https://github.com/axibase/charts/blob/master/README.md).
+Build portals with [Axibase Charts](https://axibase.com/docs/charts/).
 
 > Create files with the extension `.config`.
 
