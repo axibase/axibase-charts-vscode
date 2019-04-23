@@ -1,5 +1,9 @@
 # Change Log
 
+## `v.1.0.19`
+
+* Migrated to new vscode Webview API.
+
 ## `v.1.0.18`
 
 * Removed aggressive validation for settings that allowed in various sections.
