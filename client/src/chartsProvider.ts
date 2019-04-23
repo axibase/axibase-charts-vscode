@@ -1,6 +1,6 @@
 import { join } from "path";
 import {
-    ExtensionContext, TextDocument, Uri, ViewColumn, WebviewPanel, window, workspace
+    TextDocument, Uri, ViewColumn, window, workspace
 } from "vscode";
 import { languageId } from "./extension";
 
