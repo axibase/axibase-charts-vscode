@@ -2987,7 +2987,7 @@
             "type": "number",
             "minValue": 0,
             "example": 2,
-            "section": "configuration",
+            "section": "widget",
             "defaultValue": 4
         },
         {
@@ -5424,7 +5424,7 @@
         {
             "displayName": "pointer-position",
             "widget": "chart",
-            "section": "widget",
+            "section": "series",
             "type": "string",
             "example": "right",
             "defaultValue": "false"
