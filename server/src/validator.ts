@@ -697,20 +697,35 @@ export class Validator {
     private handleCsv(): void {
         const line: string = this.getCurrentLine();
         let header: string | null;
-        if (/=[ \t]*$/m.test(line)) {
+
+        const patterns = {
+            endcsv: /=[ \t]*$/m,
+            equals: /=/,
+            from: /from/
+        };
+
+        const {endcsv, equals, from} = patterns;
+
+        if (endcsv.test(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && /^[ \t]*$/m.test(header)) {
+            while (header !== null && endcsv.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
-            const match: RegExpExecArray | null = /=/.exec(line);
-            if (match === null) {
-                throw new Error("The line does not contain a '='");
+            let match: RegExpExecArray | null;
+
+            if (equals.test(line)) {
+                match = equals.exec(line);
+                header = line.substring(match.index + 1);
+            } else if (from.test(line)) {
+                match = from.exec(line);
+                header = line.substring(match.index + match[0].length);
+            } else {
+                throw new Error("Invalid CSV expression");
             }
-            header = line.substring(match.index + 1);
         }
-        this.match = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*=/m.exec(line);
+        this.match = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=|from)/m.exec(line);
         this.addToStringMap(this.variables, "csvNames");
         this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
     }
