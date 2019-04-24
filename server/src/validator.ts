@@ -698,18 +698,14 @@ export class Validator {
         const line: string = this.getCurrentLine();
         let header: string | null;
 
-        const patterns = {
-            endcsv: /=[ \t]*$/m,
-            equals: /=/,
-            from: /from/
-        };
+        const noHeader = /=[ \t]*$/m;
+        const equals = /=/;
+        const from = /from/;
 
-        const {endcsv, equals, from} = patterns;
-
-        if (endcsv.test(line)) {
+        if (noHeader.test(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && endcsv.test(header)) {
+            while (header !== null && noHeader.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
