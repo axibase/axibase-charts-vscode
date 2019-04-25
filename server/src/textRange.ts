@@ -88,7 +88,7 @@ export class TextRange {
     public constructor(text: string, range: Range, priority?: number, canBeUnclosed?: boolean) {
         this.range = range;
         this.text = text;
-        this.canBeUnclosed = canBeUnclosed;
         this.priority = priority;
+        this.canBeUnclosed = canBeUnclosed;
     }
 }

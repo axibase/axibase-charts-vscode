@@ -73,7 +73,7 @@ export class Validator {
      * Stack of nested keywords. For example, if can be included to a for.
      */
     private readonly keywordsStack: TextRange[] = [];
-    
+
     /**
      * Last if statement. Used to get/set settings in ifSettigns
      */
@@ -166,7 +166,7 @@ export class Validator {
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
                     this.keywordsStack.push(this.foundKeyword);
-                }               
+                }
                 this.switchKeyword();
             }
         }
@@ -539,12 +539,14 @@ export class Validator {
      */
     private diagnosticForLeftKeywords(): void {
         for (const nestedConstruction of this.keywordsStack) {
-            if (!nestedConstruction.canBeUnclosed) {
-                this.result.push(createDiagnostic(
-                    nestedConstruction.range,
-                    `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
-                ));
+            if (nestedConstruction.canBeUnclosed) {
+                continue;
             }
+
+            this.result.push(createDiagnostic(
+                nestedConstruction.range,
+                `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
+            ));
         }
     }
 
