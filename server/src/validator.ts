@@ -698,14 +698,14 @@ export class Validator {
         const line: string = this.getCurrentLine();
         let header: string | null;
 
-        const noHeader = /=[ \t]*$/m;
+        const headerNextLine = /=[ \t]*$/m;
         const equals = /=/;
         const from = /from/;
 
-        if (noHeader.test(line)) {
+        if (headerNextLine.test(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && noHeader.test(header)) {
+            while (header !== null && headerNextLine.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
@@ -716,9 +716,8 @@ export class Validator {
                 header = line.substring(match.index + 1);
             } else if (from.test(line)) {
                 match = from.exec(line);
-                header = line.substring(match.index + match[0].length);
             } else {
-                throw new Error("Invalid CSV expression");
+                this.result.push(createDiagnostic(this.foundKeyword.range, `The line should contain a '=' or 'from' keyword`));
             }
         }
         this.match = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=|from)/m.exec(line);
