@@ -136,7 +136,11 @@ export class Validator {
         /**
          * RegExp for: 'csv from <url>'
          */
-        csvFromURLMissingName: /(^[ \t]*csv[ \t]+)[ \t]*(from)/
+        csvFromURLMissingName: /(^[ \t]*csv[ \t]+)[ \t]*(from)/,
+        /**
+         * RegExp for blank line
+         */
+        blankLinePattern: /^[ \t]*$/m
     }
 
     /**
@@ -729,12 +733,12 @@ export class Validator {
         const line: string = this.getCurrentLine();
         let header: string | null = null;
 
-        const {csvInlineHeaderPattern, csvNextLineHeaderPattern, csvFromURLPattern} = this.RegExps;
+        const {csvInlineHeaderPattern, csvNextLineHeaderPattern, csvFromURLPattern, blankLinePattern} = this.RegExps;
 
         if (csvInlineHeaderPattern.exec(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && /^[ \t]*$/m.test(header)) {
+            while (header !== null && blankLinePattern.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
