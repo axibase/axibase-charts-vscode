@@ -118,7 +118,21 @@ endcsv`,
                     `csv has no matching endcsv`
                 )
             ]
-        )
+        ),
+        new Test(
+            "Incorrect csv 'from' with missing entity name",
+            `csv from https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
+            [
+                createDiagnostic(
+                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
+                    `<name> in 'csv <name> from <url>' is missing`
+                ),
+                createDiagnostic(
+                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
+                    `csv has no matching endcsv`
+                )
+            ]
+        ),
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });

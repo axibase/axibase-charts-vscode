@@ -147,7 +147,7 @@ export class Validator {
         for (const line of this.lines) {
             this.currentLineNumber++;
             /**
-             * At the moment csv from supports unclosed syntax
+             * At the moment 'csv <name> from <url>' supports unclosed syntax
              */
             const canBeSingle = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m.test(line);
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
@@ -723,7 +723,15 @@ export class Validator {
             } else if (csvFromURLPattern.exec(line)) {
                 this.match = csvFromURLPattern.exec(line);
             } else {
-                this.result.push(createDiagnostic(this.foundKeyword.range, `The line should contain a '=' or 'from' keyword`));
+                let message: string | null = null;
+
+                if (/(^[ \t]*csv[ \t]+)[ \t]*(from)/m.test(line)) {
+                    message = `<name> in 'csv <name> from <url>' is missing`;
+                } else {
+                    message = `The line should contain a '=' or 'from' keyword`;
+                }
+                
+                this.result.push(createDiagnostic(this.foundKeyword.range, message));
             }
         }
         this.addToStringMap(this.variables, "csvNames");
