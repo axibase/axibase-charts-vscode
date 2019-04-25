@@ -50,6 +50,7 @@ export class TextRange {
      * Parses a keyword from the line and creates a TextRange.
      * @param line the line containing the keyword
      * @param i the index of the line
+     * @param canBeSingle whether keyword can exist in both closed and unclosed variant or not
      */
     public static parse(line: string, i: number, canBeSingle: boolean): TextRange | undefined {
         const match: RegExpExecArray | null = TextRange.KEYWORD_REGEXP.exec(line);
