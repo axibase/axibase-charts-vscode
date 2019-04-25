@@ -146,6 +146,9 @@ export class Validator {
         }
         for (const line of this.lines) {
             this.currentLineNumber++;
+            /**
+             * At the moment csv from supports unclosed syntax
+             */
             const canBeSingle = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m.test(line);
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
 
@@ -536,7 +539,7 @@ export class Validator {
      */
     private diagnosticForLeftKeywords(): void {
         for (const nestedConstruction of this.keywordsStack) {
-            if (! nestedConstruction.canBeUnclosed) {
+            if (!nestedConstruction.canBeUnclosed) {
                 this.result.push(createDiagnostic(
                     nestedConstruction.range,
                     `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
@@ -701,29 +704,26 @@ export class Validator {
         const line: string = this.getCurrentLine();
         let header: string | null = null;
 
+        const csvNextLineHeaderPattern = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
         const csvInlineHeaderPattern = /=[ \t]*$/m;
-        const csvNextLineHeaderPattern = /=/;
-        const csvFromURLPattern = /from/;
+        const csvFromURLPattern = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;
 
-        if (csvInlineHeaderPattern.test(line)) {
+        if (csvInlineHeaderPattern.exec(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
             while (header !== null && /^[ \t]*$/m.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
-            let match: RegExpExecArray | null;
-           
-            if (csvNextLineHeaderPattern.exec(line) !== null) {
-                match = csvNextLineHeaderPattern.exec(line);
-                header = line.substring(match.index + 1);
-            } else if (csvFromURLPattern.exec(line) !== null) {
-                match = csvFromURLPattern.exec(line);
+            if (csvNextLineHeaderPattern.exec(line)) {
+                this.match = csvNextLineHeaderPattern.exec(line);
+                header = line.substring(this.match.index + 1);
+            } else if (csvFromURLPattern.exec(line)) {
+                this.match = csvFromURLPattern.exec(line);
             } else {
                 this.result.push(createDiagnostic(this.foundKeyword.range, `The line should contain a '=' or 'from' keyword`));
             }
         }
-        this.match = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=|from)/m.exec(line);
         this.addToStringMap(this.variables, "csvNames");
         this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
     }
