@@ -73,7 +73,7 @@ export class Validator {
      * Stack of nested keywords. For example, if can be included to a for.
      */
     private readonly keywordsStack: TextRange[] = [];
-
+    
     /**
      * Last if statement. Used to get/set settings in ifSettigns
      */
@@ -146,7 +146,8 @@ export class Validator {
         }
         for (const line of this.lines) {
             this.currentLineNumber++;
-            this.foundKeyword = TextRange.parse(line, this.currentLineNumber);
+            const canBeSingle = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m.test(line);
+            this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
                 /**
@@ -162,7 +163,7 @@ export class Validator {
             if (this.foundKeyword !== undefined) {
                 if (/\b(if|for|csv)\b/i.test(this.foundKeyword.text)) {
                     this.keywordsStack.push(this.foundKeyword);
-                }
+                }               
                 this.switchKeyword();
             }
         }
@@ -535,10 +536,12 @@ export class Validator {
      */
     private diagnosticForLeftKeywords(): void {
         for (const nestedConstruction of this.keywordsStack) {
-            this.result.push(createDiagnostic(
-                nestedConstruction.range,
-                `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
-            ));
+            if (! nestedConstruction.canBeUnclosed) {
+                this.result.push(createDiagnostic(
+                    nestedConstruction.range,
+                    `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
+                ));
+            }
         }
     }
 
@@ -696,26 +699,26 @@ export class Validator {
      */
     private handleCsv(): void {
         const line: string = this.getCurrentLine();
-        let header: string | null;
+        let header: string | null = null;
 
-        const headerNextLine = /=[ \t]*$/m;
-        const equals = /=/;
-        const from = /from/;
+        const csvInlineHeaderPattern = /=[ \t]*$/m;
+        const csvNextLineHeaderPattern = /=/;
+        const csvFromURLPattern = /from/;
 
-        if (headerNextLine.test(line)) {
+        if (csvInlineHeaderPattern.test(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && headerNextLine.test(header)) {
+            while (header !== null && /^[ \t]*$/m.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
             let match: RegExpExecArray | null;
-
-            if (equals.test(line)) {
-                match = equals.exec(line);
+           
+            if (csvNextLineHeaderPattern.exec(line) !== null) {
+                match = csvNextLineHeaderPattern.exec(line);
                 header = line.substring(match.index + 1);
-            } else if (from.test(line)) {
-                match = from.exec(line);
+            } else if (csvFromURLPattern.exec(line) !== null) {
+                match = csvFromURLPattern.exec(line);
             } else {
                 this.result.push(createDiagnostic(this.foundKeyword.range, `The line should contain a '=' or 'from' keyword`));
             }
