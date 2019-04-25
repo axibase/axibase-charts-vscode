@@ -83,9 +83,9 @@ export class TextRange {
     /**
      * Keyword can exist in both closed and unclosed variants
      */
-    public readonly canBeUnclosed: boolean = false;
+    public readonly canBeUnclosed: boolean;
 
-    public constructor(text: string, range: Range, priority?: number, canBeUnclosed?: boolean) {
+    public constructor(text: string, range: Range, priority?: number, canBeUnclosed: boolean = false) {
         this.range = range;
         this.text = text;
         this.priority = priority;

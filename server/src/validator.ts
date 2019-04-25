@@ -117,6 +117,29 @@ export class Validator {
         ["freemarker", ["entity", "entities", "type"]],
     ]);
     /**
+     * Regular expressions for CSV syntax checking
+     */
+    private readonly RegExps: any = {
+        /**
+         * RegExp for: `csv <name> = 
+         *              <header1>, <header2>`
+         */
+        csvNextLineHeaderPattern: /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m,
+        /**
+         * RegExp for: 'scv <name> = <header1>, <header2>'
+         */
+        csvInlineHeaderPattern: /=[ \t]*$/m,
+        /**
+         * RegExp for: 'csv <name> from <url>'
+         */
+        csvFromURLPattern: /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m,
+        /**
+         * RegExp for: 'csv from <url>'
+         */
+        csvFromURLMissingName: /(^[ \t]*csv[ \t]+)[ \t]*(from)/
+    }
+
+    /**
      * Type of the current widget
      */
     private currentWidget?: string;
@@ -149,7 +172,7 @@ export class Validator {
             /**
              * At the moment 'csv <name> from <url>' supports unclosed syntax
              */
-            const canBeSingle = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m.test(line);
+            const canBeSingle = this.RegExps.csvFromURLPattern.test(line);
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
@@ -706,9 +729,7 @@ export class Validator {
         const line: string = this.getCurrentLine();
         let header: string | null = null;
 
-        const csvNextLineHeaderPattern = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
-        const csvInlineHeaderPattern = /=[ \t]*$/m;
-        const csvFromURLPattern = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;
+        const {csvInlineHeaderPattern, csvNextLineHeaderPattern, csvFromURLPattern} = this.RegExps;
 
         if (csvInlineHeaderPattern.exec(line)) {
             let j: number = this.currentLineNumber + 1;
@@ -717,25 +738,27 @@ export class Validator {
                 header = this.getLine(++j);
             }
         } else {
-            if (csvNextLineHeaderPattern.exec(line)) {
-                this.match = csvNextLineHeaderPattern.exec(line);
-                header = line.substring(this.match.index + 1);
-            } else if (csvFromURLPattern.exec(line)) {
-                this.match = csvFromURLPattern.exec(line);
-            } else {
-                let message: string | null = null;
+            let match = csvNextLineHeaderPattern.exec(line) || csvFromURLPattern.exec(line);
 
-                if (/(^[ \t]*csv[ \t]+)[ \t]*(from)/m.test(line)) {
-                    message = `<name> in 'csv <name> from <url>' is missing`;
-                } else {
-                    message = `The line should contain a '=' or 'from' keyword`;
-                }
-                
-                this.result.push(createDiagnostic(this.foundKeyword.range, message));
+            if (match !== null) {
+                this.match = match;;
+                header = line.substring(this.match.index + 1);
+            } else {
+                this.result.push(createDiagnostic(this.foundKeyword.range, this.getCsvErrorMessage(line)));
             }
         }
         this.addToStringMap(this.variables, "csvNames");
         this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
+    }
+
+    /**
+     * If line of code didn't match any standard RegExp, compose error message
+     * @param line line of code instruction
+     * @returns csv error message 
+     */
+    private getCsvErrorMessage(line: string): string {
+        return (this.RegExps.csvFromURLMissingName.test(line)) ? `<name> in 'csv <name> from <url>' is missing` : 
+        `The line should contain a '=' or 'from' keyword`
     }
 
     /**
