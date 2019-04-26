@@ -1,9 +1,8 @@
 import { join } from "path";
 import {
-    TextDocument, Uri, ViewColumn, window, workspace
+    TextDocument, Uri, workspace
 } from "vscode";
-import { languageId } from "./extension";
-
+import { constructConnection } from "./connectionUtils";
 export interface IConnectionDetails {
     atsd: boolean;
     cookie?: string[];
@@ -11,9 +10,13 @@ export interface IConnectionDetails {
 }
 
 /**
- * Stores connection details and extension context, creates WebviewPanel and sets it's content.
+ * Stores connection details, preprocesses config:
+ *  1) clearUrl()
+ *  2) replaceImports()
+ *  3) addUrl()
+ * Generates HTML for WebviewPanel using preprocessed config.
  */
-export class ChartsProvider {
+export class PanelContentProvider {
     private readonly absolutePath: (path: string) => string;
     private atsd!: boolean;
     private jsessionid: string | undefined;
@@ -24,21 +27,6 @@ export class ChartsProvider {
         this.absolutePath = absolutePath;
     }
 
-    public createPanel() {
-        const panel = window.createWebviewPanel(
-            languageId,
-            "Preview Portal",
-            ViewColumn.Two,
-            {
-                // Allow <script>s in the webview content.
-                enableScripts: true,
-                // Allow the access to resources only in extension's resources directory.
-                localResourceRoots: [this.getUri("resources")]
-            }
-        );
-        return panel;
-    }
-
     /**
      * Prepares html for WebviewPanel.
      * @param document Document, which content must be used as config for portal.
@@ -46,13 +34,13 @@ export class ChartsProvider {
     public getWebviewContent(document?: TextDocument): string {
         if (this.url == null) {
             /**
-             * Unable to connect to ATSD after changes in settings, see onDidChangeConfiguration.
+             * Unable to connect to ATSD after changes in settings.
              */
             return `<h3>Unable to connect to ASTD</h3>
 <p>Check connection <a href="https://github.com/axibase/axibase-charts-vscode#live-preview"> settings</a>.</p>`;
         }
         if (document) {
-            this.text = deleteComments(document.getText());
+            this.text = document.getText();
             this.clearUrl();
             this.replaceImports();
             this.addUrl();
@@ -61,13 +49,16 @@ export class ChartsProvider {
     }
 
     /**
-     * Updates the provider state
-     * @param details new connection details
+     * Tries to connect to ATSD; if no errors occured, sets connection fields:
+     * url, jsessionid and atsd.
      */
-    public updateSettings(details: IConnectionDetails): void {
-        if (!details) {
+    public async setConnectionSettings() {
+        let details: IConnectionDetails;
+        try {
+            details = await constructConnection();
+        } catch (err) {
             /**
-             * Unable to connect to ATSD after changes in settings, see onDidChangeConfiguration.
+             * Unable to connect to ATSD after changes in settings.
              */
             this.url = this.jsessionid = this.atsd = null;
             return;
@@ -80,6 +71,16 @@ export class ChartsProvider {
             this.jsessionid = undefined;
         }
         this.atsd = details.atsd;
+    }
+
+    /**
+     * Returns path to local resource as Uri.
+     * @param resource
+     */
+    public getUri(resource: string): Uri {
+        return Uri.file(
+            this.absolutePath(join("client", resource))
+        );
     }
 
     /**
@@ -115,15 +116,6 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         if (match) {
             this.url = this.url.substr(0, match.index);
         }
-    }
-    /**
-     * Returns path to local resource as Uri.
-     * @param resource
-     */
-    private getUri(resource: string): Uri {
-        return Uri.file(
-            this.absolutePath(join("client", resource))
-        );
     }
     /**
      * Generates the path to a resource on the local filesystem
@@ -228,36 +220,3 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
         return `${resourcePath}${this.jsessionid ? `;jsessionid=${this.jsessionid}` : ""}`;
     }
 }
-
-/**
- * Replaces all comments with spaces
- * @param text the text to replace comments
- * @returns the modified text
- */
-const deleteComments: (text: string) => string = (text: string): string => {
-    let content: string = text;
-    const multiLine: RegExp = /\/\*[\s\S]*?\*\//g;
-    const oneLine: RegExp = /^[ \t]*#.*/mg;
-    let match: RegExpExecArray | null = multiLine.exec(content);
-    if (!match) {
-        match = oneLine.exec(content);
-    }
-
-    while (match) {
-        const newLines: number = match[0].split("\n").length - 1;
-        const spaces: string = Array(match[0].length)
-            .fill(" ")
-            .concat(
-                Array(newLines)
-                    .fill("\n"),
-            )
-            .join("");
-        content = `${content.substr(0, match.index)}${spaces}${content.substr(match.index + match[0].length)}`;
-        match = multiLine.exec(content);
-        if (!match) {
-            match = oneLine.exec(content);
-        }
-    }
-
-    return content;
-};
