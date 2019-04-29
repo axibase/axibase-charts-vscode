@@ -3,11 +3,11 @@ import { ConfigTree } from "./configTree";
 import { DefaultSetting } from "./defaultSetting";
 import {
     deprecatedTagSection,
+    illegalSetting,
     settingNameInTags,
     settingsWithWhitespaces,
     tagNameWithWhitespaces,
-    unknownToken,
-    illegalSetting
+    unknownToken
 } from "./messageUtil";
 import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
@@ -769,7 +769,7 @@ export class Validator {
                 for (const regex of regs) {
                     const matched = regex.exec(collection);
                     varName = matched ? matched[1] : null;
-                    if (varName) break;
+                    if (varName) { break; }
                 }
                 if (!varName) {
                     try {
@@ -777,7 +777,7 @@ export class Validator {
                          * Check for inline declaration, for example:
                          * for widgetType in ['chart', 'calendar']
                          */
-                        new Function(`return ${collection}`);
+                        Function(`return ${collection}`);
                     } catch (err) {
                         const start = line.indexOf(collection);
                         const end = start + collection.length;

@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { DefaultSetting } from "./defaultSetting";
-import { createDiagnostic } from "./util";
 import { illegalSetting } from "./messageUtil";
+import { createDiagnostic } from "./util";
 
 export const intervalUnits: string[] = [
     "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
@@ -67,23 +67,23 @@ function isDate(text: string): boolean {
 
 interface SpecificValueCheck {
     errMsg: string;
-    check: (value: string) => boolean;
+    isIncorrect: (value: string) => boolean;
 }
 
 const specificValueChecksMap: Map<string, SpecificValueCheck> = new Map([
     ["forecastssagroupmanualgroups", {
-        check: (value: string) => {
+        errMsg: "Incorrect group syntax",
+        isIncorrect: (value: string) => {
             const regex = /^[\d\s,;-]+$/;
             return !regex.test(value);
-        },
-        errMsg: "Incorrect group syntax"
+        }
     }],
     ["forecastssagroupautounion", {
-        check: (value: string) => {
+        errMsg: "Incorrect group union syntax",
+        isIncorrect: (value: string) => {
             const regex = /^[a-z\s,;-]+$/;
             return !regex.test(value);
-        },
-        errMsg: "Incorrect group union syntax"
+        }
     }]
 ]);
 
@@ -140,7 +140,7 @@ export class Setting extends DefaultSetting {
                     break;
                 }
                 const specCheck = specificValueChecksMap.get(this.name);
-                if (specCheck && specCheck.check(this.value)) {
+                if (specCheck && specCheck.isIncorrect(this.value)) {
                     result = createDiagnostic(range, specCheck.errMsg);
                 }
                 break;
