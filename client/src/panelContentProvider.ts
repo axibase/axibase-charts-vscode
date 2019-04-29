@@ -147,18 +147,7 @@ ${this.text.substr(match.index + match[0].length + 1)}`;
 	  .portalPage body {
 		padding: 0;
 		background: var(--vscode-editor-background);
-      }
-
-      body.vscode-light {
-        color: black;
-      }
-
-      body.vscode-dark {
-        color: white;
-      }
-
-      body.vscode-high-contrast {
-        color: red;
+        color:  var(--vscode-editor-foreground);
       }
 	</style>
 	<script>

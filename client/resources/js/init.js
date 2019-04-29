@@ -23,7 +23,7 @@ window.initChart = function () {
             /**
              * For example, unavailable resource, see examples/fred.config.
              */
-            document.body.innerHTML = `<h3>Unexpected error: </h3><code>${JSON.stringify(err, null, 2)}</code>`;
+            document.body.innerHTML = `<h3>Unexpected error: </h3><code>${err.message ? err.message : JSON.stringify(err, null, 2)}</code>`;
         }
     }
 

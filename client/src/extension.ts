@@ -1,3 +1,4 @@
+import { debounce } from "lodash";
 import { join } from "path";
 import {
     commands,
@@ -28,6 +29,8 @@ let client: LanguageClient;
  */
 export const activate: (context: ExtensionContext) => void = async (context: ExtensionContext): Promise<void> => {
 
+    // Update WebviewPanel HTML on config change only if DEBOUNCE_TIME seconds have passed without it being updated.
+    const DEBOUNCE_TIME = 5000; // 5s
     // The server is implemented in node
     const serverModule: string = context.asAbsolutePath(join("server", "out", "server.js"));
     // The debug options for the server
@@ -95,16 +98,23 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
 
     let provider: PanelContentProvider | undefined;
     let panel: WebviewPanel | undefined;
-    context.subscriptions.push(workspace.onDidChangeTextDocument((event) => {
+
+    const debouncedUpdatePanelHTML = debounce(updatePanelHTMl, DEBOUNCE_TIME);
+
+    function updatePanelHTMl(document?: TextDocument) {
+        panel.webview.html = provider.getWebviewContent(document);
+    }
+
+    context.subscriptions.push(workspace.onDidChangeTextDocument((event: any) => {
         if (event.document.languageId === languageId && provider) {
-            panel.webview.html = provider.getWebviewContent(event.document);
+            debouncedUpdatePanelHTML(event.document);
         }
     }));
 
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {
         if (window.activeTextEditor &&
             window.activeTextEditor.document.languageId === languageId && provider) {
-            panel.webview.html = provider.getWebviewContent(window.activeTextEditor.document);
+            updatePanelHTMl(window.activeTextEditor.document);
         }
     }));
 
@@ -137,12 +147,14 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             panel.onDidDispose(
                 () => {
                     provider = null;
+                    panel = null;
+                    debouncedUpdatePanelHTML.cancel();
                 },
                 null,
                 context.subscriptions
             );
         }
-        panel.webview.html = provider.getWebviewContent(document);
+        updatePanelHTMl(document);
     }));
 
     context.subscriptions.push(
@@ -152,7 +164,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
                     await window.showInformationMessage("Current connection details were modified.", "Reload");
                 if (answer === "Reload") {
                     await provider.setConnectionSettings();
-                    panel.webview.html = provider.getWebviewContent();
+                    updatePanelHTMl();
                 }
             }
         }),

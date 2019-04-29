@@ -50,6 +50,11 @@
           "type": "integer",
           "default": 8443,
           "description": "Enter the server port number."
+        },
+        "axibaseCharts.previewUpdateInterval": {
+          "type": "number",
+          "default": 5000,
+          "description": "Controls milliseconds between updates of portal preview."
         }
       }
     },
