@@ -3,11 +3,12 @@ import { ConfigTree } from "./configTree";
 import { DefaultSetting } from "./defaultSetting";
 import {
     deprecatedTagSection,
+    getCsvErrorMessage,
+    illegalSetting,
     settingNameInTags,
     settingsWithWhitespaces,
     tagNameWithWhitespaces,
-    unknownToken,
-    illegalSetting
+    unknownToken
 } from "./messageUtil";
 import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
@@ -29,7 +30,7 @@ const placeholderContainingSettings = [
 
 /** Regular expressions for CSV syntax checking */
 /**
- * RegExp for: `csv <name> = 
+ * RegExp for: `csv <name> =
  *              <header1>, <header2>`
  */
 const CSV_NEXT_LINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
@@ -41,10 +42,6 @@ const CSV_INLINE_HEADER_PATTERN = /=[ \t]*$/m;
  * RegExp for: 'csv <name> from <url>'
  */
 const CSV_FROM_URL_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;
-/**
- * RegExp for: 'csv from <url>'
- */
-const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
 /**
  * RegExp for blank line
  */
@@ -748,24 +745,14 @@ export class Validator {
             let match = CSV_NEXT_LINE_HEADER_PATTERN.exec(line) || CSV_FROM_URL_PATTERN.exec(line);
 
             if (match !== null) {
-                this.match = match;;
+                this.match = match;
                 header = line.substring(this.match.index + 1);
             } else {
-                this.result.push(createDiagnostic(this.foundKeyword.range, this.getCsvErrorMessage(line)));
+                this.result.push(createDiagnostic(this.foundKeyword.range, getCsvErrorMessage(line)));
             }
         }
         this.addToStringMap(this.variables, "csvNames");
         this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
-    }
-
-    /**
-     * If line of code didn't match any standard RegExp, compose error message
-     * @param line line of code instruction
-     * @returns csv error message 
-     */
-    private getCsvErrorMessage(line: string): string {
-        return (CSV_FROM_URL_MISSING_NAME_PATTERN.test(line)) ? `<name> in 'csv <name> from <url>' is missing` : 
-        `The line should contain a '=' or 'from' keyword`
     }
 
     /**

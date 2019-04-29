@@ -39,3 +39,17 @@ Current: ${found}, expected: ${msg}`;
 
 export const illegalSetting: MessageFactoryMethod = (found: string): string =>
   `${found} setting is not allowed here.`;
+
+/**
+ * RegExp for: 'csv from <url>'
+ */
+const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
+/**
+ * If SCV pattern didn't match any known RegExp, compose error message
+ * @param line line of code instruction
+ * @returns csv error message
+ */
+export const getCsvErrorMessage: MessageFactoryMethod = (line: string): string => {
+  return (CSV_FROM_URL_MISSING_NAME_PATTERN.test(line)) ? `<name> in 'csv <name> from <url>' is missing` :
+    `The line should contain a '=' or 'from' keyword`;
+};

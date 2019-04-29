@@ -118,8 +118,9 @@ export class JavaScriptValidator {
                         Range.create(
                             this.currentLineNumber, this.match.index,
                             this.currentLineNumber, this.match.index + this.match.length,
-                        ), CheckPriority.High
+                        )
                     );
+                    statement.textPriority = CheckPriority.High;
                     this.queue.queue(statement);
                     continue;
                 }
@@ -214,8 +215,9 @@ export class JavaScriptValidator {
                 priority = CheckPriority.High;
             }
             const statement: TextRange = new TextRange(`${content};\n`,
-                range, priority
+                range
             );
+            statement.textPriority = priority;
             this.queue.queue(statement);
         }
     }
