@@ -112,10 +112,6 @@ endcsv`,
                 createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
                    `The line should contain a '=' or 'from' keyword`
-                ),
-                createDiagnostic(
-                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
-                    `csv has no matching endcsv`
                 )
             ]
         ),
@@ -126,10 +122,6 @@ endcsv`,
                 createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
                     `<name> in 'csv <name> from <url>' is missing`
-                ),
-                createDiagnostic(
-                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
-                    `csv has no matching endcsv`
                 )
             ]
         ),

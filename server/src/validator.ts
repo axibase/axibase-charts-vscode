@@ -49,6 +49,10 @@ const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
  * RegExp for blank line
  */
 const BLANK_LINE_PATTERN = /^[ \t]*$/m;
+/**
+ * RegExp for 'csv' keyword
+ */
+const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
 
 /**
  * Performs validation of a whole document line by line.
@@ -172,7 +176,12 @@ export class Validator {
             /**
              * At the moment 'csv <name> from <url>' supports unclosed syntax
              */
-            const canBeSingle = CSV_FROM_URL_PATTERN.test(line);
+            let canBeSingle = false;
+
+            if (CSV_KEYWORD_PATTERN.test(line)) {
+                canBeSingle = !CSV_INLINE_HEADER_PATTERN.test(line) && !CSV_NEXT_LINE_HEADER_PATTERN.test(line);
+            }
+
             this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
