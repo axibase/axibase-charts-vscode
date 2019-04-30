@@ -1,9 +1,11 @@
 import {
+    version as vscodeVersion,
     window,
     workspace,
     WorkspaceConfiguration
 } from "vscode";
-import { statusFamily, StatusFamily, userAgent } from "./util";
+// @ts-ignore
+import { name, publisher, version } from "../../package.json";
 const configSection: string = "axibaseCharts";
 export const languageId: string = "axibasecharts";
 const errorMessage: string = "Configure connection properties in VSCode > Preferences > Settings. Open Settings," +
@@ -77,6 +79,7 @@ async function performRequest(address: string, username?: string, password?: str
      *  2) get jsessionid;
      */
     const path: string = (username && password) ? "/api/v1/ping" : "/login";
+    const userAgent: string = `${name}/${version} vscode/${vscodeVersion}`;
     const headers: Headers = (username && password) ?
         {
             "Authorization": `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`,
@@ -136,3 +139,33 @@ async function performRequest(address: string, username?: string, password?: str
         .then(onSuccess) // If request is successful and response is 2xx.
         .catch(onError); // If request failed (for example, timeout) or response is not 2xx.
 }
+
+enum StatusFamily {
+    SERVER_ERROR = 5,
+    CLIENT_ERROR = 4,
+    SUCCESSFUL = 2,
+    REDIRECT = 3,
+    INFO = 1,
+}
+
+const statusFamily: (statusCode: number | undefined) => StatusFamily =
+    (statusCode: number | undefined): StatusFamily => {
+        const firstNumber: number = statusCode ? Math.floor(statusCode / 100) : 0;
+        switch (firstNumber) {
+            case 1:
+                return StatusFamily.INFO;
+            case 2:
+                return StatusFamily.SUCCESSFUL;
+            case 3:
+                return StatusFamily.REDIRECT;
+            case 4:
+                return StatusFamily.CLIENT_ERROR;
+            case 5:
+                return StatusFamily.SERVER_ERROR;
+            default:
+                throw new Error(`Incorrect status code ${statusCode}`);
+        }
+    };
+
+// Used in e2e tests, see test/helper.ts
+export const appId: string = `${publisher}.${name}`;
