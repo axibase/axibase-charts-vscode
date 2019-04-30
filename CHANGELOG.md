@@ -3,7 +3,7 @@
 ## `v.1.0.21`
 
 * Added warning for deprecated settings
-* Disable validation in case of `height-units` setting is present in `widget` section
+* Disable validation in case of `height-units` setting is present in the `widget` section
 
 ## `v.1.0.20`
 
