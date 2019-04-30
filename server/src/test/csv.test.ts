@@ -125,6 +125,13 @@ endcsv`,
                 )
             ]
         ),
+        new Test(
+            "Correct csv 'from' with for loop",
+            `csv rows from http://example.com
+            for row in rows
+            endfor`,
+            []
+        )
     ];
 
     tests.forEach((test: Test) => { test.validationTest(); });
