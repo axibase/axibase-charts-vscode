@@ -7125,7 +7125,6 @@
             "section": "widget",
             "example": false,
             "defaultValue": true,
-            "deprecated": "",
             "override": {
                 "[widget == 'chart']": {
                     "deprecated": "This setting is deprecated in timechart. Use `mode = stack` instead"
