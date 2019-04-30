@@ -2,12 +2,7 @@ import { join } from "path";
 import {
     TextDocument, Uri, workspace
 } from "vscode";
-import { constructConnection } from "./connectionUtils";
-export interface IConnectionDetails {
-    atsd: boolean;
-    cookie?: string[];
-    url: string;
-}
+import { constructConnection, IConnectionDetails } from "./connectionUtils";
 
 /**
  * Stores connection details, preprocesses config:
@@ -64,12 +59,7 @@ export class PanelContentProvider {
             return;
         }
         this.url = details.url;
-        if (details.cookie) {
-            this.jsessionid = details.cookie[0].split(";")[0]
-                .split("=")[1];
-        } else {
-            this.jsessionid = undefined;
-        }
+        this.jsessionid = details.jsessionid;
         this.atsd = details.atsd;
     }
 

@@ -20,15 +20,15 @@ The **Server** part includes but is not limited to:
 The **Client** part includes but is not limited to:
 
 * [`extension`](client/src/extension.ts): The entry point of the extension. Calls a language server.
-* [`panelContentProvider`](client/src/panelContentProvider.ts#L16): Provides functionality for [Webview API](https://code.visualstudio.com/api/extension-guides/webview): creates `WebviewPanel` and manages it's HTML content to allow preview portals.
+* [`panelContentProvider`](client/src/panelContentProvider.ts#L14): Provides functionality for [Webview API](https://code.visualstudio.com/api/extension-guides/webview): creates `WebviewPanel` and manages it's HTML content to allow preview portals.
 
 #### [axibasecharts.showPortal](client/src/extension.ts#L119)
 
 Portal preview is implemented using [Webview API](https://code.visualstudio.com/api/extension-guides/webview).
 
-Major part of libraries, required for visualization, placed in `client/resources`, to ensure access to them, their paths are updated with `vscode-resource` scheme in [`extensionPath`](client/src/panelContentProvider.ts#L124) method. To restrict access to other files in local filesystem from Webview, [`localResourceRoots`](client/src/extension.ts#L134) is used.
+Major part of libraries, required for visualization, placed in `client/resources`, to ensure access to them, their paths are updated with `vscode-resource` scheme in [`extensionPath`](client/src/panelContentProvider.ts#L114) method. To restrict access to other files in local filesystem from Webview, [`localResourceRoots`](client/src/extension.ts#L147) is used.
 
-Other files (at least `charts.min.js`) are loaded from ATSD instance, see [`getHtml`](client/src/panelContentProvider.ts#L131) and [`resource`](client/src/panelContentProvider.ts#L214) methods. `initChart()` from [init.js](client/resources/js/init.js) provides a way to catch self-signed SSL certificate issues.
+Other files (at least `charts.min.js`) are loaded from ATSD instance, see [`getHtml`](client/src/panelContentProvider.ts#L121) and [`resource`](client/src/panelContentProvider.ts#L193) methods. `initChart()` from [init.js](client/resources/js/init.js) provides a way to catch self-signed SSL certificate issues.
 
 ## Building
 

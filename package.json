@@ -53,8 +53,8 @@
         },
         "axibaseCharts.previewUpdateInterval": {
           "type": "number",
-          "default": 5000,
-          "description": "Controls milliseconds between updates of portal preview."
+          "default": 1,
+          "description": "Set seconds between updates of portal preview during configuration changes."
         }
       }
     },

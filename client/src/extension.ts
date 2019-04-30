@@ -29,8 +29,11 @@ let client: LanguageClient;
  */
 export const activate: (context: ExtensionContext) => void = async (context: ExtensionContext): Promise<void> => {
 
-    // Update WebviewPanel HTML on config change only if DEBOUNCE_TIME seconds have passed without it being updated.
-    const DEBOUNCE_TIME = 5000; // 5s
+    /**
+     * Update WebviewPanel HTML on config change only if DEBOUNCE_TIME seconds have passed without it being updated.
+     * Defailt is 1 second.
+     */
+    const DEBOUNCE_TIME = +workspace.getConfiguration(configSection).get("previewUpdateInterval") * 1000;
     // The server is implemented in node
     const serverModule: string = context.asAbsolutePath(join("server", "out", "server.js"));
     // The debug options for the server
@@ -136,7 +139,7 @@ export const activate: (context: ExtensionContext) => void = async (context: Ext
             panel = window.createWebviewPanel(
                 languageId,
                 "Preview Portal",
-                ViewColumn.Two,
+                { viewColumn: ViewColumn.Two, preserveFocus: true },
                 {
                     // Allow <script>s in the webview content.
                     enableScripts: true,

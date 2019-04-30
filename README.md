@@ -59,7 +59,7 @@ Specify connection properties.
 
 ![](./images/vscode-settings.png)
 
-Click **Show Preview** in the upper-right corner to view the current portal.
+Click **Preview Portal** in the upper-right corner to view the current portal.
 
 ![](./images/preview-button.png)
 
@@ -68,6 +68,10 @@ Click **Show Preview** in the upper-right corner to view the current portal.
 Enter user password, if connecting for the first time.
 
 ![](./images/preview-example.png)
+
+Preview is automatically updated after changes in the configuration within 1 second, customize this time in **Preview Update Interval** setting.
+
+To force update regardles of specified interval, click **Preview Portal** again.
 
 ### SSL Certificates
 
