@@ -2,8 +2,8 @@
 
 ## `v.1.0.21`
 
-* Added warning for deprecated settings
-* Disable validation in case of `height-units` setting is present in the `widget` section
+* Added warning for deprecated settings.
+* Improved validation of section for height-units, width-units and pointer-position.
 
 ## `v.1.0.20`
 
