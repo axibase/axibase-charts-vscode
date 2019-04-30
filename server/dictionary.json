@@ -2987,8 +2987,7 @@
             "type": "number",
             "minValue": 0,
             "example": 2,
-            "section": "configuration",
-            "defaultValue": 4
+            "section": "widget"
         },
         {
             "displayName": "hidden",
@@ -3002,7 +3001,7 @@
             "type": "string",
             "example": "value <= 0 \\| column.key.indexOf('paging') == 0",
             "multiLine": true,
-            "section": "widget",
+            "section": "column",
             "widget": "property",
             "script": {
                 "returnValue": "boolean",
@@ -5424,7 +5423,7 @@
         {
             "displayName": "pointer-position",
             "widget": "chart",
-            "section": "widget",
+            "section": "series",
             "type": "string",
             "example": "right",
             "defaultValue": "false"
@@ -8698,8 +8697,8 @@
             "displayName": "width-units",
             "type": "number",
             "example": 2,
-            "defaultValue": 6,
-            "minValue": 0
+            "minValue": 0,
+            "section": "widget"
         },
         {
             "displayName": "zoom-svg",

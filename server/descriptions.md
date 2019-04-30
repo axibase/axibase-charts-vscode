@@ -687,7 +687,11 @@ Group diverse portals visually.
   
 ## heightunits  
   
-Number of rows in the portal.  
+Functionality depends on section:
+
+* `[configuration]` - number of rows in the portal. Default value: 4.
+
+* `[widget]` - number of rows the widget occupies. Default value: 1.  
   
 ## hidden  
   
@@ -1528,7 +1532,11 @@ By default, minimum `30%`, maximum `50%`.
   
 ## widthunits  
   
-Number of columns in the portal.  
+Functionality depends on section:
+
+* `[configuration]` - number of columns in the portal. Default value: 6.
+
+* `[widget]` - number of columns the widget occupies. Default value: 1.  
   
 ## zoomsvg  
   
