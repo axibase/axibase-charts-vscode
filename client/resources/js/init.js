@@ -32,7 +32,7 @@ window.initChart = function () {
     function onError() {
         /**
          * Unable to connect to execute ping, therefore SSL issue; if api.guest.access.enabled,
-         * authorization errors catched in connectionUtils.ts -> constructConnection()).
+         * authorization errors are catched in connectionUtils.ts -> constructConnection()).
          */
         document.body.innerHTML =
             `<h3>SSL Certificate Error during connection to ${previewOptions.url}</h3>

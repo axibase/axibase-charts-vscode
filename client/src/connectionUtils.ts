@@ -11,7 +11,6 @@ const errorMessage: string = "Configure connection properties in VSCode > Prefer
 import { IncomingMessage } from "http";
 import { Headers, UriOptions } from "request";
 import request = require("request-promise-native");
-import { RequestPromiseOptions } from "request-promise-native";
 
 export interface IConnectionDetails {
     atsd: boolean;
@@ -23,7 +22,7 @@ let jsessionid: string | undefined;
 let atsd: boolean | undefined;
 /**
  * Constructs connection details based on the extension configuration and an input box:
- * tries to connect to server and get headers "Server" and "Set-Cookie", triggers window with error message
+ * tries to connect to server and get "Server" and "Set-Cookie" headers, triggers window with error message
  * if any connection error has been occurred, otherwise triggers inform window.
  */
 export async function constructConnection(): Promise<IConnectionDetails> {
@@ -87,7 +86,7 @@ async function performRequest(address: string, username?: string, password?: str
             "user-agent": userAgent
         };
 
-    const options: RequestPromiseOptions & UriOptions = {
+    const options: request.RequestPromiseOptions & UriOptions = {
         headers,
         method: "GET",
         rejectUnauthorized: false, // allows self-signed certificates
