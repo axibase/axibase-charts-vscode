@@ -315,6 +315,7 @@ export class ConfigTree {
         while (currentLevel.length > 0) {
             let childAccumulator: Section[] = [];
             for (const parentSection of currentLevel) {
+                this.validateTimeSpan(parentSection.settings);
                 for (let [sectionToCheck, reqsForSection] of parentSection.requirementsForChildren) {
                     this.checkAllChildren(sectionToCheck, reqsForSection, parentSection);
                 }
@@ -323,6 +324,40 @@ export class ConfigTree {
             currentLevel = childAccumulator;
         }
         this.diagnostics.push(...this.colorsDiagnostics.values());
+    }
+
+    /**
+     * Checks that start-time isn't greater than end-time
+     * @param settings array of section settings
+     */
+    public validateTimeSpan(settings: Setting[]): void {
+        let endTime: string | null;
+        let startTime: string | null;
+        let invalidSetting: Setting | null;
+
+        settings.forEach((setting) => {
+            switch (setting.displayName) {
+                case "end-time":
+                {
+                    endTime = setting.value;
+                    invalidSetting = setting;
+                    break;
+                }
+                case "start-time":
+                {
+                    startTime = setting.value;
+                    invalidSetting = setting;
+                    break;
+                }
+            }
+        });
+
+        // TODO: add support for non-ISO date format
+        if (startTime > endTime) {
+            this.diagnostics.push(
+                createDiagnostic(invalidSetting.textRange, "start-time shouldn't be greater than end-time")
+            );
+        }
     }
 
     /**
