@@ -1,5 +1,10 @@
 # Change Log
 
+## `v.1.0.21`
+
+* Added warning for deprecated settings.
+* Improved validation of section for `height-units`, `width-units` and `pointer-position`.
+
 ## `v.1.0.20`
 
 * Migrated to new vscode Webview API.
