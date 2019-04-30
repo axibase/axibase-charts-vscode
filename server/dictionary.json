@@ -7124,7 +7124,12 @@
             "type": "boolean",
             "section": "widget",
             "example": false,
-            "defaultValue": true
+            "defaultValue": true,
+            "override": {
+                "[widget == 'chart']": {
+                    "deprecated": "This setting is deprecated in timechart. Use `mode = stack` instead"
+                }
+            }
         },
         {
             "displayName": "start-time",

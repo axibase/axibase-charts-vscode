@@ -208,6 +208,10 @@
               "description": "A setting, which is excluded"
             }
           },
+          "deprecated": {
+            "description": "[Optinal] Warning message to show if setting is deprecated",
+            "type": "string"
+          },
           "override": {
             "patternProperties": {
               "^\\[.+\\]$": {

@@ -75,6 +75,10 @@ export class DefaultSetting {
      */
     public readonly name: string = "";
     /**
+     * Warning text to show if setting is deprecated
+     */
+    public readonly deprecated?: string;
+    /**
      * Holds the description of the setting if it is a script
      */
     public readonly script?: Script;
