@@ -1006,6 +1006,17 @@ export class Validator {
         }
         this.addSettingValue(setting);
 
+        /**
+         * Show hint if setting is deprecated
+         */
+        if (setting.deprecated) {
+            this.result.push(createDiagnostic(
+                setting.textRange,
+                setting.deprecated,
+                DiagnosticSeverity.Warning
+            ));
+        }
+
         if (!this.isAllowedInSection(setting)) {
             this.result.push(createDiagnostic(
                 setting.textRange,
