@@ -77,7 +77,7 @@ export class DefaultSetting {
     /**
      * Warning text to show if setting is deprecated
      */
-    public readonly deprecated: string | null = null;
+    public readonly deprecated?: string;
     /**
      * Holds the description of the setting if it is a script
      */
