@@ -99,6 +99,38 @@ endcsv`,
             mssql.backup_restore_throughput      ,       ,   +
             endcsv`,
             [],
+        ),
+        new Test(
+            "Correct csv with keyword 'from'",
+            `csv rows from https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
+            [],
+        ),
+        new Test(
+            "Incorrect csv with missing keyword 'from'",
+            `csv rows https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
+            [
+                createDiagnostic(
+                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
+                   `The line should contain a '=' or 'from' keyword`
+                )
+            ]
+        ),
+        new Test(
+            "Incorrect csv 'from' with missing entity name",
+            `csv from https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
+            [
+                createDiagnostic(
+                    Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
+                    `<name> in 'csv <name> from <url>' is missing`
+                )
+            ]
+        ),
+        new Test(
+            "Correct csv 'from' with for loop",
+            `csv rows from http://example.com
+            for row in rows
+            endfor`,
+            []
         )
     ];
 

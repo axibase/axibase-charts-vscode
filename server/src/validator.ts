@@ -3,6 +3,7 @@ import { ConfigTree } from "./configTree";
 import { DefaultSetting } from "./defaultSetting";
 import {
     deprecatedTagSection,
+    getCsvErrorMessage,
     illegalSetting,
     settingNameInTags,
     settingsWithWhitespaces,
@@ -26,6 +27,29 @@ import {
 const placeholderContainingSettings = [
     "url", "urlparameters"
 ];
+
+/** Regular expressions for CSV syntax checking */
+/**
+ * RegExp for: `csv <name> =
+ *              <header1>, <header2>`
+ */
+const CSV_NEXT_LINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
+/**
+ * RegExp for: 'csv <name> = <header1>, <header2>'
+ */
+const CSV_INLINE_HEADER_PATTERN = /=[ \t]*$/m;
+/**
+ * RegExp for: 'csv <name> from <url>'
+ */
+const CSV_FROM_URL_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;
+/**
+ * RegExp for blank line
+ */
+const BLANK_LINE_PATTERN = /^[ \t]*$/m;
+/**
+ * RegExp for 'csv' keyword
+ */
+const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
 
 /**
  * Performs validation of a whole document line by line.
@@ -146,7 +170,16 @@ export class Validator {
         }
         for (const line of this.lines) {
             this.currentLineNumber++;
-            this.foundKeyword = TextRange.parse(line, this.currentLineNumber);
+            /**
+             * At the moment 'csv <name> from <url>' supports unclosed syntax
+             */
+            let canBeSingle = false;
+
+            if (CSV_KEYWORD_PATTERN.test(line)) {
+                canBeSingle = !CSV_INLINE_HEADER_PATTERN.test(line) && !CSV_NEXT_LINE_HEADER_PATTERN.test(line);
+            }
+
+            this.foundKeyword = TextRange.parse(line, this.currentLineNumber, canBeSingle);
 
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var")) {
                 /**
@@ -535,6 +568,10 @@ export class Validator {
      */
     private diagnosticForLeftKeywords(): void {
         for (const nestedConstruction of this.keywordsStack) {
+            if (nestedConstruction.canBeUnclosed) {
+                continue;
+            }
+
             this.result.push(createDiagnostic(
                 nestedConstruction.range,
                 `${nestedConstruction.text} has no matching end${nestedConstruction.text}`,
@@ -696,21 +733,24 @@ export class Validator {
      */
     private handleCsv(): void {
         const line: string = this.getCurrentLine();
-        let header: string | null;
-        if (/=[ \t]*$/m.test(line)) {
+        let header: string | null = null;
+
+        if (CSV_INLINE_HEADER_PATTERN.exec(line)) {
             let j: number = this.currentLineNumber + 1;
             header = this.getLine(j);
-            while (header !== null && /^[ \t]*$/m.test(header)) {
+            while (header !== null && BLANK_LINE_PATTERN.test(header)) {
                 header = this.getLine(++j);
             }
         } else {
-            const match: RegExpExecArray | null = /=/.exec(line);
-            if (match === null) {
-                throw new Error("The line does not contain a '='");
+            let match = CSV_NEXT_LINE_HEADER_PATTERN.exec(line) || CSV_FROM_URL_PATTERN.exec(line);
+
+            if (match !== null) {
+                this.match = match;
+                header = line.substring(this.match.index + 1);
+            } else {
+                this.result.push(createDiagnostic(this.foundKeyword.range, getCsvErrorMessage(line)));
             }
-            header = line.substring(match.index + 1);
         }
-        this.match = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*=/m.exec(line);
         this.addToStringMap(this.variables, "csvNames");
         this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
     }

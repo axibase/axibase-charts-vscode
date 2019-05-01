@@ -50,8 +50,9 @@ export class TextRange {
      * Parses a keyword from the line and creates a TextRange.
      * @param line the line containing the keyword
      * @param i the index of the line
+     * @param canBeUnclosed whether keyword can exist in both closed and unclosed variant or not
      */
-    public static parse(line: string, i: number): TextRange | undefined {
+    public static parse(line: string, i: number, canBeUnclosed: boolean): TextRange | undefined {
         const match: RegExpExecArray | null = TextRange.KEYWORD_REGEXP.exec(line);
         if (match === null) {
             return undefined;
@@ -61,13 +62,20 @@ export class TextRange {
         return new TextRange(keyword, Range.create(
             Position.create(i, indent.length),
             Position.create(i, indent.length + keyword.length),
-        ));
+        ), canBeUnclosed);
     }
 
     /**
      * Priority of the text, used in jsDomCaller: settings with higher priority are placed earlier in test js "file"
      */
-    public readonly priority: number = CheckPriority.Low;
+    public priority: number = CheckPriority.Low;
+
+    /**
+     * priority property setter
+     */
+    set textPriority(value: number) {
+        this.priority = value;
+    }
 
     /**
      * Position of the text
@@ -79,9 +87,14 @@ export class TextRange {
      */
     public readonly text: string;
 
-    public constructor(text: string, range: Range, priority?: number) {
+    /**
+     * Keyword can exist in both closed and unclosed variants
+     */
+    public readonly canBeUnclosed: boolean;
+
+    public constructor(text: string, range: Range, canBeUnclosed: boolean = false) {
         this.range = range;
         this.text = text;
-        this.priority = priority;
+        this.canBeUnclosed = canBeUnclosed;
     }
 }
