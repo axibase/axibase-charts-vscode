@@ -63,6 +63,17 @@ const relatedSettings: Requirement[] = [
     },
     {
         /**
+         * If "type=chart" and "start-time" is specified,
+         * any of "end-time" or "timespan" is required
+         */
+        conditions: [
+            sectionMatchConditionRequired("type", ["chart"])
+        ],
+        dependent: "start-time",
+        requiredAnyIfConditions: ["end-time", "timespan"]
+    },
+    {
+        /**
          * If "type=chart" and "mode" is NOT "column-stack" or "column",
          * settings "negative-style" and "current-period-style" are useless.
          */
@@ -315,7 +326,6 @@ export class ConfigTree {
         while (currentLevel.length > 0) {
             let childAccumulator: Section[] = [];
             for (const parentSection of currentLevel) {
-                this.validateTimeSpan(parentSection.settings);
                 for (let [sectionToCheck, reqsForSection] of parentSection.requirementsForChildren) {
                     this.checkAllChildren(sectionToCheck, reqsForSection, parentSection);
                 }
@@ -328,35 +338,18 @@ export class ConfigTree {
 
     /**
      * Checks that start-time isn't greater than end-time
-     * @param settings array of section settings
+     * @param startTime "start-time" setting
+     * @param endTime "end-time" setting
      */
-    public validateTimeSpan(settings: Setting[]): void {
-        let endTime: string | null;
-        let startTime: string | null;
-        let invalidSetting: Setting | null;
+    public validateTimeSpan(startTime: Setting, endTime?: Setting): void {
+        if (endTime === undefined) {
+            return;
+        }
 
-        settings.forEach((setting) => {
-            switch (setting.displayName) {
-                case "end-time":
-                {
-                    endTime = setting.value;
-                    invalidSetting = setting;
-                    break;
-                }
-                case "start-time":
-                {
-                    startTime = setting.value;
-                    invalidSetting = setting;
-                    break;
-                }
-            }
-        });
-
-        // TODO: add support for non-ISO date format
-        if (startTime > endTime) {
+        if (startTime.value > endTime.value) {
             this.diagnostics.push(
                 createDiagnostic(
-                    invalidSetting.textRange,
+                    endTime.textRange,
                     "end-time must be greater than start-time",
                     DiagnosticSeverity.Error
                 )
@@ -446,6 +439,17 @@ export class ConfigTree {
                         this.diagnostics.push(createDiagnostic(section.range.range,
                             `${req.dependent} has effect only with one of the following:
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
+                    } else {
+                        // additional validation for requiredAnyIfConditions
+                        switch (req.dependent) {
+                            case "start-time": {
+                                const endTime = ConfigTree.getSetting(section, "end-time");
+                                const startTime = ConfigTree.getSetting(section, "start-time");
+                                // TODO: add "timespan" validation
+                                this.validateTimeSpan(startTime, endTime);
+                                break;
+                            }
+                        }
                     }
                 }
             }

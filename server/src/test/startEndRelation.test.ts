@@ -4,7 +4,7 @@ import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 suite("Start-time and end-time comparison", () => {
-    test("Throws error that start-time is greater then end-time", () => {
+    test("Start-time is greater than end-time. Both settings are in [widget]", () => {
         const config = `[configuration]
         [group]
         [widget]
@@ -24,7 +24,7 @@ suite("Start-time and end-time comparison", () => {
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
     });
 
-    test("Doesn't throw error if start-time and end-time relation is correct", () => {
+    test("Start-time and end-time relation is correct. Both settings are in [widget]", () => {
         const config = `[configuration]
         [group]
         [widget]
@@ -37,5 +37,54 @@ suite("Start-time and end-time comparison", () => {
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
         deepStrictEqual(actualDiagnostics, []);
+    });
+
+    test("Start-time and end-time relation is correct. Settings are in different sections", () => {
+        const config = `[configuration]
+        entity = nurswgvml007
+        metric = cpu_busy
+        start-time = 2015-07-05 10:00:00
+      [group]
+        [widget]
+          type = chart
+          end-time = 2018-07-05 12:00:00
+          [series]
+        [widget]
+          type = chart
+          end-time = 2018-07-05 13:00:00
+          [series]`;
+        const validator = new Validator(config);
+        const actualDiagnostics = validator.lineByLine();
+        deepStrictEqual(actualDiagnostics, []);
+    });
+
+    test("Start-time is greater than end-time. Settings are in different sections", () => {
+        const config = `[configuration]
+        entity = nurswgvml007
+        metric = cpu_busy
+        start-time = 2019-07-05 10:00:00
+      [group]
+        [widget]
+          type = chart
+          end-time = 2018-07-05 12:00:00
+          [series]
+        [widget]
+          type = chart
+          end-time = 2018-07-05 13:00:00
+          [series]`;
+        const validator = new Validator(config);
+        const actualDiagnostics = validator.lineByLine();
+        const expectedDiagnostic = [
+            createDiagnostic(
+                Range.create(Position.create(7, 10), Position.create(7, 18)),
+                "end-time must be greater than start-time",
+                DiagnosticSeverity.Error
+            ),
+            createDiagnostic(
+                Range.create(Position.create(11, 10), Position.create(11, 18)),
+                "end-time must be greater than start-time",
+                DiagnosticSeverity.Error
+            )];
+        deepStrictEqual(actualDiagnostics, expectedDiagnostic);
     });
 });
