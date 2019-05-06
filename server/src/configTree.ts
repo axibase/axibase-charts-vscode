@@ -338,11 +338,11 @@ export class ConfigTree {
 
     /**
      * Checks that start-time isn't greater than end-time
-     * @param startTime "start-time" setting
-     * @param endTime "end-time" setting
+     * @param startTime interval start point
+     * @param endTime interval end point
      */
-    public validateTimeSpan(startTime: Setting, endTime?: Setting): void {
-        if (endTime === undefined) {
+    public validateTimeSpan(startTime?: Setting, endTime?: Setting): void {
+        if (endTime === undefined || startTime === undefined) {
             return;
         }
 
@@ -350,7 +350,7 @@ export class ConfigTree {
             this.diagnostics.push(
                 createDiagnostic(
                     endTime.textRange,
-                    "end-time must be greater than start-time",
+                    `${endTime.displayName} must be greater than ${startTime.displayName}`,
                     DiagnosticSeverity.Error
                 )
             );
