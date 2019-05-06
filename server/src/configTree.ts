@@ -355,7 +355,11 @@ export class ConfigTree {
         // TODO: add support for non-ISO date format
         if (startTime > endTime) {
             this.diagnostics.push(
-                createDiagnostic(invalidSetting.textRange, "end-time must be greater than start-time")
+                createDiagnostic(
+                    invalidSetting.textRange,
+                    "end-time must be greater than start-time",
+                    DiagnosticSeverity.Error
+                )
             );
         }
     }
