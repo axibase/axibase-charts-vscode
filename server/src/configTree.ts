@@ -437,7 +437,7 @@ export class ConfigTree {
                             `${req.dependent} has effect only with one of the following:
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
                     }
-                } else if (req.mustBeLessThan) {
+                } else {
                     const endTime = ConfigTree.getSetting(section, req.mustBeLessThan);
                     const settingName = Array.isArray(req.dependent) ? req.dependent[0] : req.dependent;
                     const startTime = ConfigTree.getSetting(section, settingName);
@@ -505,7 +505,8 @@ export class ConfigTree {
         if (
             requirement.requiredIfConditions == null
             && requirement.requiredAnyIfConditions == null
-            && requirement.mustBeLessThan == null) {
+            && requirement.mustBeLessThan == null
+        ) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
