@@ -87,4 +87,79 @@ suite("Start-time and end-time comparison", () => {
             )];
         deepStrictEqual(actualDiagnostics, expectedDiagnostic);
     });
+
+    test("Forecast-horizon-end-time and end-time relation is correct. Settings are in different sections", () => {
+      const config = `[configuration]
+      offset-right = 50
+      height-units = 3
+      width-units = 1
+      timezone = utc
+      entity = nurswgvml007
+      metric = cpu_busy
+      step-line = false
+      timespan = 1 week
+      end-time = 2018-02-15T00:00:00Z
+      period = 1 hour
+      statistics = avg
+      interpolate = LINEAR
+      label-format = forecast
+    [group]
+      widgets-per-row = 1
+    [widget]
+      type = chart
+      [series]
+        forecast-ssa = true
+        forecast-horizon-end-time = 2018-02-18T00:00:00Z
+        forecast-include = HISTORY, FORECAST
+    [widget]
+      type = chart
+      [series]
+        forecast-ssa = true
+        forecast-horizon-interval = 1 day
+        forecast-include = HISTORY, FORECAST`;
+
+      const validator = new Validator(config);
+      const actualDiagnostics = validator.lineByLine();
+      deepStrictEqual(actualDiagnostics, []);
+    });
+
+    test("End-time is greater than forecast-horizon-end-time. Settings are in different sections", () => {
+      const config = `[configuration]
+      offset-right = 50
+      height-units = 3
+      width-units = 1
+      timezone = utc
+      entity = nurswgvml007
+      metric = cpu_busy
+      step-line = false
+      timespan = 1 week
+      end-time = 2020-02-15T00:00:00Z
+      period = 1 hour
+      statistics = avg
+      interpolate = LINEAR
+      label-format = forecast
+    [group]
+      widgets-per-row = 1
+    [widget]
+      type = chart
+      [series]
+        forecast-ssa = true
+        forecast-horizon-end-time = 2018-02-18T00:00:00Z
+        forecast-include = HISTORY, FORECAST
+    [widget]
+      type = chart
+      [series]
+        forecast-ssa = true
+        forecast-horizon-interval = 1 day
+        forecast-include = HISTORY, FORECAST`;
+
+      const validator = new Validator(config);
+      const actualDiagnostics = validator.lineByLine();
+      const expectedDiagnostic = createDiagnostic(
+        Range.create(Position.create(20, 8), Position.create(20, 33)),
+        "forecast-horizon-end-time must be greater than end-time",
+        DiagnosticSeverity.Error
+      );
+      deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+    });
 });
