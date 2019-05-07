@@ -63,11 +63,11 @@ const relatedSettings: Requirement[] = [
     },
     {
         dependent: "end-time",
-        relation: "forecast-horizon-end-time"
+        mustBeLessThan: "forecast-horizon-end-time"
     },
     {
         dependent: "start-time",
-        relation: "end-time"
+        mustBeLessThan: "end-time"
     },
     {
         /**
@@ -437,8 +437,8 @@ export class ConfigTree {
                             `${req.dependent} has effect only with one of the following:
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
                     }
-                } else if (req.relation) {
-                    const endTime = ConfigTree.getSetting(section, req.relation);
+                } else if (req.mustBeLessThan) {
+                    const endTime = ConfigTree.getSetting(section, req.mustBeLessThan);
                     const settingName = Array.isArray(req.dependent) ? req.dependent[0] : req.dependent;
                     const startTime = ConfigTree.getSetting(section, settingName);
 
@@ -505,7 +505,7 @@ export class ConfigTree {
         if (
             requirement.requiredIfConditions == null
             && requirement.requiredAnyIfConditions == null
-            && requirement.relation == null) {
+            && requirement.mustBeLessThan == null) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
@@ -520,7 +520,7 @@ export class ConfigTree {
              */
             requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
         } else {
-            requiredSetting = getSetting(requirement.relation);
+            requiredSetting = getSetting(requirement.mustBeLessThan);
         }
 
         const sectionNames = requiredSetting.section;
