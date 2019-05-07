@@ -62,15 +62,12 @@ const relatedSettings: Requirement[] = [
         requiredAnyIfConditions: ["forecast-horizon-end-time", "forecast-horizon-interval", "forecast-horizon-length"]
     },
     {
-        /**
-         * If "type=chart" and "start-time" is specified,
-         * any of "end-time" or "timespan" is required
-         */
-        conditions: [
-            sectionMatchConditionRequired("type", ["chart"])
-        ],
+        dependent: "end-time",
+        relation: "forecast-horizon-end-time"
+    },
+    {
         dependent: "start-time",
-        requiredAnyIfConditions: ["end-time", "timespan"]
+        relation: "end-time"
     },
     {
         /**
@@ -432,25 +429,20 @@ export class ConfigTree {
                             break;
                         }
                     }
-                } else {
+                } else if (req.requiredAnyIfConditions) {
                     const anyRequiredIsSpecified = req.requiredAnyIfConditions.some(
                         reqSetting => ConfigTree.getSetting(section, reqSetting) != null);
                     if (!anyRequiredIsSpecified) {
                         this.diagnostics.push(createDiagnostic(section.range.range,
                             `${req.dependent} has effect only with one of the following:
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
-                    } else {
-                        // additional validation for requiredAnyIfConditions
-                        switch (req.dependent) {
-                            case "start-time": {
-                                const endTime = ConfigTree.getSetting(section, "end-time");
-                                const startTime = ConfigTree.getSetting(section, "start-time");
-                                // TODO: add "timespan" validation
-                                this.validateTimeSpan(startTime, endTime);
-                                break;
-                            }
-                        }
                     }
+                } else if (req.relation) {
+                    const endTime = ConfigTree.getSetting(section, req.relation);
+                    const settingName = Array.isArray(req.dependent) ? req.dependent[0] : req.dependent;
+                    const startTime = ConfigTree.getSetting(section, settingName);
+
+                    this.validateTimeSpan(startTime, endTime);
                 }
             }
         }
@@ -509,20 +501,26 @@ export class ConfigTree {
      * @param dependent Setting, which requires other settings or which must be checked for applicability.
      */
     private checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
-        if (requirement.requiredIfConditions == null && requirement.requiredAnyIfConditions == null) {
+
+        if (
+            requirement.requiredIfConditions == null
+            && requirement.requiredAnyIfConditions == null
+            && requirement.relation == null) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
         let requiredSetting;
         if (requirement.requiredIfConditions) {
             requiredSetting = getSetting(requirement.requiredIfConditions);
-        } else {
+        } else if (requirement.requiredAnyIfConditions) {
             /**
              * If requirement.requiredIfConditions == null, then requiredAnyIfConditions != null.
              * It's supposed that all settings from `requiredAnyIfConditions` have the same sections,
              * that's why only first section is used here.
              */
             requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
+        } else {
+            requiredSetting = getSetting(requirement.relation);
         }
 
         const sectionNames = requiredSetting.section;

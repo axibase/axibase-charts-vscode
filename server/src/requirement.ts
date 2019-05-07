@@ -82,4 +82,6 @@ export interface Requirement {
     requiredIfConditions?: string;
     // at least one of these settings required if the conditions are satisfied
     requiredAnyIfConditions?: string[];
+    // related setting
+    relation?: string;
 }
