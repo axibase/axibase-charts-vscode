@@ -51,6 +51,8 @@ To display available completions, press `Ctrl+Space` on PC or `⌃Space` on Mac.
 
 ## Live Preview
 
+> Requires VSCode >= `v1.33.1` and plugin >= `1.33.0`.
+
 The extension shows a preview of the portal in the VSCode interface by requesting data from the target server.
 
 To configure the target server, open **Preferences > Settings** and enter `axibase` in the search box.
