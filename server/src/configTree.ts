@@ -1,10 +1,14 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { uselessScope } from "./messageUtil";
 import {
+    checkColorsMatchTreshold,
+    checkTimeSettings,
+    relatedSettings
+} from "./relatedSettingsCheckers";
+import {
     Condition, Requirement,
     SectionScope
 } from "./requirement";
-import { checkColorsMatchTreshold, checkTimeSettings, relatedSettings } from "./requirementsChecker";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
@@ -254,17 +258,13 @@ export class ConfigTree {
                             `${required} is required if ${req.dependent} is specified`));
                         return;
                     }
-
                     switch (required) {
                         case "thresholds": {
                             const colorsSetting = ConfigTree.getSetting(section, "colors");
-
-                            const colorsDontMatch = checkColorsMatchTreshold(colorsSetting, checkedSetting);
-
-                            if (colorsDontMatch !== undefined) {
-                                this.colorsDiagnostics.set(colorsSetting, colorsDontMatch);
+                            const diagnostics = checkColorsMatchTreshold(colorsSetting, checkedSetting);
+                            if (diagnostics !== undefined) {
+                                this.colorsDiagnostics.set(colorsSetting, diagnostics);
                             }
-
                             break;
                         }
                         case "forecast-ssa-decompose-eigentriple-limit": {
@@ -290,7 +290,6 @@ export class ConfigTree {
                     // Related settings time interval validation
                     let start: Setting;
                     let end: Setting;
-
                     switch (req.relation) {
                         case "forecast-horizon-end-time":
                         {
@@ -305,9 +304,7 @@ export class ConfigTree {
                             break;
                         }
                     }
-
                     const checkTimeWarning = checkTimeSettings(start, end);
-
                     if (checkTimeWarning !== undefined) {
                         this.diagnostics.push(
                             checkTimeWarning

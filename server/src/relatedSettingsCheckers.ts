@@ -159,7 +159,7 @@ export const relatedSettings: Requirement[] = [
  * @param start interval start point
  * @param end interval end point
  */
-export const checkTimeSettings = (start?: Setting, end?: Setting): Diagnostic | undefined  => {
+export function checkTimeSettings (start?: Setting, end?: Setting): Diagnostic | undefined {
     if (end === undefined || start === undefined) {
         return undefined;
     }
@@ -179,10 +179,7 @@ export const checkTimeSettings = (start?: Setting, end?: Setting): Diagnostic | 
  * Check the relationship between thresholds and colors:
  * in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
  */
-export const checkColorsMatchTreshold = (
-    colorsSetting: Setting,
-    thresholdsSetting: Setting
-): Diagnostic | undefined => {
+export function checkColorsMatchTreshold(colorsSetting: Setting, thresholdsSetting: Setting): Diagnostic | undefined {
     let colorsValues;
     let thresholdsValues;
     if (colorsSetting.values.length > 0) {
