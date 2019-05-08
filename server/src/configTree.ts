@@ -62,12 +62,20 @@ const relatedSettings: Requirement[] = [
         requiredAnyIfConditions: ["forecast-horizon-end-time", "forecast-horizon-interval", "forecast-horizon-length"]
     },
     {
+        /**
+         * If "end-time" is specified,
+         * consider it is less than "forecast-horizon-end-time"
+         */
         dependent: "end-time",
-        mustBeLessThan: "forecast-horizon-end-time"
+        relation: "forecast-horizon-end-time"
     },
     {
+        /**
+         * If "start-time" is specified,
+         * consider it is less than "end-time"
+         */
         dependent: "start-time",
-        mustBeLessThan: "end-time"
+        relation: "end-time"
     },
     {
         /**
@@ -438,11 +446,25 @@ export class ConfigTree {
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
                     }
                 } else {
-                    const endTime = ConfigTree.getSetting(section, req.mustBeLessThan);
-                    const settingName = Array.isArray(req.dependent) ? req.dependent[0] : req.dependent;
-                    const startTime = ConfigTree.getSetting(section, settingName);
+                    // Additional settings time relation validation
+                    switch (req.relation) {
+                        case "forecast-horizon-end-time":
+                        {
+                            let endTime = ConfigTree.getSetting(section, "forecast-horizon-end-time");
+                            let startTime = ConfigTree.getSetting(section, "end-time");
 
-                    this.validateTimeSpan(startTime, endTime);
+                            this.validateTimeSpan(startTime, endTime);
+                            break;
+                        }
+                        case "end-time":
+                        {
+                            const endTime = ConfigTree.getSetting(section, "end-time");
+                            const startTime = ConfigTree.getSetting(section, "start-time");
+
+                            this.validateTimeSpan(startTime, endTime);
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -505,7 +527,7 @@ export class ConfigTree {
         if (
             requirement.requiredIfConditions == null
             && requirement.requiredAnyIfConditions == null
-            && requirement.mustBeLessThan == null
+            && requirement.relation == null
         ) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
@@ -521,7 +543,7 @@ export class ConfigTree {
              */
             requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
         } else {
-            requiredSetting = getSetting(requirement.mustBeLessThan);
+            requiredSetting = getSetting(requirement.relation);
         }
 
         const sectionNames = requiredSetting.section;
