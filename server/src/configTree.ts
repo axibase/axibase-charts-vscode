@@ -446,12 +446,12 @@ export class ConfigTree {
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
                     }
                 } else {
-                    // Additional settings time relation validation
+                    // Related settings time interval validation
                     switch (req.relation) {
                         case "forecast-horizon-end-time":
                         {
-                            let endTime = ConfigTree.getSetting(section, "forecast-horizon-end-time");
-                            let startTime = ConfigTree.getSetting(section, "end-time");
+                            const endTime = ConfigTree.getSetting(section, "forecast-horizon-end-time");
+                            const startTime = ConfigTree.getSetting(section, "end-time");
 
                             this.validateTimeSpan(startTime, endTime);
                             break;
