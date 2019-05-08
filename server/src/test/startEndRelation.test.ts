@@ -77,28 +77,28 @@ suite("Start-time and end-time comparison", () => {
             "end-time must be greater than start-time",
             DiagnosticSeverity.Error
         );
-        deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+        deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
     });
 
     test("Start-time and end-time relation is correct. Both settings are in [widget]", () => {
         const config = sameSectionStartEnd("2014-04-22 01:00:00", "2015-04-22 01:00:00");
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
-        deepStrictEqual(actualDiagnostics, []);
+        deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
     });
 
     test("Start-time and end-time relation is correct. Settings are in different sections", () => {
         const config = differentSectionStartEnd("2015-07-05 10:00:00", "2018-07-05 12:00:00");
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
-        deepStrictEqual(actualDiagnostics, []);
+        deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
     });
 
     test("End-time and start-time relation is correct. Settings are in different sections", () => {
       const config = differentSectionEndStart("2018-07-05 12:00:00", "2019-07-05 12:00:00");
       const validator = new Validator(config);
       const actualDiagnostics = validator.lineByLine();
-      deepStrictEqual(actualDiagnostics, []);
+      deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
     });
 
     test("End-time is less then start-time. Settings are in different sections", () => {
@@ -110,7 +110,7 @@ suite("Start-time and end-time comparison", () => {
         "end-time must be greater than start-time",
         DiagnosticSeverity.Error
       );
-      deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+      deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
     });
 
     test("Start-time is greater than end-time. Settings are in different sections", () => {
@@ -128,7 +128,7 @@ suite("Start-time and end-time comparison", () => {
                 "end-time must be greater than start-time",
                 DiagnosticSeverity.Error
             )];
-        deepStrictEqual(actualDiagnostics, expectedDiagnostic);
+        deepStrictEqual(actualDiagnostics, expectedDiagnostic, `Config: \n${config}`);
     });
 });
 
@@ -137,7 +137,7 @@ suite("Forecast-horizon-end-time and end-time comparison", () => {
     const config = differentSectionForecast("2018-02-15T00:00:00Z", "2018-02-18T00:00:00Z");
     const validator = new Validator(config);
     const actualDiagnostics = validator.lineByLine();
-    deepStrictEqual(actualDiagnostics, []);
+    deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
   });
 
   test("End-time is greater than forecast-horizon-end-time. Settings are in different sections", () => {
@@ -149,6 +149,6 @@ suite("Forecast-horizon-end-time and end-time comparison", () => {
       "forecast-horizon-end-time must be greater than end-time",
       DiagnosticSeverity.Error
     );
-    deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+    deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
   });
 });

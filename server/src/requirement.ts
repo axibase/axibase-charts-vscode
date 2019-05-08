@@ -82,6 +82,6 @@ export interface Requirement {
     requiredIfConditions?: string;
     // at least one of these settings required if the conditions are satisfied
     requiredAnyIfConditions?: string[];
-    // setting related to this setting
+    // setting, time relation with which would be considered
     relation?: string;
 }

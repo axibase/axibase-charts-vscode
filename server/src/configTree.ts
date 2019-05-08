@@ -342,20 +342,20 @@ export class ConfigTree {
     }
 
     /**
-     * Checks that start-time isn't greater than end-time
-     * @param startTime interval start point
-     * @param endTime interval end point
+     * Checks that start point isn't greater than end point
+     * @param start interval start point
+     * @param end interval end point
      */
-    public validateTimeSpan(startTime?: Setting, endTime?: Setting): void {
-        if (endTime === undefined || startTime === undefined) {
+    public checkTimeSettings(start?: Setting, end?: Setting): void {
+        if (end === undefined || start === undefined) {
             return;
         }
 
-        if (startTime.value > endTime.value) {
+        if (start.value >= end.value) {
             this.diagnostics.push(
                 createDiagnostic(
-                    endTime.textRange,
-                    `${endTime.displayName} must be greater than ${startTime.displayName}`,
+                    end.textRange,
+                    `${end.displayName} must be greater than ${start.displayName}`,
                     DiagnosticSeverity.Error
                 )
             );
@@ -447,24 +447,25 @@ export class ConfigTree {
                     }
                 } else {
                     // Related settings time interval validation
+                    let start: Setting;
+                    let end: Setting;
+
                     switch (req.relation) {
                         case "forecast-horizon-end-time":
                         {
-                            const endTime = ConfigTree.getSetting(section, "forecast-horizon-end-time");
-                            const startTime = ConfigTree.getSetting(section, "end-time");
-
-                            this.validateTimeSpan(startTime, endTime);
+                            start = ConfigTree.getSetting(section, "end-time");
+                            end = ConfigTree.getSetting(section, "forecast-horizon-end-time");
                             break;
                         }
                         case "end-time":
                         {
-                            const endTime = ConfigTree.getSetting(section, "end-time");
-                            const startTime = ConfigTree.getSetting(section, "start-time");
-
-                            this.validateTimeSpan(startTime, endTime);
+                            start = ConfigTree.getSetting(section, "start-time");
+                            end = ConfigTree.getSetting(section, "end-time");
                             break;
                         }
                     }
+
+                    this.checkTimeSettings(start, end);
                 }
             }
         }
@@ -532,21 +533,21 @@ export class ConfigTree {
             this.checkDependentUseless(section, requirement, dependent);
             return;
         }
-        let requiredSetting;
+        let checkedSetting;
         if (requirement.requiredIfConditions) {
-            requiredSetting = getSetting(requirement.requiredIfConditions);
+            checkedSetting = getSetting(requirement.requiredIfConditions);
         } else if (requirement.requiredAnyIfConditions) {
             /**
              * If requirement.requiredIfConditions == null, then requiredAnyIfConditions != null.
              * It's supposed that all settings from `requiredAnyIfConditions` have the same sections,
              * that's why only first section is used here.
              */
-            requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
+            checkedSetting = getSetting(requirement.requiredAnyIfConditions[0]);
         } else {
-            requiredSetting = getSetting(requirement.relation);
+            checkedSetting = getSetting(requirement.relation);
         }
 
-        const sectionNames = requiredSetting.section;
+        const sectionNames = checkedSetting.section;
         if (!sectionNames) {
             return;
         }
