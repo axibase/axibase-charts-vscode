@@ -130,23 +130,25 @@ suite("Start-time and end-time comparison", () => {
             )];
         deepStrictEqual(actualDiagnostics, expectedDiagnostic);
     });
+});
 
-    test("Forecast-horizon-end-time and end-time relation is correct. Settings are in different sections", () => {
-      const config = differentSectionForecast("2018-02-15T00:00:00Z", "2018-02-18T00:00:00Z");
-      const validator = new Validator(config);
-      const actualDiagnostics = validator.lineByLine();
-      deepStrictEqual(actualDiagnostics, []);
-    });
+suite("Forecast-horizon-end-time and end-time comparison", () => {
+  test("Forecast-horizon-end-time and end-time relation is correct. Settings are in different sections", () => {
+    const config = differentSectionForecast("2018-02-15T00:00:00Z", "2018-02-18T00:00:00Z");
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    deepStrictEqual(actualDiagnostics, []);
+  });
 
-    test("End-time is greater than forecast-horizon-end-time. Settings are in different sections", () => {
-      const config = differentSectionForecast("2020-02-15T00:00:00Z", "2018-02-18T00:00:00Z");
-      const validator = new Validator(config);
-      const actualDiagnostics = validator.lineByLine();
-      const expectedDiagnostic = createDiagnostic(
-        Range.create(Position.create(8, 4), Position.create(8, 29)),
-        "forecast-horizon-end-time must be greater than end-time",
-        DiagnosticSeverity.Error
-      );
-      deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
-    });
+  test("End-time is greater than forecast-horizon-end-time. Settings are in different sections", () => {
+    const config = differentSectionForecast("2020-02-15T00:00:00Z", "2018-02-18T00:00:00Z");
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    const expectedDiagnostic = createDiagnostic(
+      Range.create(Position.create(8, 4), Position.create(8, 29)),
+      "forecast-horizon-end-time must be greater than end-time",
+      DiagnosticSeverity.Error
+    );
+    deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+  });
 });
