@@ -51,7 +51,7 @@ To display available completions, press `Ctrl+Space` on PC or `⌃Space` on Mac.
 
 ## Live Preview
 
-> Requires VSCode >= `v1.33.1` and plugin >= `1.33.0`.
+> Requires VSCode >= `v1.33.1` and plugin >= `1.0.20`.
 
 The extension shows a preview of the portal in the VSCode interface by requesting data from the target server.
 
