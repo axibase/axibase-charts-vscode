@@ -145,7 +145,7 @@ suite("Forecast-horizon-end-time and end-time comparison", () => {
     const validator = new Validator(config);
     const actualDiagnostics = validator.lineByLine();
     const expectedDiagnostic = createDiagnostic(
-      Range.create(Position.create(8, 4), Position.create(8, 29)),
+      Range.create(Position.create(3, 2), Position.create(3, 10)),
       "forecast-horizon-end-time must be greater than end-time",
       DiagnosticSeverity.Error
     );

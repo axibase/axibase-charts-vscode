@@ -2,9 +2,9 @@ import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { uselessScope } from "./messageUtil";
 import {
     checkColorsMatchTreshold,
-    checkTimeSettings,
     relatedSettings
 } from "./relatedSettingsCheckers";
+import { RelatedSettingsTraversal } from "./relatedSettingsTraversal";
 import {
     Condition, Requirement,
     SectionScope
@@ -14,7 +14,48 @@ import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
-class Section {
+export class Section {
+
+    public static ValidationRules(section: Section): (() => void | Diagnostic)[] {
+        return [
+            (): Diagnostic | void => {
+                let forecast = ConfigTree.getSetting(section, "forecast-horizon-end-time");
+                let end = ConfigTree.getSetting(section, "end-time");
+
+                if (end === undefined || forecast === undefined) {
+                    return;
+                }
+
+                if (end.value >= forecast.value) {
+                    return createDiagnostic(
+                        end.textRange,
+                        `${forecast.displayName} must be greater than ${end.displayName}`,
+                        DiagnosticSeverity.Error
+                    );
+                }
+            },
+            (): Diagnostic | void => {
+                let start = ConfigTree.getSetting(section, "start-time");
+                let end = ConfigTree.getSetting(section, "end-time");
+
+                if (end === undefined || start === undefined) {
+                    return;
+                }
+
+                if (section.name !== start.section) {
+                    return;
+                }
+
+                if (start.value >= end.value) {
+                    return createDiagnostic(
+                        end.textRange,
+                        `${end.displayName} must be greater than ${start.displayName}`,
+                        DiagnosticSeverity.Error
+                    );
+                }
+            }
+        ];
+    }
 
     public name: string;
     public settings: Setting[];
@@ -95,6 +136,8 @@ export class ConfigTree {
     private root: Section;
     private lastAddedParent: Section;
     private previous: Section;
+
+    private relatedSettingsTraversal: RelatedSettingsTraversal = new RelatedSettingsTraversal();
 
     public constructor(diagnostics: Diagnostic[]) {
         this.diagnostics = diagnostics;
@@ -199,6 +242,12 @@ export class ConfigTree {
             currentLevel = childAccumulator;
         }
         this.diagnostics.push(...this.colorsDiagnostics.values());
+
+        this.relatedSettingsTraversal.tranverse(this.root);
+
+        if (this.relatedSettingsTraversal.diagnostic.length) {
+            this.diagnostics.push(...this.relatedSettingsTraversal.diagnostic);
+        }
     }
 
     /**
@@ -285,30 +334,6 @@ export class ConfigTree {
                         this.diagnostics.push(createDiagnostic(section.range.range,
                             `${req.dependent} has effect only with one of the following:
  * ${req.requiredAnyIfConditions.join("\n * ")}`));
-                    }
-                } else {
-                    // Related settings time interval validation
-                    let start: Setting;
-                    let end: Setting;
-                    switch (req.relation) {
-                        case "forecast-horizon-end-time":
-                        {
-                            start = ConfigTree.getSetting(section, "end-time");
-                            end = ConfigTree.getSetting(section, "forecast-horizon-end-time");
-                            break;
-                        }
-                        case "end-time":
-                        {
-                            start = ConfigTree.getSetting(section, "start-time");
-                            end = ConfigTree.getSetting(section, "end-time");
-                            break;
-                        }
-                    }
-                    const checkTimeWarning = checkTimeSettings(start, end);
-                    if (checkTimeWarning !== undefined) {
-                        this.diagnostics.push(
-                            checkTimeWarning
-                        );
                     }
                 }
             }
