@@ -536,7 +536,6 @@ export class ConfigTree {
      * @param dependent Setting, which requires other settings or which must be checked for applicability.
      */
     private checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
-
         if (requirement.requiredIfConditions == null && requirement.requiredAnyIfConditions == null) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
