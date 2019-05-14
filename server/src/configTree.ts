@@ -4,7 +4,7 @@ import { relatedSettings } from "./relatedSettings";
 import { RelatedSettingsTraversal } from "./relatedSettingsTraversal";
 import {
     Condition, Requirement,
-    SectionScope
+    sectionMatchConditionRequired, SectionScope
 } from "./requirement";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
@@ -55,6 +55,52 @@ export class Section {
                             `${forecast.displayName} must be greater than ${end.displayName}`,
                             DiagnosticSeverity.Error
                         );
+                    }
+                }
+            },
+            {
+                name: "Check colors match threshold",
+                rule(section: Section): Diagnostic | void {
+                    let colorsValues;
+                    let thresholdsValues;
+
+                    const colorsSetting = section.getSettingFromTree("colors");
+                    const thresholdsSetting = section.getSettingFromTree("thresholds");
+
+                    if (colorsSetting === undefined || thresholdsSetting === undefined) {
+                        return;
+                    }
+
+                    if (!section.sectionMatchConditions([
+                        sectionMatchConditionRequired("type", ["calendar", "treemap", "gauge"]),
+                        sectionMatchConditionRequired("mode", ["half", "default"])
+                    ])) {
+                        return;
+                    }
+
+                    if (colorsSetting.values.length > 0) {
+                        colorsSetting.values.push(colorsSetting.value);
+                        colorsValues = colorsSetting.values;
+                    } else {
+                        /**
+                         * Converts 1) -> 2):
+                         * 1) colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)
+                         * 2) colors = rgb, rgb, rgb
+                         */
+                        colorsValues = colorsSetting.value.replace(/(\s*\d{3}\s*,?)/g, "");
+                        colorsValues = colorsValues.split(",").filter(s => s.trim() !== "");
+                    }
+                    if (thresholdsSetting.values.length > 0) {
+                        thresholdsSetting.values.push(thresholdsSetting.value);
+                        thresholdsValues = thresholdsSetting.values;
+                    } else {
+                        thresholdsValues = thresholdsSetting.value.split(",").filter(s => s.trim() !== "");
+                    }
+
+                    const expected = thresholdsValues.length - 1;
+                    if (colorsValues.length !== expected) {
+                        return createDiagnostic(colorsSetting.textRange,
+                            incorrectColors(`${colorsValues.length}`, `${expected}`));
                     }
                 }
             }
@@ -120,6 +166,21 @@ export class Section {
     public getScopeValue(settingName: string): string {
         return settingName === "type" ? this.scope.widgetType : this.scope.mode;
     }
+
+    public sectionMatchConditions(conditions: Condition[]): boolean {
+        const section: Section = this;
+
+        if (conditions === undefined) {
+            return true;
+        }
+        for (const condition of conditions) {
+            const currCondition = condition(section);
+            if (!currCondition) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 /**
@@ -128,17 +189,6 @@ export class Section {
 // tslint:disable-next-line:max-classes-per-file
 export class ConfigTree {
     public diagnostics: Diagnostic[];
-    /**
-     * Prevents from duplicates for incorrect colors if [widget] contains several [series], for example:
-     *
-     * thresholds = 0, 10, 20
-     * colors = #d7ede2, #9ad1b6, #71bf99
-     * [series]
-     *   entity = nurswgvml006
-     * [series]
-     *   entity = nurswgvml007
-     */
-    private colorsDiagnostics: Map<Setting, Diagnostic> = new Map();
     private root: Section;
     private lastAddedParent: Section;
     private previous: Section;
@@ -247,7 +297,6 @@ export class ConfigTree {
             }
             currentLevel = childAccumulator;
         }
-        this.diagnostics.push(...this.colorsDiagnostics.values());
 
         this.relatedSettingsTraversal.tranverse(this.root);
 
@@ -285,25 +334,12 @@ export class ConfigTree {
         }
     }
 
-    private sectionMatchConditions(section: Section, conditions: Condition[]): boolean {
-        if (conditions === undefined) {
-            return true;
-        }
-        for (const condition of conditions) {
-            const currCondition = condition(section);
-            if (!currCondition) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Adds Diagnostic if section matches condifitons and doesn't contain required ("checked") setting.
      */
     private checkSection(requirements: Requirement[], section: Section) {
         for (const req of requirements) {
-            if (this.sectionMatchConditions(section, req.conditions)) {
+            if (section.sectionMatchConditions(req.conditions)) {
                 if (req.requiredIfConditions) {
                     const required = req.requiredIfConditions;
                     const checkedSetting = section.getSettingFromTree(required);
@@ -314,11 +350,6 @@ export class ConfigTree {
                         return;
                     }
                     switch (required) {
-                        case "thresholds": {
-                            const colorsSetting = section.getSettingFromTree("colors");
-                            this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
-                            break;
-                        }
                         case "forecast-ssa-decompose-eigentriple-limit": {
                             const groupAutoCount = section.getSettingFromTree("forecast-ssa-group-auto-count");
                             const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
@@ -354,39 +385,6 @@ export class ConfigTree {
                 uselessScope(dependent.displayName, `${msg.join(", ")}`),
                 DiagnosticSeverity.Warning
             ));
-        }
-    }
-
-    /**
-     * Check the relationship between thresholds and colors:
-     * in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
-     */
-    private checkColorsMatchTreshold(colorsSetting: Setting, thresholdsSetting: Setting) {
-        let colorsValues;
-        let thresholdsValues;
-        if (colorsSetting.values.length > 0) {
-            colorsSetting.values.push(colorsSetting.value);
-            colorsValues = colorsSetting.values;
-        } else {
-            /**
-             * Converts 1) -> 2):
-             * 1) colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)
-             * 2) colors = rgb, rgb, rgb
-             */
-            colorsValues = colorsSetting.value.replace(/(\s*\d{3}\s*,?)/g, "");
-            colorsValues = colorsValues.split(",").filter(s => s.trim() !== "");
-        }
-        if (thresholdsSetting.values.length > 0) {
-            thresholdsSetting.values.push(thresholdsSetting.value);
-            thresholdsValues = thresholdsSetting.values;
-        } else {
-            thresholdsValues = thresholdsSetting.value.split(",").filter(s => s.trim() !== "");
-        }
-
-        const expected = thresholdsValues.length - 1;
-        if (colorsValues.length !== expected) {
-            this.colorsDiagnostics.set(colorsSetting, createDiagnostic(colorsSetting.textRange,
-                incorrectColors(`${colorsValues.length}`, `${expected}`)));
         }
     }
 

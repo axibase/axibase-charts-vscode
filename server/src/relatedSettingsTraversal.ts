@@ -9,10 +9,9 @@ export class RelatedSettingsTraversal {
     public tranverse(node: Section) {
         this.getAllSeries(node);
 
-        // Validate related settings of [series] and [widget]
+        // Validate related settings of [series]
         for (let serie of this.series) {
             this.validateSectionSettings(serie);
-            this.validateSectionSettings(serie.parent);
         }
     }
 
