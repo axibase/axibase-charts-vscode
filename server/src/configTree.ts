@@ -15,7 +15,6 @@ export interface RelatedSettingsRule {
     rule: (section: Section) => Diagnostic | void;
 }
 
-// tslint:disable-next-line:max-classes-per-file
 export class Section {
     public name: string;
     public settings: Setting[];
