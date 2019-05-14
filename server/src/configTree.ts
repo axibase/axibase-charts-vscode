@@ -103,6 +103,25 @@ export class Section {
                             incorrectColors(`${colorsValues.length}`, `${expected}`));
                     }
                 }
+            },
+            {
+                name: "Forecast SSA limit check",
+                rule(section: Section): Diagnostic | void {
+                    const forecastLimit = section.getSettingFromTree("forecast-ssa-decompose-eigentriple-limit");
+                    const groupAutoCount = section.getSettingFromTree("forecast-ssa-group-auto-count");
+                    const defaultValue = getSetting("forecast-ssa-decompose-eigentriple-limit").defaultValue;
+
+                    if (groupAutoCount === undefined) {
+                        return;
+                    }
+
+                    const eigentripleLimitValue = forecastLimit ? forecastLimit.value : defaultValue;
+                    if (eigentripleLimitValue <= groupAutoCount.value) {
+                        return createDiagnostic(groupAutoCount.textRange,
+                            `forecast-ssa-group-auto-count ` +
+                            `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`);
+                    }
+                }
             }
         ];
 
@@ -348,18 +367,6 @@ export class ConfigTree {
                         this.diagnostics.push(createDiagnostic(section.range.range,
                             `${required} is required if ${req.dependent} is specified`));
                         return;
-                    }
-                    switch (required) {
-                        case "forecast-ssa-decompose-eigentriple-limit": {
-                            const groupAutoCount = section.getSettingFromTree("forecast-ssa-group-auto-count");
-                            const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
-                            if (eigentripleLimitValue <= groupAutoCount.value) {
-                                this.diagnostics.push(createDiagnostic(groupAutoCount.textRange,
-                                    `forecast-ssa-group-auto-count ` +
-                                    `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`));
-                            }
-                            break;
-                        }
                     }
                 } else {
                     const anyRequiredIsSpecified = req.requiredAnyIfConditions.some(
