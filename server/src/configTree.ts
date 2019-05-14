@@ -23,14 +23,10 @@ export class Section {
             {
                 name: "Validate start-time and end-time",
                 rule(section: Section): Diagnostic | void {
-                    const end = ConfigTree.getSetting(section, "end-time");
-                    const start = ConfigTree.getSetting(section, "start-time");
+                    const end = section.getSettingFromTree("end-time");
+                    const start = section.getSettingFromTree("start-time");
 
-                    if (
-                        end === undefined
-                        || start === undefined
-                        || [start, end].some((setting) => setting.section !== section.name)
-                    ) {
+                    if (end === undefined || start === undefined) {
                         return;
                     }
 
@@ -46,8 +42,8 @@ export class Section {
             {
                 name: "Validate forecast-horizon-end-time and end-time",
                 rule(section: Section): Diagnostic | void {
-                    let forecast = ConfigTree.getSetting(section, "forecast-horizon-end-time");
-                    let end = ConfigTree.getSetting(section, "end-time");
+                    let forecast = section.getSettingFromTree("forecast-horizon-end-time");
+                    let end = section.getSettingFromTree("end-time");
 
                     if (end === undefined || forecast === undefined) {
                         return;
@@ -105,6 +101,22 @@ export class Section {
         return this.settings.find(s => s.name === cleared);
     }
 
+    /**
+     * Searches setting in the parents starting from the startSection and ending root, returns the closest one.
+     * @param settingName Setting name
+     */
+    public getSettingFromTree(settingName: string): Setting | undefined {
+        let currentSection: Section = this;
+        while (currentSection) {
+            const value = currentSection.getSetting(settingName);
+            if (value !== void 0) {
+                return value;
+            }
+            currentSection = currentSection.parent;
+        }
+        return undefined;
+    }
+
     public getScopeValue(settingName: string): string {
         return settingName === "type" ? this.scope.widgetType : this.scope.mode;
     }
@@ -115,22 +127,6 @@ export class Section {
  */
 // tslint:disable-next-line:max-classes-per-file
 export class ConfigTree {
-
-    /**
-     * Searches setting in the parents starting from the startSection and ending root, returns the closest one.
-     * @param settingName Setting name
-     * @param startSection Node of subtree to search for settingName
-     */
-    public static getSetting(startSection: Section, settingName: string): Setting | undefined {
-        for (let currentSection = startSection; currentSection; currentSection = currentSection.parent) {
-            const value = currentSection.getSetting(settingName);
-            if (value !== void 0) {
-                return value;
-            }
-        }
-        return undefined;
-    }
-
     public diagnostics: Diagnostic[];
     /**
      * Prevents from duplicates for incorrect colors if [widget] contains several [series], for example:
@@ -310,7 +306,7 @@ export class ConfigTree {
             if (this.sectionMatchConditions(section, req.conditions)) {
                 if (req.requiredIfConditions) {
                     const required = req.requiredIfConditions;
-                    const checkedSetting = ConfigTree.getSetting(section, required);
+                    const checkedSetting = section.getSettingFromTree(required);
                     const defaultValue = getSetting(required).defaultValue;
                     if (checkedSetting == null && defaultValue == null) {
                         this.diagnostics.push(createDiagnostic(section.range.range,
@@ -319,12 +315,12 @@ export class ConfigTree {
                     }
                     switch (required) {
                         case "thresholds": {
-                            const colorsSetting = ConfigTree.getSetting(section, "colors");
+                            const colorsSetting = section.getSettingFromTree("colors");
                             this.checkColorsMatchTreshold(colorsSetting, checkedSetting);
                             break;
                         }
                         case "forecast-ssa-decompose-eigentriple-limit": {
-                            const groupAutoCount = ConfigTree.getSetting(section, "forecast-ssa-group-auto-count");
+                            const groupAutoCount = section.getSettingFromTree("forecast-ssa-group-auto-count");
                             const eigentripleLimitValue = checkedSetting ? checkedSetting.value : defaultValue;
                             if (eigentripleLimitValue <= groupAutoCount.value) {
                                 this.diagnostics.push(createDiagnostic(groupAutoCount.textRange,
@@ -336,7 +332,7 @@ export class ConfigTree {
                     }
                 } else {
                     const anyRequiredIsSpecified = req.requiredAnyIfConditions.some(
-                        reqSetting => ConfigTree.getSetting(section, reqSetting) != null);
+                        reqSetting => section.getSettingFromTree(reqSetting) != null);
                     if (!anyRequiredIsSpecified) {
                         this.diagnostics.push(createDiagnostic(section.range.range,
                             `${req.dependent} has effect only with one of the following:

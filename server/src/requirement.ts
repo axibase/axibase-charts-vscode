@@ -1,4 +1,3 @@
-import { ConfigTree } from "./configTree";
 import { getSetting } from "./util";
 
 export const frequentlyUsed = ["mode", "type"];
@@ -20,7 +19,7 @@ function getValueOfCheckedSetting(settingName: string, section: Section): string
     if (frequentlyUsed.includes(settingName)) {
         value = section.getScopeValue(settingName);
     } else {
-        let setting = ConfigTree.getSetting(section, settingName);
+        let setting = section.getSettingFromTree(settingName);
         if (setting === undefined) {
             /**
              * Setting is not declared, so loooking for default value.

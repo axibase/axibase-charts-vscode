@@ -27,11 +27,18 @@ export class RelatedSettingsTraversal {
     }
 
     private validateSectionSettings(section: Section) {
-        Section.ValidationRules().forEach(item => {
-            let diag = item.rule(section);
+        Section.ValidationRules().forEach(validationRule => {
+            let diag = validationRule.rule(section);
             if (diag) {
                 this.diagnostic.push(diag);
             }
         });
+
+        // Filter diagnostic from items with identical range
+        this.diagnostic = [
+            ...this.diagnostic.reduce((itemsMap, item) =>
+            itemsMap.has(item.range) ? itemsMap : itemsMap.set(item.range, item),
+            new Map()).values()
+        ];
     }
 }
