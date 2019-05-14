@@ -63,22 +63,6 @@ export const relatedSettings: Requirement[] = [
     },
     {
         /**
-         * If "end-time" is specified,
-         * consider it is less than "forecast-horizon-end-time"
-         */
-        dependent: "end-time",
-        relation: "forecast-horizon-end-time"
-    },
-    {
-        /**
-         * If "start-time" is specified,
-         * consider it is less than "end-time"
-         */
-        dependent: "start-time",
-        relation: "end-time"
-    },
-    {
-        /**
          * If "type=chart" and "mode" is NOT "column-stack" or "column",
          * settings "negative-style" and "current-period-style" are useless.
          */

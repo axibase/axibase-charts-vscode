@@ -383,7 +383,6 @@ export class ConfigTree {
         if (
             requirement.requiredIfConditions == null
             && requirement.requiredAnyIfConditions == null
-            && requirement.relation == null
         ) {
             this.checkDependentUseless(section, requirement, dependent);
             return;
@@ -391,15 +390,13 @@ export class ConfigTree {
         let checkedSetting;
         if (requirement.requiredIfConditions) {
             checkedSetting = getSetting(requirement.requiredIfConditions);
-        } else if (requirement.requiredAnyIfConditions) {
+        } else {
             /**
              * If requirement.requiredIfConditions == null, then requiredAnyIfConditions != null.
              * It's supposed that all settings from `requiredAnyIfConditions` have the same sections,
              * that's why only first section is used here.
              */
             checkedSetting = getSetting(requirement.requiredAnyIfConditions[0]);
-        } else {
-            checkedSetting = getSetting(requirement.relation);
         }
 
         const sectionNames = checkedSetting.section;
