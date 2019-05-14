@@ -4073,7 +4073,7 @@
         {
             "displayName": "metric-label",
             "widget": "bar",
-            "section": "widget",
+            "section": "series",
             "type": "string",
             "example": "CPU Busy, %"
         },
