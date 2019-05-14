@@ -1,5 +1,6 @@
 import { Diagnostic } from "vscode-languageserver";
 import { Section } from "./configTree";
+import validationRules from "./validationRules";
 
 export class RelatedSettingsTraversal {
     public diagnostic: Diagnostic[] = [];
@@ -26,7 +27,7 @@ export class RelatedSettingsTraversal {
     }
 
     private validateSectionSettings(section: Section) {
-        Section.ValidationRules().forEach(validationRule => {
+        validationRules.forEach(validationRule => {
             let diag = validationRule.rule(section);
             if (diag) {
                 this.diagnostic.push(diag);

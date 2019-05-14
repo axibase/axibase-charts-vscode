@@ -1,133 +1,22 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { incorrectColors, uselessScope } from "./messageUtil";
+import { uselessScope } from "./messageUtil";
 import { relatedSettings } from "./relatedSettings";
 import { RelatedSettingsTraversal } from "./relatedSettingsTraversal";
 import {
-    Condition, Requirement,
-    sectionMatchConditionRequired, SectionScope
+    Condition, Requirement, SectionScope
 } from "./requirement";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
-interface RelatedSettingsRule {
+export interface RelatedSettingsRule {
     name: string;
     rule: (section: Section) => Diagnostic | void;
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export class Section {
-    public static ValidationRules(): RelatedSettingsRule[] {
-        const rules: RelatedSettingsRule[] = [
-            {
-                name: "Validate start-time and end-time",
-                rule(section: Section): Diagnostic | void {
-                    const end = section.getSettingFromTree("end-time");
-                    const start = section.getSettingFromTree("start-time");
-
-                    if (end === undefined || start === undefined) {
-                        return;
-                    }
-
-                    if (start.value >= end.value) {
-                        return createDiagnostic(
-                            end.textRange,
-                            `${end.displayName} must be greater than ${start.displayName}`,
-                            DiagnosticSeverity.Error
-                        );
-                    }
-                }
-            },
-            {
-                name: "Validate forecast-horizon-end-time and end-time",
-                rule(section: Section): Diagnostic | void {
-                    let forecast = section.getSettingFromTree("forecast-horizon-end-time");
-                    let end = section.getSettingFromTree("end-time");
-
-                    if (end === undefined || forecast === undefined) {
-                        return;
-                    }
-
-                    if (end.value >= forecast.value) {
-                        return createDiagnostic(
-                            end.textRange,
-                            `${forecast.displayName} must be greater than ${end.displayName}`,
-                            DiagnosticSeverity.Error
-                        );
-                    }
-                }
-            },
-            {
-                name: "Check colors match threshold",
-                rule(section: Section): Diagnostic | void {
-                    let colorsValues;
-                    let thresholdsValues;
-
-                    const colorsSetting = section.getSettingFromTree("colors");
-                    const thresholdsSetting = section.getSettingFromTree("thresholds");
-
-                    if (colorsSetting === undefined || thresholdsSetting === undefined) {
-                        return;
-                    }
-
-                    if (!section.sectionMatchConditions([
-                        sectionMatchConditionRequired("type", ["calendar", "treemap", "gauge"]),
-                        sectionMatchConditionRequired("mode", ["half", "default"])
-                    ])) {
-                        return;
-                    }
-
-                    if (colorsSetting.values.length > 0) {
-                        colorsSetting.values.push(colorsSetting.value);
-                        colorsValues = colorsSetting.values;
-                    } else {
-                        /**
-                         * Converts 1) -> 2):
-                         * 1) colors = rgb(247,251,255), rgb(222,235,247), rgb(198,219,239)
-                         * 2) colors = rgb, rgb, rgb
-                         */
-                        colorsValues = colorsSetting.value.replace(/(\s*\d{3}\s*,?)/g, "");
-                        colorsValues = colorsValues.split(",").filter(s => s.trim() !== "");
-                    }
-                    if (thresholdsSetting.values.length > 0) {
-                        thresholdsSetting.values.push(thresholdsSetting.value);
-                        thresholdsValues = thresholdsSetting.values;
-                    } else {
-                        thresholdsValues = thresholdsSetting.value.split(",").filter(s => s.trim() !== "");
-                    }
-
-                    const expected = thresholdsValues.length - 1;
-                    if (colorsValues.length !== expected) {
-                        return createDiagnostic(colorsSetting.textRange,
-                            incorrectColors(`${colorsValues.length}`, `${expected}`));
-                    }
-                }
-            },
-            {
-                name: "Forecast SSA limit check",
-                rule(section: Section): Diagnostic | void {
-                    const forecastLimit = section.getSettingFromTree("forecast-ssa-decompose-eigentriple-limit");
-                    const groupAutoCount = section.getSettingFromTree("forecast-ssa-group-auto-count");
-                    const defaultValue = getSetting("forecast-ssa-decompose-eigentriple-limit").defaultValue;
-
-                    if (groupAutoCount === undefined) {
-                        return;
-                    }
-
-                    const eigentripleLimitValue = forecastLimit ? forecastLimit.value : defaultValue;
-                    if (eigentripleLimitValue <= groupAutoCount.value) {
-                        return createDiagnostic(groupAutoCount.textRange,
-                            `forecast-ssa-group-auto-count ` +
-                            `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`);
-                    }
-                }
-            }
-        ];
-
-        return rules;
-    }
-
     public name: string;
     public settings: Setting[];
     public parent: Section;
