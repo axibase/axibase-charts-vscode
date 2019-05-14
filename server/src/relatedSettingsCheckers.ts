@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver";
 import { incorrectColors } from "./messageUtil";
 import {
     Requirement,
@@ -155,27 +155,6 @@ export const relatedSettings: Requirement[] = [
 ];
 
 /**
- * Checks that setting start point isn't greater than end point
- * @param start interval start point
- * @param end interval end point
- */
-export function checkTimeSettings (start?: Setting, end?: Setting): Diagnostic | undefined {
-    if (end === undefined || start === undefined) {
-        return undefined;
-    }
-
-    if (start.value >= end.value) {
-        return createDiagnostic(
-            end.textRange,
-            `${end.displayName} must be greater than ${start.displayName}`,
-            DiagnosticSeverity.Error
-        );
-    }
-
-    return undefined;
-};
-
-/**
  * Check the relationship between thresholds and colors:
  * in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
  */
@@ -208,4 +187,4 @@ export function checkColorsMatchTreshold(colorsSetting: Setting, thresholdsSetti
     } else {
         return undefined;
     }
-};
+}

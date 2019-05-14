@@ -14,47 +14,66 @@ import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
+// Sets validation rule for related settings
+class RelatedSettingRule {
+    public name: string;
+    public rule: () => Diagnostic | void;
+
+    constructor(name: string, rule: () => Diagnostic | void) {
+        this.name = name;
+        this.rule = rule;
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
 export class Section {
+    public static ValidationRules(section: Section): RelatedSettingRule[] {
+        const rules: RelatedSettingRule[] = [
+            new RelatedSettingRule(
+                "Validate start-time and end-time",
+                (): Diagnostic | void => {
+                    const end = ConfigTree.getSetting(section, "end-time");
+                    const start = ConfigTree.getSetting(section, "start-time");
 
-    public static ValidationRules(section: Section): (() => void | Diagnostic)[] {
-        return [
-            (): Diagnostic | void => {
-                let forecast = ConfigTree.getSetting(section, "forecast-horizon-end-time");
-                let end = ConfigTree.getSetting(section, "end-time");
+                    if (
+                        end === undefined
+                        || start === undefined
+                        || [start, end].some((setting) => setting.section !== section.name)
+                    ) {
+                        return;
+                    }
 
-                if (end === undefined || forecast === undefined) {
-                    return;
+                    if (start.value >= end.value) {
+                        return createDiagnostic(
+                            end.textRange,
+                            `${end.displayName} must be greater than ${start.displayName}`,
+                            DiagnosticSeverity.Error
+                        );
+                    }
                 }
+            ),
+            new RelatedSettingRule(
+                "Validate forecast-horizon-end-time and end-time",
+                (): Diagnostic | void => {
+                    let forecast = ConfigTree.getSetting(section, "forecast-horizon-end-time");
+                    let end = ConfigTree.getSetting(section, "end-time");
 
-                if (end.value >= forecast.value) {
-                    return createDiagnostic(
-                        end.textRange,
-                        `${forecast.displayName} must be greater than ${end.displayName}`,
-                        DiagnosticSeverity.Error
-                    );
-                }
-            },
-            (): Diagnostic | void => {
-                let start = ConfigTree.getSetting(section, "start-time");
-                let end = ConfigTree.getSetting(section, "end-time");
+                    if (end === undefined || forecast === undefined) {
+                        return;
+                    }
 
-                if (end === undefined || start === undefined) {
-                    return;
+                    if (end.value >= forecast.value) {
+                        return createDiagnostic(
+                            end.textRange,
+                            `${forecast.displayName} must be greater than ${end.displayName}`,
+                            DiagnosticSeverity.Error
+                        );
+                    }
                 }
-
-                if (section.name !== start.section) {
-                    return;
-                }
-
-                if (start.value >= end.value) {
-                    return createDiagnostic(
-                        end.textRange,
-                        `${end.displayName} must be greater than ${start.displayName}`,
-                        DiagnosticSeverity.Error
-                    );
-                }
-            }
+            )
         ];
+
+        return rules;
     }
 
     public name: string;

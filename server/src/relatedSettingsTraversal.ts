@@ -5,9 +5,11 @@ export class RelatedSettingsTraversal {
     public diagnostic: Diagnostic[] = [];
     public series: Section[] = [];
 
+    // Go through sections, find related settings and validate them
     public tranverse(node: Section) {
         this.getAllSeries(node);
 
+        // Validate related settings of [series] and [widget]
         for (let serie of this.series) {
             this.validateSectionSettings(serie);
             this.validateSectionSettings(serie.parent);
@@ -25,8 +27,8 @@ export class RelatedSettingsTraversal {
     }
 
     private validateSectionSettings(section: Section) {
-        Section.ValidationRules(section).forEach(rule => {
-            let diag = rule(section, this);
+        Section.ValidationRules(section).forEach(item => {
+            let diag = item.rule();
             if (diag) {
                 this.diagnostic.push(diag);
             }
