@@ -27,8 +27,8 @@ export class RelatedSettingsTraversal {
     }
 
     private validateSectionSettings(section: Section) {
-        Section.ValidationRules(section).forEach(item => {
-            let diag = item.rule();
+        Section.ValidationRules().forEach(item => {
+            let diag = item.rule(section);
             if (diag) {
                 this.diagnostic.push(diag);
             }
