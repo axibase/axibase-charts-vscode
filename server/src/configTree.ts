@@ -24,7 +24,7 @@ import { createDiagnostic, getSetting } from "./util";
  * the section will be checked for applicability of any of `dependent`;
  * if any setting from `dependent` is declared in the section, then section will be checked for match to `conditions`.
  */
-export const relatedSettings: Requirement[] = [
+const relatedSettings: Requirement[] = [
     {
         /**
          * If "type" is "calendar", "treemap " or "gauge" and mode is "half" or "default",
@@ -484,6 +484,20 @@ export class ConfigTree {
     }
 
     /**
+     * If section doesn't match at least one condition, adds new Diagnostic about dependent.
+     */
+    private checkDependentUseless(section: Section, requirement: Requirement, dependent: Setting) {
+        const msg: string[] = requirement.conditions.map(condition => condition(section) as string).filter(m => m);
+        if (msg.length > 0) {
+            this.diagnostics.push(createDiagnostic(
+                dependent.textRange,
+                uselessScope(dependent.displayName, `${msg.join(", ")}`),
+                DiagnosticSeverity.Warning
+            ));
+        }
+    }
+
+    /**
      * Check the relationship between thresholds and colors:
      * in "gauge", "calendar", "treemap" number of colors (if specified) must be equal to number of thresholds minus 1.
      */
@@ -513,20 +527,6 @@ export class ConfigTree {
         if (colorsValues.length !== expected) {
             this.colorsDiagnostics.set(colorsSetting, createDiagnostic(colorsSetting.textRange,
                 incorrectColors(`${colorsValues.length}`, `${expected}`)));
-        }
-    }
-
-    /**
-     * If section doesn't match at least one condition, adds new Diagnostic about dependent.
-     */
-    private checkDependentUseless(section: Section, requirement: Requirement, dependent: Setting) {
-        const msg: string[] = requirement.conditions.map(condition => condition(section) as string).filter(m => m);
-        if (msg.length > 0) {
-            this.diagnostics.push(createDiagnostic(
-                dependent.textRange,
-                uselessScope(dependent.displayName, `${msg.join(", ")}`),
-                DiagnosticSeverity.Warning
-            ));
         }
     }
 
