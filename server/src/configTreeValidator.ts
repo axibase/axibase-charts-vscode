@@ -1,7 +1,8 @@
 import { Diagnostic } from "vscode-languageserver";
-import { ConfigTree, RelatedSettingsRule } from "./configTree";
+import { ConfigTree } from "./configTree";
 import { Section } from "./section";
 import validationRules from "./validationRules";
+import { RelatedSettingsRule } from "./validationRules/interfaces";
 
 export class ConfigTreeValidator {
     public diagnostic: Diagnostic[] = [];

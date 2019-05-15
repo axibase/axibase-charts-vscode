@@ -1,7 +1,12 @@
+import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { uselessScope } from "./messageUtil";
 import {
     Requirement,
     sectionMatchConditionRequired, sectionMatchConditionUseless,
 } from "./requirement";
+import { Section } from "./section";
+import { Setting } from "./setting";
+import { createDiagnostic, getSetting } from "./util";
 
 /**
  * Related settings requirements
@@ -16,7 +21,7 @@ import {
  * the section will be checked for applicability of any of `dependent`;
  * if any setting from `dependent` is declared in the section, then section will be checked for match to `conditions`.
  */
-const relatedSettings: Requirement[] = [
+const requiredSettings: Requirement[] = [
     {
         /**
          * If "type" is "calendar", "treemap " or "gauge" and mode is "half" or "default",
@@ -134,11 +139,121 @@ const relatedSettings: Requirement[] = [
 ];
 
 /**
+ * Checks section for useless or missing required settings
+ */
+export class RequiredSettingsValidator {
+    public diagnostics: Diagnostic[] = [];
+
+    /**
+     * @param requirement Requirement for `dependent` setting.
+     * @param section Section, where `dependent` is declared.
+     * @param dependent Setting, which requires other settings or which must be checked for applicability.
+     */
+    public checkCurrentAndSetRequirementsForChildren(requirement: Requirement, section: Section, dependent: Setting) {
+        if (requirement.requiredIfConditions == null && requirement.requiredAnyIfConditions == null) {
+            this.checkDependentUseless(section, requirement, dependent);
+            return;
+        }
+        let requiredSetting;
+        if (requirement.requiredIfConditions) {
+            requiredSetting = getSetting(requirement.requiredIfConditions);
+        } else {
+            /**
+             * If requirement.requiredIfConditions == null, then requiredAnyIfConditions != null.
+             * It's supposed that all settings from `requiredAnyIfConditions` have the same sections,
+             * that's why only first section is used here.
+             */
+            requiredSetting = getSetting(requirement.requiredAnyIfConditions[0]);
+        }
+
+        const sectionNames = requiredSetting.section;
+        if (!sectionNames) {
+            return;
+        }
+        if (sectionNames.includes(section.name)) {
+            // check current
+            this.checkSection([requirement], section);
+            return;
+        }
+        const childSectionNames: string[] = typeof sectionNames === "string" ? [sectionNames] : sectionNames;
+        for (const secName of childSectionNames) {
+            const reqs = section.requirementsForChildren.get(secName);
+            if (reqs) {
+                reqs.push(requirement);
+            } else {
+                section.requirementsForChildren.set(secName, [requirement]);
+            }
+        }
+    }
+
+    /**
+     * Checks each children of the section recursevly.
+     * @param targetSectionName name of the section, which need to be checked
+     * @param requirements array of requirements for the section, which need to be checked
+     * @param startSection root of subtree to search for targetSection
+     */
+    public checkAllChildren(targetSectionName: string, requirements: Requirement[], startSection: Section) {
+        if (startSection.children.length < 1) {
+            return;
+        }
+        for (const child of startSection.children) {
+            if (child.name === targetSectionName) {
+                this.checkSection(requirements, child);
+                continue;
+            }
+            this.checkAllChildren(targetSectionName, requirements, child);
+        }
+    }
+
+    /**
+     * Adds Diagnostic if section matches condifitons and doesn't contain required ("checked") setting.
+     */
+    private checkSection(requirements: Requirement[], section: Section) {
+        for (const req of requirements) {
+            if (section.sectionMatchConditions(req.conditions)) {
+                if (req.requiredIfConditions) {
+                    const required = req.requiredIfConditions;
+                    const checkedSetting = section.getSettingFromTree(required);
+                    const defaultValue = getSetting(required).defaultValue;
+                    if (checkedSetting == null && defaultValue == null) {
+                        this.diagnostics.push(createDiagnostic(section.range.range,
+                            `${required} is required if ${req.dependent} is specified`));
+                        return;
+                    }
+                } else {
+                    const anyRequiredIsSpecified = req.requiredAnyIfConditions.some(
+                        reqSetting => section.getSettingFromTree(reqSetting) != null);
+                    if (!anyRequiredIsSpecified) {
+                        this.diagnostics.push(createDiagnostic(section.range.range,
+                            `${req.dependent} has effect only with one of the following:
+ * ${req.requiredAnyIfConditions.join("\n * ")}`));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * If section doesn't match at least one condition, adds new Diagnostic about dependent.
+     */
+    private checkDependentUseless(section: Section, requirement: Requirement, dependent: Setting) {
+        const msg: string[] = requirement.conditions.map(condition => condition(section) as string).filter(m => m);
+        if (msg.length > 0) {
+            this.diagnostics.push(createDiagnostic(
+                dependent.textRange,
+                uselessScope(dependent.displayName, `${msg.join(", ")}`),
+                DiagnosticSeverity.Warning
+            ));
+        }
+    }
+}
+
+/**
  * Returns object from relatedSettings based on setting.displayName.
  * @param settingName setting.displayName
  */
 export function getRequirement(settingName: string): Requirement | undefined {
-    return relatedSettings.find(req => {
+    return requiredSettings.find(req => {
         return Array.isArray(req.dependent) ? req.dependent.includes(settingName) : req.dependent === settingName;
     });
 }

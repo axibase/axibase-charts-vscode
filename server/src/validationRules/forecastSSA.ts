@@ -1,7 +1,7 @@
 import { Diagnostic } from "vscode-languageserver";
-import { RelatedSettingsRule } from "../configTree";
 import { Section } from "../section";
 import { createDiagnostic, getSetting } from "../util";
+import { RelatedSettingsRule } from "./interfaces";
 
 const rule: RelatedSettingsRule = {
     name: "Forecast SSA limit check",

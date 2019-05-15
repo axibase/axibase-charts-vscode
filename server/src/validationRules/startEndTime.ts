@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { RelatedSettingsRule } from "../configTree";
 import { Section } from "../section";
 import { createDiagnostic } from "../util";
+import { RelatedSettingsRule } from "../validationRules/interfaces";
 
 const rule: RelatedSettingsRule = {
     name: "Validate start-time and end-time",
