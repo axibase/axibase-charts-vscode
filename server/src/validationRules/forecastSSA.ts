@@ -1,5 +1,6 @@
 import { Diagnostic } from "vscode-languageserver";
-import { RelatedSettingsRule, Section } from "../configTree";
+import { RelatedSettingsRule } from "../configTree";
+import { Section } from "../section";
 import { createDiagnostic, getSetting } from "../util";
 
 const rule: RelatedSettingsRule = {

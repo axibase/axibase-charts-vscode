@@ -1,5 +1,6 @@
 import { Diagnostic } from "vscode-languageserver";
-import { ConfigTree, RelatedSettingsRule, Section } from "./configTree";
+import { ConfigTree, RelatedSettingsRule } from "./configTree";
+import { Section } from "./section";
 import validationRules from "./validationRules";
 
 export class ConfigTreeValidator {
