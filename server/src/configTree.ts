@@ -106,8 +106,7 @@ export class ConfigTree {
     }
 
     /**
-     * Bypasses the tree and adds diagnostics about not applicable settings
-     * or absent required setting.
+     * Bypasses the tree and applies rules.
      */
     public goThroughTree() {
         if (!this.root) {
