@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { ConfigTreeValidator } from "./configTreeValidator";
 import { uselessScope } from "./messageUtil";
 import { relatedSettings } from "./relatedSettings";
-import { RelatedSettingsTraversal } from "./relatedSettingsTraversal";
 import {
     Condition, Requirement, SectionScope
 } from "./requirement";
@@ -12,7 +12,12 @@ import { createDiagnostic, getSetting } from "./util";
 
 export interface RelatedSettingsRule {
     name: string;
-    rule: (section: Section) => Diagnostic | void;
+    rule: (section: Section, tree: ConfigTree) => Diagnostic | void;
+}
+
+export interface ValidationRule {
+    name: string;
+    rules: RelatedSettingsRule[];
 }
 
 export class Section {
@@ -100,10 +105,14 @@ export class ConfigTree {
     private lastAddedParent: Section;
     private previous: Section;
 
-    private relatedSettingsTraversal: RelatedSettingsTraversal = new RelatedSettingsTraversal();
+    private configTreeValidator: ConfigTreeValidator = new ConfigTreeValidator();
 
     public constructor(diagnostics: Diagnostic[]) {
         this.diagnostics = diagnostics;
+    }
+
+    get getRoot() {
+        return this.root;
     }
 
     /**
@@ -205,11 +214,8 @@ export class ConfigTree {
             currentLevel = childAccumulator;
         }
 
-        this.relatedSettingsTraversal.tranverse(this.root);
-
-        if (this.relatedSettingsTraversal.diagnostic.length) {
-            this.diagnostics.push(...this.relatedSettingsTraversal.diagnostic);
-        }
+        const diagnostic: Diagnostic[] =  this.configTreeValidator.validate(this);
+        this.diagnostics.push(...diagnostic);
     }
 
     /**
