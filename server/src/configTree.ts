@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { ConfigTreeValidator } from "./configTreeValidator";
 import { uselessScope } from "./messageUtil";
-import { relatedSettings } from "./relatedSettings";
+import { getRequirement } from "./relatedSettings";
 import { Requirement } from "./requirement";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { Section } from "./section";
@@ -107,7 +107,7 @@ export class ConfigTree {
         section.applyScope();
 
         for (const setting of settings) {
-            const requirement = this.getRequirement(setting.displayName);
+            const requirement = getRequirement(setting.displayName);
             if (requirement !== undefined) {
                 /**
                  * Section contains dependent which can be useless or requires additional setting.
@@ -139,16 +139,6 @@ export class ConfigTree {
 
         const diagnostic: Diagnostic[] =  this.configTreeValidator.validate(this);
         this.diagnostics.push(...diagnostic);
-    }
-
-    /**
-     * Returns object from relatedSettings based on setting.displayName.
-     * @param settingName setting.displayName
-     */
-    private getRequirement(settingName: string): Requirement | undefined {
-        return relatedSettings.find(req => {
-            return Array.isArray(req.dependent) ? req.dependent.includes(settingName) : req.dependent === settingName;
-        });
     }
 
     /**

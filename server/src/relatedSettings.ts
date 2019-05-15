@@ -16,7 +16,7 @@ import {
  * the section will be checked for applicability of any of `dependent`;
  * if any setting from `dependent` is declared in the section, then section will be checked for match to `conditions`.
  */
-export const relatedSettings: Requirement[] = [
+const relatedSettings: Requirement[] = [
     {
         /**
          * If "type" is "calendar", "treemap " or "gauge" and mode is "half" or "default",
@@ -132,3 +132,13 @@ export const relatedSettings: Requirement[] = [
         dependent: "caption-style", requiredIfConditions: "caption"
     }
 ];
+
+/**
+ * Returns object from relatedSettings based on setting.displayName.
+ * @param settingName setting.displayName
+ */
+export function getRequirement(settingName: string): Requirement | undefined {
+    return relatedSettings.find(req => {
+        return Array.isArray(req.dependent) ? req.dependent.includes(settingName) : req.dependent === settingName;
+    });
+}
