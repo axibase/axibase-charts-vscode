@@ -11,10 +11,11 @@ import { TextRange } from "./textRange";
 import { createDiagnostic, getSetting } from "./util";
 
 /**
- * If `requiredIfConditions` !== null OR `requiredAnyIfConditions` !== null,
+ * If `requiredIfConditions` != null OR `requiredAnyIfConditions` != null,
  * the section will be checked for match to `conditions`; if section matches conditions, then:
- *  1) setting, specified in `requiredIfConditions` is required for this section;
- *  2) required at least one setting from `requiredAnyIfConditions`.
+ *  a) setting, specified in `requiredIfConditions` is required for this section;
+ *  or
+ *  b) required at least one setting from `requiredAnyIfConditions`.
  * `requiredIfConditions` can not be specified simultaneously with `requiredAnyIfConditions`.
  *
  * If `requiredIfConditions` == null AND `requiredAnyIfConditions` == null,
@@ -24,7 +25,7 @@ import { createDiagnostic, getSetting } from "./util";
 const relatedSettings: Requirement[] = [
     {
         /**
-         * If "type" is "calendar", "treemap " or "gauge" and mode is "half" or "default",
+         * If "type" is "calendar", "treemap " or "gauge" and "mode" is "half" or "default",
          * "colors" and "thresholds" are applicable, and if "colors" are specified, the "thresholds" are required.
          */
         conditions: [

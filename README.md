@@ -51,6 +51,8 @@ To display available completions, press `Ctrl+Space` on PC or `⌃Space` on Mac.
 
 ## Live Preview
 
+> Requires VSCode >= `v1.33.1` and plugin >= `1.0.20`.
+
 The extension shows a preview of the portal in the VSCode interface by requesting data from the target server.
 
 To configure the target server, open **Preferences > Settings** and enter `axibase` in the search box.
@@ -59,7 +61,7 @@ Specify connection properties.
 
 ![](./images/vscode-settings.png)
 
-Click **Show Preview** in the upper-right corner to view the current portal.
+Click **Preview Portal** in the upper-right corner to view the current portal.
 
 ![](./images/preview-button.png)
 
@@ -68,6 +70,10 @@ Click **Show Preview** in the upper-right corner to view the current portal.
 Enter user password, if connecting for the first time.
 
 ![](./images/preview-example.png)
+
+Preview is automatically updated after changes in the configuration within 1 second, customize this time in **Preview Update Interval** setting.
+
+To force update regardles of specified interval, click **Preview Portal** again.
 
 ### SSL Certificates
 

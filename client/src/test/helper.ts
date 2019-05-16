@@ -6,7 +6,7 @@
 
 import * as path from "path";
 import { Extension, extensions, TextDocument, TextEditor, Uri, window, workspace } from "vscode";
-import { appId } from "../util";
+import { appId } from "../connectionUtils";
 
 export let doc: TextDocument;
 export let editor: TextEditor;
