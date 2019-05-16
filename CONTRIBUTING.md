@@ -14,6 +14,14 @@ The **Server** part includes but is not limited to:
 * `formatter`: Provides `TextEdits` which make the document easier to read.
 * `javaScriptValidator`: Generates statements from inline JS which are evaluated by `jsdom` package.
 * `resources`: Reads and holds helpful information, such as list of settings or relations between them.
+* `relatedSettingsRules`: Contains rules, which perform checks of relations between settings:
+  * [`presenceValidation`](server/src/relatedSettingsRules/presenceValidation) contains two types of rules:
+
+    1. [`noUselessSettings`](server/src/relatedSettingsRules/presenceValidation/noUselessSettings/index.ts) - these rules check that there are no useless settings in the config, for example, `forecast-arima-d` is useless if `forecast-arima-auto = true` ;
+    2. [`requiredSettings`](server/src/relatedSettingsRules/presenceValidation/requiredSettings.ts) - these rules check that there are settings, which are required if particular conditions are met, for example, `node-alert-style` has no effect without `alert-expression` if `type` of config is `graph`.
+  * [`valueValidation`](server/src/relatedSettingsRules/valueValidation) contains rules, which check relations between values of the settings, for example, `startEndTime.ts` checks that `start-time` is greater than `end-time`.
+
+Rules are grouped by deepest section of settings, which are used in rule, see [relatedSettingsRules/index.ts](server/src/relatedSettingsRules/index.ts).
 
 ### Client
 

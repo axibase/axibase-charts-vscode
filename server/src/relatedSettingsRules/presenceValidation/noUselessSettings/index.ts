@@ -29,12 +29,12 @@ function getRule(checksMap: Map<string, Condition[]>): Check {
     };
 }
 
-export const uselessSettingsForWidget: RelatedSettingsRule = {
+export const noUselessSettingsForWidget: RelatedSettingsRule = {
     check: getRule(forWidget),
     name: "Checks absence of useless settings in [widget]"
 };
 
-export const uselessSettingsForSeries: RelatedSettingsRule = {
+export const noUselessSettingsForSeries: RelatedSettingsRule = {
     check: getRule(forSeries),
     name: "Checks absence of useless settings in [series]"
 };

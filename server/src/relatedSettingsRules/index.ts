@@ -1,5 +1,5 @@
+import { noUselessSettingsForSeries, noUselessSettingsForWidget } from "./presenceValidation/noUselessSettings/index";
 import requiredSettings from "./presenceValidation/requiredSettings";
-import { uselessSettingsForSeries, uselessSettingsForWidget } from "./presenceValidation/uselessSettings/index";
 import { RelatedSettingsRule } from "./utils/interfaces";
 import colorsThresholds from "./valueValidation/colorsThresholds";
 import forecastAutoCountAndEigentripleLimit from "./valueValidation/forecastAutoCountAndEigentripleLimit";
@@ -13,13 +13,13 @@ const rulesBySection: Map<string, RelatedSettingsRule[]> = new Map<string, Relat
             forecastEndTime,
             forecastAutoCountAndEigentripleLimit,
             requiredSettings,
-            uselessSettingsForSeries
+            noUselessSettingsForSeries
         ]
     ],
     [
         "widget", [
             startEndTime,
-            uselessSettingsForWidget
+            noUselessSettingsForWidget
         ]
     ]
 ]);
