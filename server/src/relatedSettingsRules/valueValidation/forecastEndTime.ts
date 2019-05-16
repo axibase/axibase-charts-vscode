@@ -1,15 +1,17 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { Section } from "../section";
-import { createDiagnostic } from "../util";
-import { RelatedSettingsRule } from "./interfaces";
+import { Section } from "../../configTree/section";
+import { createDiagnostic } from "../../util";
+import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {
-    name: "Validate forecast-horizon-end-time and end-time",
-    rule(section: Section): Diagnostic | void {
+    name: "Checks forecast-horizon-end-time is greater than end-time",
+    check(section: Section): Diagnostic | void {
         let forecast = section.getSettingFromTree("forecast-horizon-end-time");
+        if (forecast === undefined) {
+            return;
+        }
         let end = section.getSettingFromTree("end-time");
-
-        if (end === undefined || forecast === undefined) {
+        if (end === undefined) {
             return;
         }
 

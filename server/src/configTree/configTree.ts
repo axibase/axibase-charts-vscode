@@ -1,36 +1,26 @@
-import { Diagnostic } from "vscode-languageserver";
-import { ConfigTreeValidator } from "./configTreeValidator";
-import { getRequirement, RequiredSettingsValidator } from "./requiredSettingsValidator";
-import { isNestedToPrevious, sectionDepthMap } from "./resources";
+import { isNestedToPrevious, sectionDepthMap } from "../resources";
+import { Setting } from "../setting";
+import { TextRange } from "../textRange";
 import { Section } from "./section";
-import { Setting } from "./setting";
-import { TextRange } from "./textRange";
 
 /**
- * Builds config tree structure
+ * Stores sections with corresponding settings in tree order.
  */
 export class ConfigTree {
-    public diagnostics: Diagnostic[];
     private root: Section;
     private lastAddedParent: Section;
     private previous: Section;
-
-    private configTreeValidator: ConfigTreeValidator = new ConfigTreeValidator();
-    private requiredSettingsValidator: RequiredSettingsValidator = new RequiredSettingsValidator();
-
-    public constructor(diagnostics: Diagnostic[]) {
-        this.diagnostics = diagnostics;
-    }
 
     get getRoot() {
         return this.root;
     }
 
     /**
-     * Adds section to tree. Checks section for non-applicable settings and declares requirements for children.
+     * Creates Section object based on `range` and `settings`, applies scope to it and adds to tree.
      * Doesn't alert if the section is out of order, this check is performed by SectionStack.
-     * @param range The text (name of section) and the position of the text
-     * @param settings Section settings
+     *
+     * @param range - The text (name of section) and the position of the text
+     * @param settings - Section settings
      */
     public addSection(range: TextRange, settings: Setting[]) {
         const section = new Section(range, settings);
@@ -93,41 +83,5 @@ export class ConfigTree {
         }
         this.previous = section;
         section.applyScope();
-
-        for (const setting of settings) {
-            const requirement = getRequirement(setting.displayName);
-            if (requirement !== undefined) {
-                /**
-                 * Section contains dependent which can be useless or requires additional setting.
-                 */
-                this.requiredSettingsValidator.checkCurrentAndSetRequirementsForChildren(requirement, section, setting);
-            }
-        }
-    }
-
-    /**
-     * Bypasses the tree and adds diagnostics about not applicable settings
-     * or absent required setting.
-     */
-    public goThroughTree() {
-        if (!this.root) {
-            return;
-        }
-        let currentLevel: Section[] = [this.root];
-        while (currentLevel.length > 0) {
-            let childAccumulator: Section[] = [];
-            for (const parentSection of currentLevel) {
-                for (let [sectionToCheck, reqsForSection] of parentSection.requirementsForChildren) {
-                    this.requiredSettingsValidator.checkAllChildren(sectionToCheck, reqsForSection, parentSection);
-                }
-                childAccumulator.push(...parentSection.children);
-            }
-            currentLevel = childAccumulator;
-        }
-        // Adds diagnostic about useless or missing required settings
-        this.diagnostics.push(...this.requiredSettingsValidator.diagnostics);
-        // Adds diagnostic of settings validation
-        const diagnostic: Diagnostic[] =  this.configTreeValidator.validate(this);
-        this.diagnostics.push(...diagnostic);
     }
 }

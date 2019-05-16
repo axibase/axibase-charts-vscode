@@ -1,28 +1,31 @@
 import { Diagnostic } from "vscode-languageserver";
-import { incorrectColors } from "../messageUtil";
-import { sectionMatchConditionRequired } from "../requirement";
-import { Section } from "../section";
-import { createDiagnostic } from "../util";
-import { RelatedSettingsRule } from "./interfaces";
+import { Section } from "../../configTree/section";
+import { incorrectColors } from "../../messageUtil";
+import { createDiagnostic } from "../../util";
+import { requiredCondition } from "../utils/condition";
+import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {
-    name: "Check colors match thresholds",
-    rule(section: Section): Diagnostic | void {
+    name: "Checks colors is less than thresholds by 1",
+    check(section: Section): Diagnostic | void {
         let colorsValues;
         let thresholdsValues;
 
-        const colorsSetting = section.getSettingFromTree("colors");
-        const thresholdsSetting = section.getSettingFromTree("thresholds");
-
-        if (colorsSetting === undefined || thresholdsSetting === undefined) {
+        if (!section.matchesConditions([
+            requiredCondition("type", ["calendar", "treemap", "gauge"]),
+            requiredCondition("mode", ["half", "default"])])) {
             return;
         }
 
-        if (!section.sectionMatchConditions([
-            sectionMatchConditionRequired("type", ["calendar", "treemap", "gauge"]),
-            sectionMatchConditionRequired("mode", ["half", "default"])
-        ])) {
+        const colorsSetting = section.getSettingFromTree("colors");
+        if (colorsSetting === undefined) {
             return;
+        }
+
+        const thresholdsSetting = section.getSettingFromTree("thresholds");
+        if (thresholdsSetting === undefined) {
+            return createDiagnostic(section.range.range,
+                `thresholds is required if colors is specified`);
         }
 
         if (colorsSetting.values.length > 0) {
