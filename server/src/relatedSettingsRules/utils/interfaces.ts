@@ -14,5 +14,6 @@ export interface RelatedSettingsRule {
 
 export interface Requirement {
     conditions?: Condition[];
+    // One of these settings is required if section passes conditions.
     requiredSetting: string | string[];
 }
