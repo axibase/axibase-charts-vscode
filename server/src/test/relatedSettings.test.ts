@@ -25,7 +25,7 @@ thresholds = 80
 thresholds = 0, 60, 80`;
 
 suite("RelatedSettings: thresholds and colors tests", () => {
-    test("Correct number of colors: \"thresholds\" declared before \"colors\"", () => {
+    test("Correct number of colors: thresholds declared before colors", () => {
         const conf = `${config}
         type = gauge
         thresholds = 0, 60, 80, 100
@@ -36,7 +36,7 @@ suite("RelatedSettings: thresholds and colors tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Correct number of colors: \"thresholds\" declared after \"colors\"", () => {
+    test("Correct number of colors: thresholds declared after colors", () => {
         const conf = `${config}
         type = gauge
         colors = green, orange, red
@@ -69,7 +69,7 @@ suite("RelatedSettings: thresholds and colors tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Correct: \"colors\" declared without \"thresholds\" for bar", () => {
+    test("Correct: colors declared without thresholds for bar", () => {
         const conf = `${config}
         type = bar
         timespan = 5 minute
@@ -81,7 +81,7 @@ suite("RelatedSettings: thresholds and colors tests", () => {
     });
 
     // tslint:disable-next-line:max-line-length
-    test("Correct: number of \"colors\" != number of \"thresholds\" - 1  for chart (\"thresholds\" have no effect)", () => {
+    test("Correct: number of colors != number of thresholds - 1  for chart (thresholds have no effect)", () => {
         const conf = `${config}
         type = chart
         colors = green
@@ -92,7 +92,7 @@ suite("RelatedSettings: thresholds and colors tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Incorrect number of colors: \"thresholds\" declared before \"colors\"", () => {
+    test("Incorrect number of colors: thresholds declared before colors", () => {
         const conf = `${config}
         type = gauge
         thresholds = 0, 40, 60, 80, 100
@@ -107,7 +107,7 @@ colors = green, orange, red
         )], `Config: \n${conf}`);
     });
 
-    test("Incorrect number of colors: \"thresholds\" declared after \"colors\"", () => {
+    test("Incorrect number of colors: thresholds declared after colors", () => {
         const conf = `${config}
         type = calendar
 colors = green, orange, red
@@ -122,7 +122,7 @@ colors = green, orange, red
         )], `Config: \n${conf}`);
     });
 
-    test("Incorrect: \"colors\" declared without \"thresholds\" for treemap", () => {
+    test("Incorrect: colors declared without thresholds for treemap", () => {
         const conf = `${config}
         type = treemap
         timespan = 5 minute
@@ -186,7 +186,7 @@ colors = orange
             )), `Config: \n${conf}`);
     });
 
-    test("Correct: \"thresholds\" is multiline", () => {
+    test("Correct: thresholds is multiline", () => {
         const conf = `${config}
             type = gauge
             thresholds = 0
@@ -199,7 +199,7 @@ thresholds = 100
         assert.deepStrictEqual(diags, deprecate, `Config: \n${conf}`);
     });
 
-    test("Incorrect number of colors: \"thresholds\" is multiline", () => {
+    test("Incorrect number of colors: thresholds is multiline", () => {
         const conf = `${config}
             type = gauge
             thresholds = 0
@@ -217,8 +217,8 @@ colors = silver
     });
 });
 
-suite("RelatedSettings: \"forecast-style\" and \"data-type\" tests", () => {
-    test("Correct: \"data-type\" is declared in [series]", () => {
+suite("RelatedSettings: forecast-style and data-type tests", () => {
+    test("Correct: data-type is declared in [series]", () => {
         const conf = `${config}
         type = chart
         title = Column chart
@@ -239,7 +239,7 @@ suite("RelatedSettings: \"forecast-style\" and \"data-type\" tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Incorrect: \"data-type\" is not declared", () => {
+    test("Incorrect: data-type is not declared", () => {
         const conf = `${config}
         type = chart
         mode = column
@@ -255,9 +255,9 @@ forecast-style = stroke: magenta;
     });
 });
 
-suite("RelatedSettings: \"alert-style\" and \"alert-expression\" tests", () => {
+suite("RelatedSettings: alert-style and alert-expression tests", () => {
 
-    test("Correct: \"alert-expression\" is declared", () => {
+    test("Correct: alert-expression is declared", () => {
         const conf = `${config}
         type = chart
         alert-expression = value > 60
@@ -268,23 +268,23 @@ suite("RelatedSettings: \"alert-style\" and \"alert-expression\" tests", () => {
         assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
     });
 
-    test("Incorrect: \"alert-expression\" is not declared", () => {
+    test("Incorrect: alert-expression is not declared", () => {
         const conf = `${config}
         type = chart
 alert-style = color: red
-            [series]`;
+[series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [createDiagnostic(
-            Range.create(Position.create(4, 1),
-                Position.create(4, "[widget".length)),
+            Range.create(Position.create(7, 1),
+                Position.create(7, "[series".length)),
             "alert-expression is required if alert-style is specified",
         )], `Config: \n${conf}`);
     });
 });
 
-suite("RelatedSettings: \"atribute\" and \"table\" tests", () => {
-    test("Incorrect: \"table\" without \"attribute\"", () => {
+suite("RelatedSettings: atribute and table tests", () => {
+    test("Incorrect: table without attribute", () => {
         const conf = `${config}
         type = chart
 [series]
@@ -298,7 +298,7 @@ suite("RelatedSettings: \"atribute\" and \"table\" tests", () => {
         )], `Config: \n${conf}`);
     });
 
-    test("Incorrect: \"attribute\" without \"table\"", () => {
+    test("Incorrect: attribute without table", () => {
         const conf = `${config}
         type = chart
 [series]
@@ -314,7 +314,7 @@ suite("RelatedSettings: \"atribute\" and \"table\" tests", () => {
 });
 
 suite("RelatedSettings: several widgets", () => {
-    test("Incorrect: resolved local \"colors\", unresolved global because type is \"gauge\"", () => {
+    test("Incorrect: resolved local colors, unresolved global because type is gauge", () => {
         const conf = `[configuration]
         entity = d
         metric = t
@@ -380,7 +380,7 @@ suite("RelatedSettings: several widgets", () => {
         )], `Config: \n${conf}`);
     });
 
-    test("Correct: resolved local \"colors\", resolved global because type is \"bar\"", () => {
+    test("Correct: resolved local colors, resolved global because type is bar", () => {
         const conf = `[configuration]
         entity = d
         metric = t
