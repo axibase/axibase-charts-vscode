@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { ConfigTree } from "./configTree";
+import { ConfigTree } from "./configTree/configTree";
+import { ConfigTreeValidator } from "./configTree/configTreeValidator";
 import { DefaultSetting } from "./defaultSetting";
 import {
     deprecatedTagSection,
@@ -150,14 +151,14 @@ export class Validator {
     private lastEndIf: number = undefined;
 
     /**
-     * Util class which helps to check related settings, for example, tresholds and colors.
+     * Stores sections with corresponding settings in tree order.
      */
     private configTree: ConfigTree;
 
     public constructor(text: string) {
         this.lines = deleteComments(text)
             .split("\n");
-        this.configTree = new ConfigTree(this.result);
+        this.configTree = new ConfigTree();
     }
 
     /**
@@ -204,7 +205,19 @@ export class Validator {
         this.checkRequredSettingsForSection();
         this.checkUrlPlaceholders();
         this.setSectionToStackAndTree(null);
-        this.configTree.goThroughTree();
+        /**
+         * Apply checks, which require walking through the ConfigTree.
+         */
+        let rulesDiagnostics: Diagnostic[] = ConfigTreeValidator.validate(this.configTree);
+        /**
+         * Ugly hack. Removes duplicates from rulesDiagnostics.
+         */
+        rulesDiagnostics = [
+            ...rulesDiagnostics.reduce(
+                ((allItems, item) => allItems.has(item.range) ? allItems : allItems.set(item.range, item)),
+                new Map()).values()
+        ];
+        this.result.push(...rulesDiagnostics);
         return this.result;
     }
 

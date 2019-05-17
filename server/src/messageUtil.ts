@@ -1,4 +1,4 @@
-type MessageFactoryMethod = (found?: string, msg?: string) => string;
+type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**
  * Creates a error message for unknown setting or value.
  * @param found the variant found in the user's text
@@ -53,3 +53,10 @@ export const getCsvErrorMessage: MessageFactoryMethod = (line: string): string =
   return (CSV_FROM_URL_MISSING_NAME_PATTERN.test(line)) ? `<name> in 'csv <name> from <url>' is missing` :
     `The line should contain a '=' or 'from' keyword`;
 };
+
+export const noRequiredSetting: MessageFactoryMethod = (dependent: string, required: string): string =>
+  `${required} is required if ${dependent} is specified`;
+
+export const noRequiredSettings: MessageFactoryMethod = (dependent: string, required: string[]): string =>
+  `${dependent} has effect only with one of the following:
+ * ${required.join("\n * ")}`;
