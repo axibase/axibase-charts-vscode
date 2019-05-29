@@ -1,4 +1,5 @@
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { lineFeedRequired } from "../messageUtil";
 import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
@@ -99,8 +100,7 @@ endscript`,
             `script alert("Hello, world!")
 endscript`,
             [createDiagnostic(
-                Range.create(0, 0, 0, "script".length),
-                "A linefeed character after 'script' keyword is required",
+                Range.create(0, 0, 0, "script".length), lineFeedRequired("script")
             )],
         ),
         new Test(

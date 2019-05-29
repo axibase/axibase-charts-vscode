@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { settingsMap } from "./resources";
 import { Setting } from "./setting";
 
@@ -10,7 +10,7 @@ const DIAGNOSTIC_SOURCE: string = "Axibase Charts";
  * @returns true if at least one value in map is/contains the wanted value
  */
 export function isInMap<T>(value: T, map: Map<string, T[]> | Map<string, T[][]>): boolean {
-    if (value == undefined) {
+    if (value == null) {
         return false;
     }
     for (const array of map.values()) {
@@ -177,4 +177,19 @@ colors = red, yellow, green`;
     }
 
     return createDiagnostic(range, message, diagnosticSeverity);
+}
+
+/**
+ * Creates Range object.
+ *
+ * @param start - The starting position in the string
+ * @param length - Length of the word to be highlighted
+ * @param lineNumber - Number of line, where is the word to be highlighted
+ * @returns Range object with start equal to `start` and end equal to `start+length` and line equal to `lineNumber`
+ */
+export function createRange(start: number, length: number, lineNumber: number) {
+    return Range.create(
+        Position.create(lineNumber, start),
+        Position.create(lineNumber, start + length),
+    );
 }

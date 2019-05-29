@@ -1,5 +1,6 @@
-import { Position, Range } from "vscode-languageserver";
+import { Range } from "vscode-languageserver";
 import { CheckPriority } from "./checkPriority";
+import { createRange } from "./util";
 
 /**
  * Contains the text and the position of the text
@@ -9,7 +10,8 @@ export class TextRange {
      * Matches a keyword
      */
     public static readonly KEYWORD_REGEXP: RegExp =
-        /^([ \t]*)(import|endvar|endcsv|endfor|elseif|endif|endscript|endlist|script|else|if|list|for|csv|var)\b/i;
+        // tslint:disable-next-line: max-line-length
+        /^([ \t]*)(import|endvar|endcsv|endfor|elseif|endif|endscript|endlist|endsql|script|else|if|list|sql|for|csv|var)\b/i;
 
     /**
      * Checks is current keyword closeable or not (can be closed like var-endvar)
@@ -17,7 +19,7 @@ export class TextRange {
      * @returns true if the keyword closeable
      */
     public static isCloseAble(line: string): boolean {
-        return /^[\s\t]*(?:for|if|list|var|script[\s\t]*$|csv|else|elseif)\b/.test(line);
+        return /^[\s\t]*(?:for|if|list|sql|var|script[\s\t]*$|csv|else|elseif)\b/.test(line);
     }
 
     /**
@@ -26,24 +28,7 @@ export class TextRange {
      * @returns true if the keyword closes a section
      */
     public static isClosing(line: string): boolean {
-        return /^[ \t]*(?:end(?:for|if|list|var|script|csv)|elseif|else)\b/.test(line);
-    }
-
-    /**
-     * Checks does the keyword increase the indent
-     * @param line the line containing the keyword
-     */
-    public static isIncreasingIndent(line: string): boolean {
-        return /^[ \t]*(?:for|if|else|elseif|script|csv|var|list)\b/.test(line);
-    }
-
-    /**
-     * Checks is the keyword closeable or not.
-     * @param line the line containing the keyword
-     * @returns true if not closeable, false otherwise
-     */
-    public static isNotCloseAble(line: string): boolean {
-        return /^[ \t]*else(?:if)?\b/.test(line);
+        return /^[\s\t]*(?:end(?:for|if|list|var|script|sql|csv)|elseif|else)\b/.test(line);
     }
 
     /**
@@ -59,10 +44,7 @@ export class TextRange {
         }
         const [, indent, keyword] = match;
 
-        return new TextRange(keyword, Range.create(
-            Position.create(i, indent.length),
-            Position.create(i, indent.length + keyword.length),
-        ), canBeUnclosed);
+        return new TextRange(keyword, createRange(indent.length, keyword.length, i), canBeUnclosed);
     }
 
     /**

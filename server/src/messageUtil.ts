@@ -34,7 +34,7 @@ export const uselessScope: MessageFactoryMethod = (found: string, msg: string): 
   `${found} setting is appplied only if ${msg}.`;
 
 export const incorrectColors: MessageFactoryMethod = (found: string, msg: string): string =>
-`Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
+  `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
 Current: ${found}, expected: ${msg}`;
 
 export const illegalSetting: MessageFactoryMethod = (found: string): string =>
@@ -60,3 +60,9 @@ export const noRequiredSetting: MessageFactoryMethod = (dependent: string, requi
 export const noRequiredSettings: MessageFactoryMethod = (dependent: string, required: string[]): string =>
   `${dependent} has effect only with one of the following:
  * ${required.join("\n * ")}`;
+
+export const noMatching: MessageFactoryMethod = (dependent: string, required: string): string =>
+  `${dependent} has no matching ${required}`;
+
+export const lineFeedRequired: MessageFactoryMethod = (dependent: string): string =>
+  `A linefeed character after '${dependent}' keyword is required`;

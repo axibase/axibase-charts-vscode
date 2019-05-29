@@ -64,3 +64,7 @@ To debug the **Server** part:
 * Activate `Launch Client` configuration
 * Activate `Attach to Server` configuration
 * Add a breakpoint.
+
+## Documenting Conventions
+
+Refer to [TSDoc](https://github.com/microsoft/tsdoc/tree/master/tsdoc).
