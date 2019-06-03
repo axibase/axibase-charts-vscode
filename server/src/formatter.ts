@@ -1,7 +1,8 @@
-import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
+import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
+import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
-import { isEmpty } from "./util";
+import { createRange, isEmpty } from "./util";
 
 interface Section {
     indent?: string;
@@ -124,10 +125,7 @@ export class Formatter {
         if (spacesBefore !== " ") {
             this.edits.push(
                 TextEdit.replace(
-                    Range.create(
-                        Position.create(this.currentLine, declaration.length),
-                        Position.create(this.currentLine, declaration.length + spacesBefore.length),
-                    ),
+                    createRange(declaration.length, spacesBefore.length, this.currentLine),
                     " ",
                 ),
             );
@@ -136,10 +134,7 @@ export class Formatter {
             const start = line.indexOf(sign) + sign.length;
             this.edits.push(
                 TextEdit.replace(
-                    Range.create(
-                        Position.create(this.currentLine, start),
-                        Position.create(this.currentLine, start + spacesAfter.length),
-                    ),
+                    createRange(start, spacesAfter.length, this.currentLine),
                     " ",
                 ),
             );
@@ -320,7 +315,7 @@ export class Formatter {
      */
     private shouldBeClosed(): boolean {
         let line: string | undefined = this.getCurrentLine();
-        this.match = /^[ \t]*((?:var|list)|script[\s\t]*$)/.exec(line);
+        this.match = /^[ \t]*((?:var|list|sql)|script[\s\t]*$)/.exec(line);
         if (!this.match) {
             return true;
         }
@@ -352,9 +347,22 @@ export class Formatter {
                         }
                         line = this.getLine(++j);
                     }
+                    return true;
                 }
-
-                return true;
+                if (BLOCK_SQL_START.test(line)) {
+                    let j: number = this.currentLine + 1;
+                    line = this.getLine(j);
+                    while (line !== undefined) {
+                        if (BLOCK_SQL_START.test(line)) {
+                            break;
+                        }
+                        if (BLOCK_SQL_END.test(line)) {
+                            return true;
+                        }
+                        line = this.getLine(++j);
+                    }
+                    return true;
+                }
             }
         }
 
