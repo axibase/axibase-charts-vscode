@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
 import { createDiagnostic } from "./util";

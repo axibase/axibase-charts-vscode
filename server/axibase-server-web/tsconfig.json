@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "es2017",
+		"module": "amd",
+		"declaration": true,
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"lib": [
+			"es2017",
+			"dom"
+		],
+		"resolveJsonModule": true,
+	},
+	"files": [
+		"../src/completionProvider.ts"
+	],
+	"include": [
+		"../../snippets/snippets.json",
+		"../dictionary.json",
+		"../dictionary.schema.json"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

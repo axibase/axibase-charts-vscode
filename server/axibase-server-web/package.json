@@ -1,0 +1,13 @@
+{
+  "name": "axibase-server-web",
+  "version": "0.0.1",
+  "main": "dist/server/src/completionProvider.js",
+  "author": "Axibase Developers",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json"
+  },
+  "dependencies": {
+    "typescript": "^3.5.1"
+  }
+}

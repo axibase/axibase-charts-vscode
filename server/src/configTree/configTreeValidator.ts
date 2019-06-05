@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 import validationRules from "../relatedSettingsRules";
 import { ConfigTree } from "./configTree";
 import { Section } from "./section";
