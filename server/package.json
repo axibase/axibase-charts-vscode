@@ -22,6 +22,7 @@
 	"devDependencies": {
 		"@types/jsdom": "^11.12.0",
 		"@types/mocha": "^5.2.5",
+		"browser-or-node": "^1.2.1",
 		"vscode": "^1.1.33"
 	}
 }

@@ -1,6 +1,6 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
-} from "vscode-languageserver";
+} from "vscode-languageserver-types";
 import { Field } from "./field";
 import { settingsMap } from "./resources";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";

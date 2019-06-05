@@ -1,5 +1,4 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import { isNode } from "browser-or-node";
 import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 interface IDictionary { $schema: string; settings: Setting[]; }
@@ -9,9 +8,18 @@ interface IDictionary { $schema: string; settings: Setting[]; }
  * @returns array of settings from the file
  */
 function readSettings(): Setting[] {
-    const dictionaryFilePath: string = join(__dirname, "..", "dictionary.json");
-    const jsonContent: string = readFileSync(dictionaryFilePath, "UTF-8");
-    const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
+    let dictionary: IDictionary;
+
+    if (isNode) {
+        const path = require("path");
+        const fs = require("fs");
+        const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
+        const jsonContent: string = fs.readFileSync(dictionaryFilePath, "UTF-8");
+        dictionary = JSON.parse(jsonContent) as IDictionary;
+    } else {
+        const jsonContent: string = require("../dictionary.json");
+        dictionary = (jsonContent as any) as IDictionary;
+    }
 
     return dictionary.settings;
 }
@@ -21,8 +29,17 @@ function readSettings(): Setting[] {
  * @returns map of settings names and descriptions
  */
 function readDescriptions(): Map<string, string> {
-    const descriptionsPath: string = join(__dirname, "..", "descriptions.md");
-    const content: string = readFileSync(descriptionsPath, "UTF-8");
+    let content: string = "";
+
+    if (isNode) {
+        const path = require("path");
+        const fs = require("fs");
+        const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
+        content = fs.readFileSync(descriptionsPath, "UTF-8");
+    } else {
+        content = require("../descriptions.md").default;
+    }
+
     const map: Map<string, string> = new Map();
     // ## settingname\n\nsetting description[url](hello#html)\n
     const regExp: RegExp = /\#\# ([a-z]+?)  \n  \n([^\s#][\S\s]+?)  (?=\n  (?:\n(?=\#)|$))/g;
