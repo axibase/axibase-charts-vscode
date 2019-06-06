@@ -5,7 +5,8 @@
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json"
+    "build": "rm -r ./dist && tsc -p ./tsconfig.json && npm run copy",
+    "copy": "cp '../../server/descriptions.md' 'dist/server/descriptions.md'"
   },
   "dependencies": {
     "typescript": "^3.5.1"
