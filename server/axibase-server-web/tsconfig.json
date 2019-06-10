@@ -12,7 +12,8 @@
 		"resolveJsonModule": true,
 	},
 	"files": [
-		"../src/completionProvider.ts"
+		"../src/completionProvider.ts",
+		"../src/validator.ts"
 	],
 	"include": [
 		"../../snippets/snippets.json",
