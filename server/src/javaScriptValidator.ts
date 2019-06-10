@@ -1,5 +1,5 @@
 import { DOMWindow, JSDOM } from "jsdom";
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
 import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 import { TextRange } from "./textRange";

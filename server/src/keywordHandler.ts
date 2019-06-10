@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 import { lineFeedRequired } from "./messageUtil";
 import { TextRange } from "./textRange";
 import { createDiagnostic, createRange } from "./util";

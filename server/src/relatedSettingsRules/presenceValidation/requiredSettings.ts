@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
 import { noRequiredSetting, noRequiredSettings } from "../../messageUtil";
 import { Setting } from "../../setting";

@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 /**
  * Performs validation of a whole document line by line.
  */

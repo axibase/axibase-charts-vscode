@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 interface DependencyResolveInfo {

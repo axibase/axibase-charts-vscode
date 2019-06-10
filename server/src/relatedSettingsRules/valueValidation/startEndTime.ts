@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
 import { createDiagnostic } from "../../util";
 import { RelatedSettingsRule } from "../utils/interfaces";

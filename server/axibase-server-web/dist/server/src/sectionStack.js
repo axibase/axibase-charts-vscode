@@ -1,4 +1,4 @@
-define(["require", "exports", "vscode-languageserver", "./resources", "./setting", "./textRange", "./util"], function (require, exports, vscode_languageserver_1, resources_1, setting_1, textRange_1, util_1) {
+define(["require", "exports", "vscode-languageserver-types", "./resources", "./setting", "./textRange", "./util"], function (require, exports, vscode_languageserver_types_1, resources_1, setting_1, textRange_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class SectionStackNode {
@@ -85,7 +85,7 @@ define(["require", "exports", "vscode-languageserver", "./resources", "./setting
         dependencies: [],
         dependenciesResolved: true,
         name: "",
-        range: new textRange_1.TextRange("", vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(0, 0), vscode_languageserver_1.Position.create(0, 0))),
+        range: new textRange_1.TextRange("", vscode_languageserver_types_1.Range.create(vscode_languageserver_types_1.Position.create(0, 0), vscode_languageserver_types_1.Position.create(0, 0))),
         settings: [],
         unresolved: [],
         resolveDependency() { },
@@ -194,7 +194,7 @@ define(["require", "exports", "vscode-languageserver", "./resources", "./setting
             return node ? node.range : null;
         }
         createErrorDiagnostic(section, message) {
-            return util_1.createDiagnostic(section.range, message, vscode_languageserver_1.DiagnosticSeverity.Error);
+            return util_1.createDiagnostic(section.range, message, vscode_languageserver_types_1.DiagnosticSeverity.Error);
         }
         checkDependenciesResolved(startIndex) {
             const stack = this.stack;

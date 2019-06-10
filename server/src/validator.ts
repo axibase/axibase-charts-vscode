@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { Config } from "./config";
 import { ConfigTree } from "./configTree/configTree";
 import { ConfigTreeValidator } from "./configTree/configTreeValidator";

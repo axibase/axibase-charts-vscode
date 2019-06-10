@@ -1,4 +1,4 @@
-import { Range } from "vscode-languageserver";
+import { Range } from "vscode-languageserver-types";
 /**
  * Contains the text and the position of the text
  */

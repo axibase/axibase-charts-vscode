@@ -1,4 +1,4 @@
-define(["require", "exports", "vscode-languageserver", "./config", "./configTree/configTree", "./configTree/configTreeValidator", "./defaultSetting", "./keywordHandler", "./messageUtil", "./resources", "./sectionStack", "./setting", "./textRange", "./util"], function (require, exports, vscode_languageserver_1, config_1, configTree_1, configTreeValidator_1, defaultSetting_1, keywordHandler_1, messageUtil_1, resources_1, sectionStack_1, setting_1, textRange_1, util_1) {
+define(["require", "exports", "vscode-languageserver-types", "./config", "./configTree/configTree", "./configTree/configTreeValidator", "./defaultSetting", "./keywordHandler", "./messageUtil", "./resources", "./sectionStack", "./setting", "./textRange", "./util"], function (require, exports, vscode_languageserver_types_1, config_1, configTree_1, configTreeValidator_1, defaultSetting_1, keywordHandler_1, messageUtil_1, resources_1, sectionStack_1, setting_1, textRange_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const placeholderContainingSettings = [
@@ -327,7 +327,7 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
             if (this.match !== null) {
                 this.result.push(util_1.createDiagnostic(this.createRange(this.match.index, this.match[0].length), `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
                     `\nMigration examples are available at ` +
-                    `https://github.com/axibase/charts/blob/master/syntax/freemarker.md`, vscode_languageserver_1.DiagnosticSeverity.Information));
+                    `https://github.com/axibase/charts/blob/master/syntax/freemarker.md`, vscode_languageserver_types_1.DiagnosticSeverity.Information));
                 this.match = /(as\s*(\S+)>)/.exec(line);
                 if (this.match) {
                     this.addToStringArray(this.aliases);
@@ -777,7 +777,7 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
                 const [, indent, name] = this.match;
                 const setting = this.getSetting(name);
                 if (this.isAllowedWidget(setting)) {
-                    this.result.push(util_1.createDiagnostic(this.createRange(indent.length, name.length), messageUtil_1.settingNameInTags(name), vscode_languageserver_1.DiagnosticSeverity.Information));
+                    this.result.push(util_1.createDiagnostic(this.createRange(indent.length, name.length), messageUtil_1.settingNameInTags(name), vscode_languageserver_types_1.DiagnosticSeverity.Information));
                 }
             }
         }
@@ -834,10 +834,10 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
              * Show hint if setting is deprecated
              */
             if (setting.deprecated) {
-                this.result.push(util_1.createDiagnostic(setting.textRange, setting.deprecated, vscode_languageserver_1.DiagnosticSeverity.Warning));
+                this.result.push(util_1.createDiagnostic(setting.textRange, setting.deprecated, vscode_languageserver_types_1.DiagnosticSeverity.Warning));
             }
             if (!this.isAllowedInSection(setting)) {
-                this.result.push(util_1.createDiagnostic(setting.textRange, messageUtil_1.illegalSetting(setting.displayName), vscode_languageserver_1.DiagnosticSeverity.Error));
+                this.result.push(util_1.createDiagnostic(setting.textRange, messageUtil_1.illegalSetting(setting.displayName), vscode_languageserver_types_1.DiagnosticSeverity.Error));
             }
             if (setting.name === "type") {
                 this.currentWidget = this.match[3];
@@ -878,11 +878,11 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
                     const range = this.createRange(start, settingName.length);
                     if (this.currentSection.text === "tags") {
                         if (!/^["].+["]$/.test(settingName)) {
-                            this.result.push(util_1.createDiagnostic(range, messageUtil_1.tagNameWithWhitespaces(settingName), vscode_languageserver_1.DiagnosticSeverity.Warning));
+                            this.result.push(util_1.createDiagnostic(range, messageUtil_1.tagNameWithWhitespaces(settingName), vscode_languageserver_types_1.DiagnosticSeverity.Warning));
                         }
                     }
                     else if (this.currentSection.text !== "properties") {
-                        this.result.push(util_1.createDiagnostic(range, messageUtil_1.settingsWithWhitespaces(settingName), vscode_languageserver_1.DiagnosticSeverity.Warning));
+                        this.result.push(util_1.createDiagnostic(range, messageUtil_1.settingsWithWhitespaces(settingName), vscode_languageserver_types_1.DiagnosticSeverity.Warning));
                     }
                 }
             }
@@ -904,7 +904,7 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
             const word = this.match[2];
             const range = this.createRange(indent, word.length);
             if (word === "tag") {
-                this.result.push(util_1.createDiagnostic(range, messageUtil_1.deprecatedTagSection, vscode_languageserver_1.DiagnosticSeverity.Warning));
+                this.result.push(util_1.createDiagnostic(range, messageUtil_1.deprecatedTagSection, vscode_languageserver_types_1.DiagnosticSeverity.Warning));
             }
         }
         /**
@@ -1058,11 +1058,11 @@ define(["require", "exports", "vscode-languageserver", "./config", "./configTree
                     return phSectionSettings.find(s => s.name === cleared) == null;
                 });
                 if (missingPhs.length > 0) {
-                    this.result.push(util_1.createDiagnostic(placeholderRange.range, `Missing placeholders: ${missingPhs.join(", ")}.`, vscode_languageserver_1.DiagnosticSeverity.Error));
+                    this.result.push(util_1.createDiagnostic(placeholderRange.range, `Missing placeholders: ${missingPhs.join(", ")}.`, vscode_languageserver_types_1.DiagnosticSeverity.Error));
                 }
                 let unnecessaryPhs = phSectionSettings.filter(s => !phs.includes(s.name)).map(s => s.name);
                 if (unnecessaryPhs.length > 0) {
-                    this.result.push(util_1.createDiagnostic(placeholderRange.range, `Unnecessary placeholders: ${unnecessaryPhs.join(", ")}.`, vscode_languageserver_1.DiagnosticSeverity.Warning));
+                    this.result.push(util_1.createDiagnostic(placeholderRange.range, `Unnecessary placeholders: ${unnecessaryPhs.join(", ")}.`, vscode_languageserver_types_1.DiagnosticSeverity.Warning));
                 }
             }
         }

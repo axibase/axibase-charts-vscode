@@ -1,4 +1,4 @@
-define(["require", "exports", "vscode-languageserver", "../../util"], function (require, exports, vscode_languageserver_1, util_1) {
+define(["require", "exports", "vscode-languageserver-types", "../../util"], function (require, exports, vscode_languageserver_types_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const rule = {
@@ -13,7 +13,7 @@ define(["require", "exports", "vscode-languageserver", "../../util"], function (
                 return;
             }
             if (end.value >= forecast.value) {
-                return util_1.createDiagnostic(end.textRange, `${forecast.displayName} must be greater than ${end.displayName}`, vscode_languageserver_1.DiagnosticSeverity.Error);
+                return util_1.createDiagnostic(end.textRange, `${forecast.displayName} must be greater than ${end.displayName}`, vscode_languageserver_types_1.DiagnosticSeverity.Error);
             }
         }
     };

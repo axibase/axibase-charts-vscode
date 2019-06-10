@@ -1,4 +1,4 @@
-import { Diagnostic } from "vscode-languageserver";
+import { Diagnostic } from "vscode-languageserver-types";
 import { TextRange } from "./textRange";
 export declare const BLOCK_SQL_START: RegExp;
 export declare const BLOCK_SQL_END: RegExp;
