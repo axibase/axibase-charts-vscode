@@ -1,3 +1,4 @@
+/// <amd-module name="CompletionProvider"/>
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";

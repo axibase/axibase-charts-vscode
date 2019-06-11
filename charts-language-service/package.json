@@ -1,14 +1,14 @@
 {
   "name": "axibase-server-web",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/amd/index.js",
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rm -r ./dist && tsc -p ./tsconfig.json && npm run copy",
-    "copy": "cp '../server/descriptions.md' 'dist/amd/server/descriptions.md'"
+    "build": "rm -r ./dist && tsc -p ./tsconfig.json"
   },
   "dependencies": {
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.1",
+    "vscode-languageserver-types": "^3.14.0"
   }
 }

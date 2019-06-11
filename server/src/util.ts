@@ -1,3 +1,4 @@
+/// <amd-module name="Util"/>
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
 import { settingsMap } from "./resources";
 import { Setting } from "./setting";

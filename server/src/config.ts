@@ -1,3 +1,4 @@
+/// <amd-module name="Config"/>
 import { deleteComments } from "./util";
 
 /**

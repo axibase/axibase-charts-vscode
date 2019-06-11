@@ -1,3 +1,4 @@
+/// <amd-module name="Setting"/>
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";

@@ -1,3 +1,4 @@
+/// <amd-module name="KeywordHandler"/>
 import { Diagnostic } from "vscode-languageserver-types";
 import { lineFeedRequired } from "./messageUtil";
 import { TextRange } from "./textRange";

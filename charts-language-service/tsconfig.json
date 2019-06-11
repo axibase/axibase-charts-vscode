@@ -4,21 +4,15 @@
 		"module": "amd",
 		"declaration": true,
 		"moduleResolution": "node",
-		"outDir": "dist/amd",
+		"outFile": "dist/amd/index.js",
 		"lib": [
 			"es2017",
 			"dom"
-		],
-		"resolveJsonModule": true,
+		]
 	},
 	"files": [
 		"../server/src/completionProvider.ts",
 		"../server/src/validator.ts"
-	],
-	"include": [
-		"../snippets/snippets.json",
-		"../server/dictionary.json",
-		"../server/dictionary.schema.json"
 	],
 	"exclude": [
 		"node_modules"

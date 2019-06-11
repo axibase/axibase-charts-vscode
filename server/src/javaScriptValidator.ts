@@ -1,3 +1,4 @@
+/// <amd-module name="JavaScriptValidator"/>
 import { DOMWindow, JSDOM } from "jsdom";
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";

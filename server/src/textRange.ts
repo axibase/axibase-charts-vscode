@@ -1,3 +1,4 @@
+/// <amd-module name="TextRange"/>
 import { Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
 import { createRange } from "./util";

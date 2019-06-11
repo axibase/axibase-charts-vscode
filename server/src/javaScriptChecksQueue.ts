@@ -1,3 +1,4 @@
+/// <amd-module name="JavaScriptChecksQueue"/>
 import { CheckPriority } from "./checkPriority";
 import { TextRange } from "./textRange";
 

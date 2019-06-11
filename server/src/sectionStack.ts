@@ -1,3 +1,4 @@
+/// <amd-module name="SectionStackNode"/>
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
 import { inheritableSections, requiredSectionSettingsMap, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";

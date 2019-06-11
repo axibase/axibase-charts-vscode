@@ -1,3 +1,4 @@
+/// <amd-module name="Field"/>
 /**
  * Represents a field in a script setting.
  * For example, `max` is a field in `alert-expression` setting

@@ -1,3 +1,4 @@
+/// <amd-module name="Script"/>
 import { Field } from "./field";
 
 export class Script {

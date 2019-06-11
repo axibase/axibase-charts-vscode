@@ -1,3 +1,4 @@
+/// <amd-module name="DefaultSetting"/>
 import { PossibleValue } from "./possibleValue";
 import { Script } from "./script";
 import { Setting } from "./setting";
