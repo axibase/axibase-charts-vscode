@@ -20,7 +20,7 @@ interface ValueRange {
 /**
  * Holds the description of a setting and corresponding methods.
  */
-/// <amd-module name="DefaultSetting"/>
+/// <amd-module name="defaultSetting"/>
 export class DefaultSetting {
     /**
      * Lowercases the string and deletes non-alphabetic characters

@@ -522,7 +522,7 @@ define("defaultSetting", ["require", "exports", "setting"], function (require, e
     /**
      * Holds the description of a setting and corresponding methods.
      */
-    /// <amd-module name="DefaultSetting"/>
+    /// <amd-module name="defaultSetting"/>
     class DefaultSetting {
         constructor(setting) {
             /**
@@ -686,6 +686,7 @@ define("defaultSetting", ["require", "exports", "setting"], function (require, e
 define("resources", ["require", "exports", "browser-or-node", "setting"], function (require, exports, browser_or_node_1, setting_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="resources"/>
     /**
      * Reads dictionary from "dictionary.json" file
      * @returns array of settings from the file
