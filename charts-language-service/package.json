@@ -1,11 +1,11 @@
 {
-  "name": "axibase-server-web",
+  "name": "charts-language-service",
   "version": "0.0.1",
   "main": "dist/main.js",
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "webpack --mode=development"
+    "build": "webpack --mode=production"
   },
   "devDependencies": {
     "raw-loader": "^3.0.0",
