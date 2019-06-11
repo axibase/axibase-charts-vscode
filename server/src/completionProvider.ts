@@ -1,4 +1,3 @@
-/// <amd-module name="CompletionProvider"/>
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";
@@ -19,6 +18,7 @@ export interface ItemFields {
 /**
  * Provides dynamic completion items.
  */
+/// <amd-module name="CompletionProvider"/>
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;

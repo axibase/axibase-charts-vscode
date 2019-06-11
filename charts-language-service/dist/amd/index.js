@@ -1,11 +1,11 @@
 define("Field", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="Field"/>
     /**
      * Represents a field in a script setting.
      * For example, `max` is a field in `alert-expression` setting
      */
+    /// <amd-module name="Field"/>
     class Field {
         constructor(type, name, description = "", args = [], required = true) {
             this.type = type;
@@ -33,9 +33,10 @@ define("PossibleValue", ["require", "exports"], function (require, exports) {
     }
     exports.PossibleValue = PossibleValue;
 });
-define("Script", ["require", "exports"], function (require, exports) {
+define("script", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="Script"/>
     class Script {
         constructor(returnValue, fields = []) {
             this.returnValue = returnValue;
@@ -44,8 +45,7 @@ define("Script", ["require", "exports"], function (require, exports) {
     }
     exports.Script = Script;
 });
-/// <amd-module name="MessageUtil"/>
-define("MessageUtil", ["require", "exports"], function (require, exports) {
+define("messageUtil", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -96,7 +96,7 @@ Current: ${found}, expected: ${msg}`;
     exports.noMatching = (dependent, required) => `${dependent} has no matching ${required}`;
     exports.lineFeedRequired = (dependent) => `A linefeed character after '${dependent}' keyword is required`;
 });
-define("Util", ["require", "exports", "vscode-languageserver-types", "Resources", "Setting"], function (require, exports, vscode_languageserver_types_1, resources_1, setting_1) {
+define("util", ["require", "exports", "vscode-languageserver-types", "resources", "setting"], function (require, exports, vscode_languageserver_types_1, resources_1, setting_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const DIAGNOSTIC_SOURCE = "Axibase Charts";
@@ -277,7 +277,7 @@ colors = red, yellow, green`;
     }
     exports.createRange = createRange;
 });
-define("Setting", ["require", "exports", "vscode-languageserver-types", "DefaultSetting", "MessageUtil", "Util"], function (require, exports, vscode_languageserver_types_2, defaultSetting_1, messageUtil_1, util_1) {
+define("setting", ["require", "exports", "vscode-languageserver-types", "defaultSetting", "messageUtil", "util"], function (require, exports, vscode_languageserver_types_2, defaultSetting_1, messageUtil_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.intervalUnits = [
@@ -346,6 +346,7 @@ define("Setting", ["require", "exports", "vscode-languageserver-types", "Default
     /**
      * In addition to DefaultSetting contains specific fields.
      */
+    /// <amd-module name="Setting"/>
     class Setting extends defaultSetting_1.DefaultSetting {
         constructor(setting) {
             super(setting);
@@ -515,12 +516,13 @@ Current: ${this.value}`);
     }
     exports.Setting = Setting;
 });
-define("DefaultSetting", ["require", "exports", "Setting"], function (require, exports, setting_2) {
+define("defaultSetting", ["require", "exports", "setting"], function (require, exports, setting_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * Holds the description of a setting and corresponding methods.
      */
+    /// <amd-module name="DefaultSetting"/>
     class DefaultSetting {
         constructor(setting) {
             /**
@@ -681,8 +683,7 @@ define("DefaultSetting", ["require", "exports", "Setting"], function (require, e
     DefaultSetting.clearValue = (str) => str.toLowerCase();
     exports.DefaultSetting = DefaultSetting;
 });
-/// <amd-module name="Resources"/>
-define("Resources", ["require", "exports", "browser-or-node", "Setting"], function (require, exports, browser_or_node_1, setting_3) {
+define("resources", ["require", "exports", "browser-or-node", "setting"], function (require, exports, browser_or_node_1, setting_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -890,13 +891,14 @@ define("Resources", ["require", "exports", "browser-or-node", "Setting"], functi
         "keys", "tags"
     ]);
 });
-define("CompletionProvider", ["require", "exports", "vscode-languageserver-types", "Resources", "Setting", "Util"], function (require, exports, vscode_languageserver_types_3, resources_2, setting_4, util_2) {
+define("completionProvider", ["require", "exports", "vscode-languageserver-types", "resources", "setting", "util"], function (require, exports, vscode_languageserver_types_3, resources_2, setting_4, util_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.snippets = require("../../snippets/snippets.json");
     /**
      * Provides dynamic completion items.
      */
+    /// <amd-module name="CompletionProvider"/>
     class CompletionProvider {
         constructor(textDocument, position) {
             const text = textDocument.getText().substr(0, textDocument.offsetAt(position));
@@ -1156,12 +1158,13 @@ endif
     }
     exports.CompletionProvider = CompletionProvider;
 });
-define("Config", ["require", "exports", "Util"], function (require, exports, util_3) {
+define("config", ["require", "exports", "util"], function (require, exports, util_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * Stores config lines as array, removes comments.
      */
+    /// <amd-module name="Config"/>
     class Config {
         constructor(text) {
             this.currentLineNumber = -1;
@@ -1195,12 +1198,13 @@ define("CheckPriority", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("TextRange", ["require", "exports", "Util"], function (require, exports, util_4) {
+define("textRange", ["require", "exports", "util"], function (require, exports, util_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * Contains the text and the position of the text
      */
+    /// <amd-module name="TextRange"/>
     class TextRange {
         constructor(text, range, canBeUnclosed = false) {
             /**
@@ -1256,7 +1260,7 @@ define("TextRange", ["require", "exports", "Util"], function (require, exports, 
     /^([ \t]*)(import|endvar|endcsv|endfor|elseif|endif|endscript|endlist|endsql|script|else|if|list|sql|for|csv|var)\b/i;
     exports.TextRange = TextRange;
 });
-define("relatedSettingsRules/utils/condition", ["require", "exports", "Util"], function (require, exports, util_5) {
+define("relatedSettingsRules/utils/condition", ["require", "exports", "util"], function (require, exports, util_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -1336,7 +1340,7 @@ define("relatedSettingsRules/utils/condition", ["require", "exports", "Util"], f
     }
     exports.isNotUselessIf = isNotUselessIf;
 });
-define("configTree/section", ["require", "exports", "Setting"], function (require, exports, setting_5) {
+define("configTree/section", ["require", "exports", "setting"], function (require, exports, setting_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -1423,7 +1427,7 @@ define("configTree/section", ["require", "exports", "Setting"], function (requir
     }
     exports.Section = Section;
 });
-define("configTree/configTree", ["require", "exports", "Resources", "configTree/section"], function (require, exports, resources_3, section_1) {
+define("configTree/configTree", ["require", "exports", "resources", "configTree/section"], function (require, exports, resources_3, section_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -1612,7 +1616,7 @@ define("relatedSettingsRules/presenceValidation/noUselessSettings/forWidget", ["
     ]);
     exports.default = checks;
 });
-define("relatedSettingsRules/presenceValidation/noUselessSettings/index", ["require", "exports", "vscode-languageserver-types", "MessageUtil", "Util", "relatedSettingsRules/presenceValidation/noUselessSettings/forSeries", "relatedSettingsRules/presenceValidation/noUselessSettings/forWidget"], function (require, exports, vscode_languageserver_types_4, messageUtil_2, util_6, forSeries_1, forWidget_1) {
+define("relatedSettingsRules/presenceValidation/noUselessSettings/index", ["require", "exports", "vscode-languageserver-types", "messageUtil", "util", "relatedSettingsRules/presenceValidation/noUselessSettings/forSeries", "relatedSettingsRules/presenceValidation/noUselessSettings/forWidget"], function (require, exports, vscode_languageserver_types_4, messageUtil_2, util_6, forSeries_1, forWidget_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function getRule(checksMap) {
@@ -1640,7 +1644,7 @@ define("relatedSettingsRules/presenceValidation/noUselessSettings/index", ["requ
         name: "Checks absence of useless settings in [series]"
     };
 });
-define("relatedSettingsRules/presenceValidation/requiredSettings", ["require", "exports", "MessageUtil", "Util", "relatedSettingsRules/utils/condition"], function (require, exports, messageUtil_3, util_7, condition_3) {
+define("relatedSettingsRules/presenceValidation/requiredSettings", ["require", "exports", "messageUtil", "util", "relatedSettingsRules/utils/condition"], function (require, exports, messageUtil_3, util_7, condition_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -1817,7 +1821,7 @@ define("relatedSettingsRules/presenceValidation/requiredSettings", ["require", "
     };
     exports.default = rule;
 });
-define("relatedSettingsRules/valueValidation/colorsThresholds", ["require", "exports", "MessageUtil", "Util", "relatedSettingsRules/utils/condition"], function (require, exports, messageUtil_4, util_8, condition_4) {
+define("relatedSettingsRules/valueValidation/colorsThresholds", ["require", "exports", "messageUtil", "util", "relatedSettingsRules/utils/condition"], function (require, exports, messageUtil_4, util_8, condition_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const rule = {
@@ -1867,7 +1871,7 @@ define("relatedSettingsRules/valueValidation/colorsThresholds", ["require", "exp
     };
     exports.default = rule;
 });
-define("relatedSettingsRules/valueValidation/forecastAutoCountAndEigentripleLimit", ["require", "exports", "Util"], function (require, exports, util_9) {
+define("relatedSettingsRules/valueValidation/forecastAutoCountAndEigentripleLimit", ["require", "exports", "util"], function (require, exports, util_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const rule = {
@@ -1888,7 +1892,7 @@ define("relatedSettingsRules/valueValidation/forecastAutoCountAndEigentripleLimi
     };
     exports.default = rule;
 });
-define("relatedSettingsRules/valueValidation/forecastEndTime", ["require", "exports", "vscode-languageserver-types", "Util"], function (require, exports, vscode_languageserver_types_5, util_10) {
+define("relatedSettingsRules/valueValidation/forecastEndTime", ["require", "exports", "vscode-languageserver-types", "util"], function (require, exports, vscode_languageserver_types_5, util_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const rule = {
@@ -1909,7 +1913,7 @@ define("relatedSettingsRules/valueValidation/forecastEndTime", ["require", "expo
     };
     exports.default = rule;
 });
-define("relatedSettingsRules/valueValidation/startEndTime", ["require", "exports", "vscode-languageserver-types", "Util"], function (require, exports, vscode_languageserver_types_6, util_11) {
+define("relatedSettingsRules/valueValidation/startEndTime", ["require", "exports", "vscode-languageserver-types", "util"], function (require, exports, vscode_languageserver_types_6, util_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const rule = {
@@ -2021,7 +2025,7 @@ define("configTree/configTreeValidator", ["require", "exports", "relatedSettings
         }
     }
 });
-define("KeywordHandler", ["require", "exports", "MessageUtil", "Util"], function (require, exports, messageUtil_5, util_12) {
+define("keywordHandler", ["require", "exports", "messageUtil", "util"], function (require, exports, messageUtil_5, util_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -2038,6 +2042,7 @@ define("KeywordHandler", ["require", "exports", "MessageUtil", "Util"], function
     const BLOCK_SCRIPT_START_WITHOUT_LF = /(^\s*)script\s*\S/;
     exports.BLOCK_SCRIPT_START = /script(?!([\s\S]*=))/;
     exports.BLOCK_SCRIPT_END = /^\s*endscript\s*$/;
+    /// <amd-module name="KeywordHandler"/>
     class KeywordHandler {
         constructor(keywordsStack) {
             this.diagnostics = [];
@@ -2066,9 +2071,10 @@ define("KeywordHandler", ["require", "exports", "MessageUtil", "Util"], function
     }
     exports.KeywordHandler = KeywordHandler;
 });
-define("SectionStackNode", ["require", "exports", "vscode-languageserver-types", "Resources", "Setting", "TextRange", "Util"], function (require, exports, vscode_languageserver_types_7, resources_4, setting_6, textRange_1, util_13) {
+define("sectionStack", ["require", "exports", "vscode-languageserver-types", "resources", "setting", "textRange", "util"], function (require, exports, vscode_languageserver_types_7, resources_4, setting_6, textRange_1, util_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="SectionStackNode"/>
     class SectionStackNode {
         constructor(range) {
             this.range = range;
@@ -2314,7 +2320,7 @@ define("SectionStackNode", ["require", "exports", "vscode-languageserver-types",
     }
     exports.SectionStack = SectionStack;
 });
-define("Validator", ["require", "exports", "vscode-languageserver-types", "Config", "configTree/configTree", "configTree/configTreeValidator", "DefaultSetting", "KeywordHandler", "MessageUtil", "Resources", "SectionStackNode", "Setting", "TextRange", "Util"], function (require, exports, vscode_languageserver_types_8, config_1, configTree_1, configTreeValidator_1, defaultSetting_2, keywordHandler_1, messageUtil_6, resources_5, sectionStack_1, setting_7, textRange_2, util_14) {
+define("validator", ["require", "exports", "vscode-languageserver-types", "config", "configTree/configTree", "configTree/configTreeValidator", "defaultSetting", "keywordHandler", "messageUtil", "resources", "sectionStack", "setting", "textRange", "util"], function (require, exports, vscode_languageserver_types_8, config_1, configTree_1, configTreeValidator_1, defaultSetting_2, keywordHandler_1, messageUtil_6, resources_5, sectionStack_1, setting_7, textRange_2, util_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const placeholderContainingSettings = [
@@ -2345,6 +2351,7 @@ define("Validator", ["require", "exports", "vscode-languageserver-types", "Confi
     /**
      * Performs validation of a whole document line by line.
      */
+    /// <amd-module name="Validator"/>
     class Validator {
         constructor(text) {
             /**

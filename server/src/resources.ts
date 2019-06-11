@@ -1,5 +1,3 @@
-/// <amd-module name="Resources"/>
-
 import { isNode } from "browser-or-node";
 import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";

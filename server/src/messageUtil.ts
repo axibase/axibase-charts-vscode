@@ -1,5 +1,3 @@
-/// <amd-module name="MessageUtil"/>
-
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**
  * Creates a error message for unknown setting or value.

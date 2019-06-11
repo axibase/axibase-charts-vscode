@@ -44,8 +44,7 @@ declare module "PossibleValue" {
         constructor(value: string, detail?: string);
     }
 }
-/// <amd-module name="Script" />
-declare module "Script" {
+declare module "script" {
     import { Field } from "Field";
     export class Script {
         readonly fields: Field[];
@@ -53,8 +52,7 @@ declare module "Script" {
         constructor(returnValue: string | number | boolean, fields?: Field[]);
     }
 }
-/// <amd-module name="MessageUtil" />
-declare module "MessageUtil" {
+declare module "messageUtil" {
     type MessageFactoryMethod = (found?: string, msg?: any) => string;
     /**
      * Creates a error message for unknown setting or value.
@@ -80,10 +78,9 @@ declare module "MessageUtil" {
     export const noMatching: MessageFactoryMethod;
     export const lineFeedRequired: MessageFactoryMethod;
 }
-/// <amd-module name="Util" />
-declare module "Util" {
+declare module "util" {
     import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
-    import { Setting } from "Setting";
+    import { Setting } from "setting";
     /**
      * @param value the value to find
      * @param map the map to search
@@ -152,10 +149,9 @@ declare module "Util" {
      */
     export function createRange(start: number, length: number, lineNumber: number): Range;
 }
-/// <amd-module name="Setting" />
-declare module "Setting" {
+declare module "setting" {
     import { Diagnostic, Range } from "vscode-languageserver-types";
-    import { DefaultSetting } from "DefaultSetting";
+    import { DefaultSetting } from "defaultSetting";
     export const intervalUnits: string[];
     export const calendarKeywords: string[];
     /**
@@ -186,10 +182,9 @@ declare module "Setting" {
         private findIndexInEnum;
     }
 }
-/// <amd-module name="DefaultSetting" />
-declare module "DefaultSetting" {
+declare module "defaultSetting" {
     import { PossibleValue } from "PossibleValue";
-    import { Script } from "Script";
+    import { Script } from "script";
     export interface SettingScope {
         widget: string;
         section: string;
@@ -298,9 +293,8 @@ declare module "DefaultSetting" {
         private getOverrideTest;
     }
 }
-/// <amd-module name="Resources" />
-declare module "Resources" {
-    import { DefaultSetting } from "DefaultSetting";
+declare module "resources" {
+    import { DefaultSetting } from "defaultSetting";
     export const settingsMap: Map<string, DefaultSetting>;
     interface SectionRequirements {
         settings?: DefaultSetting[][];
@@ -334,8 +328,7 @@ declare module "Resources" {
      */
     export const inheritableSections: Set<string>;
 }
-/// <amd-module name="CompletionProvider" />
-declare module "CompletionProvider" {
+declare module "completionProvider" {
     import { CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument } from "vscode-languageserver-types";
     export const snippets: any;
     export interface ItemFields {
@@ -406,8 +399,7 @@ declare module "CompletionProvider" {
         private getItemsArray;
     }
 }
-/// <amd-module name="Config" />
-declare module "Config" {
+declare module "config" {
     /**
      * Stores config lines as array, removes comments.
      */
@@ -437,8 +429,7 @@ declare module "CheckPriority" {
         Low = 1
     }
 }
-/// <amd-module name="TextRange" />
-declare module "TextRange" {
+declare module "textRange" {
     import { Range } from "vscode-languageserver-types";
     /**
      * Contains the text and the position of the text
@@ -517,8 +508,8 @@ declare module "relatedSettingsRules/utils/condition" {
 }
 declare module "configTree/section" {
     import { Condition } from "relatedSettingsRules/utils/condition";
-    import { Setting } from "Setting";
-    import { TextRange } from "TextRange";
+    import { Setting } from "setting";
+    import { TextRange } from "textRange";
     /**
      * See frequentlyUsed.
      */
@@ -568,8 +559,8 @@ declare module "configTree/section" {
     }
 }
 declare module "configTree/configTree" {
-    import { Setting } from "Setting";
-    import { TextRange } from "TextRange";
+    import { Setting } from "setting";
+    import { TextRange } from "textRange";
     import { Section } from "configTree/section";
     /**
      * Stores sections with corresponding settings in tree order.
@@ -670,10 +661,9 @@ declare module "configTree/configTreeValidator" {
         static validate(сonfigTree: ConfigTree): Diagnostic[];
     }
 }
-/// <amd-module name="KeywordHandler" />
-declare module "KeywordHandler" {
+declare module "keywordHandler" {
     import { Diagnostic } from "vscode-languageserver-types";
-    import { TextRange } from "TextRange";
+    import { TextRange } from "textRange";
     export const BLOCK_SQL_START: RegExp;
     export const BLOCK_SQL_END: RegExp;
     export const BLOCK_SCRIPT_START: RegExp;
@@ -686,11 +676,10 @@ declare module "KeywordHandler" {
         handleScript(line: string, foundKeyword: TextRange): void;
     }
 }
-/// <amd-module name="SectionStackNode" />
-declare module "SectionStackNode" {
+declare module "sectionStack" {
     import { Diagnostic } from "vscode-languageserver-types";
-    import { Setting } from "Setting";
-    import { TextRange } from "TextRange";
+    import { Setting } from "setting";
+    import { TextRange } from "textRange";
     interface DependencyResolveInfo {
         resolvedCount: number;
         unresolved: string[];
@@ -747,8 +736,7 @@ declare module "SectionStackNode" {
         private checkAndGetDepth;
     }
 }
-/// <amd-module name="Validator" />
-declare module "Validator" {
+declare module "validator" {
     import { Diagnostic } from "vscode-languageserver-types";
     /**
      * Performs validation of a whole document line by line.

@@ -1,4 +1,3 @@
-/// <amd-module name="DefaultSetting"/>
 import { PossibleValue } from "./possibleValue";
 import { Script } from "./script";
 import { Setting } from "./setting";
@@ -21,6 +20,7 @@ interface ValueRange {
 /**
  * Holds the description of a setting and corresponding methods.
  */
+/// <amd-module name="DefaultSetting"/>
 export class DefaultSetting {
     /**
      * Lowercases the string and deletes non-alphabetic characters

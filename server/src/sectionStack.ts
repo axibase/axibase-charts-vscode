@@ -1,4 +1,3 @@
-/// <amd-module name="SectionStackNode"/>
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
 import { inheritableSections, requiredSectionSettingsMap, sectionDepthMap } from "./resources";
 import { Setting } from "./setting";
@@ -12,6 +11,7 @@ interface DependencyResolveInfo {
 
 type AtLeastOneString = [string, ...string[]];
 
+/// <amd-module name="SectionStackNode"/>
 class SectionStackNode {
     public readonly dependencies: DependencyResolveInfo[] = [];
     public readonly settings: Setting[] = [];

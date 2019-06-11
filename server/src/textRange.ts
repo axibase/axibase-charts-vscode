@@ -1,4 +1,3 @@
-/// <amd-module name="TextRange"/>
 import { Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
 import { createRange } from "./util";
@@ -6,6 +5,7 @@ import { createRange } from "./util";
 /**
  * Contains the text and the position of the text
  */
+/// <amd-module name="TextRange"/>
 export class TextRange {
     /**
      * Matches a keyword

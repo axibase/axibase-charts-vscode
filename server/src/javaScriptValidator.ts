@@ -1,4 +1,3 @@
-/// <amd-module name="JavaScriptValidator"/>
 import { DOMWindow, JSDOM } from "jsdom";
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
@@ -6,6 +5,7 @@ import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 import { TextRange } from "./textRange";
 import { createDiagnostic, deleteComments } from "./util";
 
+/// <amd-module name="JavaScriptValidator"/>
 export class JavaScriptValidator {
 
     private currentLineNumber: number = 0;

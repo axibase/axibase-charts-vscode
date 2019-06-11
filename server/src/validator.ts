@@ -1,4 +1,3 @@
-/// <amd-module name="Validator"/>
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { Config } from "./config";
 import { ConfigTree } from "./configTree/configTree";
@@ -59,6 +58,7 @@ const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
 /**
  * Performs validation of a whole document line by line.
  */
+/// <amd-module name="Validator"/>
 export class Validator {
     /**
      * Array of declared aliases in the current widget

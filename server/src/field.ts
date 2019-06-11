@@ -1,8 +1,8 @@
-/// <amd-module name="Field"/>
 /**
  * Represents a field in a script setting.
  * For example, `max` is a field in `alert-expression` setting
  */
+/// <amd-module name="Field"/>
 export class Field {
     /**
      * Args which are passed to the field if it is a script
