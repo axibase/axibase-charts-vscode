@@ -1,15 +1,22 @@
 {
 	"extends": "../tsconfig.base.json",
 	"compilerOptions": {
-        "baseUrl": ".",
-        "paths": { "*": ["types/*"] },
+		"baseUrl": ".",
+		"paths": {
+			"*": [
+				"types/*"
+			]
+		},
 		"target": "es2017",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"outDir": "out",
 		"rootDir": "src",
-		"lib": [ "es2017", "dom" ]
+		"lib": [
+			"es2017",
+			"dom"
+		]
 	},
 	"include": [
 		"src"
