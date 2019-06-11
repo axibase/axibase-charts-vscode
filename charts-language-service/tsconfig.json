@@ -1,19 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "es2017",
-		"module": "amd",
 		"declaration": true,
-		"moduleResolution": "node",
-		"outFile": "dist/amd/index.js",
-		"lib": [
-			"es2017",
-			"dom"
-		]
+		"declarationDir": "./dist",
+		"module": "es6",
+		"noImplicitAny": true,
+		"outDir": "./dist",
+		"target": "es5",
+		"lib": ["es2017"]
 	},
-	"files": [
-		"../server/src/completionProvider.ts",
-		"../server/src/validator.ts"
-	],
 	"exclude": [
 		"node_modules"
 	]

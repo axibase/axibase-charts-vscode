@@ -1,4 +1,3 @@
-/// <amd-module name="PossibleValue"/>
 export class PossibleValue {
 
     public readonly value: string;

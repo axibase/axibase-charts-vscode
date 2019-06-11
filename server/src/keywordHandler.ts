@@ -19,7 +19,6 @@ const BLOCK_SCRIPT_START_WITHOUT_LF = /(^\s*)script\s*\S/;
 export const BLOCK_SCRIPT_START = /script(?!([\s\S]*=))/;
 export const BLOCK_SCRIPT_END = /^\s*endscript\s*$/;
 
-/// <amd-module name="KeywordHandler"/>
 export class KeywordHandler {
     public diagnostics: Diagnostic[] = [];
     public keywordsStack: TextRange[];

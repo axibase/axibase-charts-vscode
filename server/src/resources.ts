@@ -3,7 +3,6 @@ import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 interface IDictionary { $schema: string; settings: Setting[]; }
 
-/// <amd-module name="resources"/>
 /**
  * Reads dictionary from "dictionary.json" file
  * @returns array of settings from the file

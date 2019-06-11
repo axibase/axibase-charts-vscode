@@ -1,7 +1,6 @@
 import { CheckPriority } from "./checkPriority";
 import { TextRange } from "./textRange";
 
-/// <amd-module name="JavaScriptChecksQueue"/>
 export class JavaScriptChecksQueue {
 
     /**

@@ -5,7 +5,6 @@ import { createRange } from "./util";
 /**
  * Contains the text and the position of the text
  */
-/// <amd-module name="TextRange"/>
 export class TextRange {
     /**
      * Matches a keyword

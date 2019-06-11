@@ -3,7 +3,6 @@ import { deleteComments } from "./util";
 /**
  * Stores config lines as array, removes comments.
  */
-/// <amd-module name="Config"/>
 export class Config {
     public currentLineNumber: number = -1;
     private currentLine: string;

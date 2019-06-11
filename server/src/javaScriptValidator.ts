@@ -5,7 +5,6 @@ import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 import { TextRange } from "./textRange";
 import { createDiagnostic, deleteComments } from "./util";
 
-/// <amd-module name="JavaScriptValidator"/>
 export class JavaScriptValidator {
 
     private currentLineNumber: number = 0;

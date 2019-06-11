@@ -11,7 +11,6 @@ interface DependencyResolveInfo {
 
 type AtLeastOneString = [string, ...string[]];
 
-/// <amd-module name="SectionStackNode"/>
 class SectionStackNode {
     public readonly dependencies: DependencyResolveInfo[] = [];
     public readonly settings: Setting[] = [];

@@ -1,6 +1,5 @@
 import { Field } from "./field";
 
-/// <amd-module name="Script"/>
 export class Script {
     public readonly fields: Field[];
     public readonly returnValue: string | number | boolean;

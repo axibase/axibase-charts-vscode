@@ -90,7 +90,6 @@ const specificValueChecksMap: Map<string, SpecificValueCheck> = new Map([
 /**
  * In addition to DefaultSetting contains specific fields.
  */
-/// <amd-module name="Setting"/>
 export class Setting extends DefaultSetting {
 
     get textRange(): Range {
