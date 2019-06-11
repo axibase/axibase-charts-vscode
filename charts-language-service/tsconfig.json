@@ -4,7 +4,7 @@
 		"module": "amd",
 		"declaration": true,
 		"moduleResolution": "node",
-		"outDir": "dist",
+		"outDir": "dist/amd",
 		"lib": [
 			"es2017",
 			"dom"
@@ -12,13 +12,13 @@
 		"resolveJsonModule": true,
 	},
 	"files": [
-		"../src/completionProvider.ts",
-		"../src/validator.ts"
+		"../server/src/completionProvider.ts",
+		"../server/src/validator.ts"
 	],
 	"include": [
-		"../../snippets/snippets.json",
-		"../dictionary.json",
-		"../dictionary.schema.json"
+		"../snippets/snippets.json",
+		"../server/dictionary.json",
+		"../server/dictionary.schema.json"
 	],
 	"exclude": [
 		"node_modules"
