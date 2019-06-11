@@ -5,7 +5,11 @@
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rm -r ./dist && tsc -p ./tsconfig.json"
+    "build": "rm -r dist && tsc -p ./tsconfig.json && npm run copy",
+    "copy": "npm run copy_descriptions && npm run copy_snippets && npm run copy_dictionary",
+    "copy_descriptions": "cp '../server/descriptions.md' 'dist/descriptions.md'",
+    "copy_snippets": "rm -r snippets && mkdir snippets && cp '../snippets/snippets.json' 'snippets/snippets.json'",
+    "copy_dictionary": "cp '../server/dictionary.schema.json' 'dist/dictionary.schema.json' && cp '../server/dictionary.json' 'dist/dictionary.json'"
   },
   "dependencies": {
     "typescript": "^3.5.1",
