@@ -1,6 +1,7 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
 import { ResourcesProvider } from "./resourcesProvider";
+import { ResourcesProviderBase } from "./resourcesProviderBase";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
 
@@ -160,7 +161,7 @@ export class Formatter {
                 break;
             }
             case 3: { // [series], [dropdown], [column], ...
-                if (ResourcesProvider.isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
+                if (ResourcesProviderBase.isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
                     this.currentIndent = this.previousSection.indent;
                     this.increaseIndent();
                 } else {

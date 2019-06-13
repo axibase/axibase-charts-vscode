@@ -4,11 +4,15 @@ import { Setting } from "./setting";
 interface IDictionary { $schema: string; settings: Setting[]; }
 
 export class ResourcesProvider extends ResourcesProviderBase {
+
+    constructor() {
+        super();
+    }
     /**
      * Reads dictionary from "dictionary.json" file
      * @returns array of settings from the file
      */
-    protected static readSettings(): Setting[] {
+    protected readSettings(): Setting[] {
         const path = require("path");
         const fs = require("fs");
         const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
@@ -22,7 +26,7 @@ export class ResourcesProvider extends ResourcesProviderBase {
      * Reads descriptions from "descriptions.md" file
      * @returns map of settings names and descriptions
      */
-    protected static readDescriptions(): Map<string, string> {
+    protected readDescriptions(): Map<string, string> {
         const path = require("path");
         const fs = require("fs");
         const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
@@ -39,9 +43,5 @@ export class ResourcesProvider extends ResourcesProviderBase {
         }
 
         return map;
-    }
-
-    constructor() {
-        super();
     }
 }

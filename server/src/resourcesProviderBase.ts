@@ -1,13 +1,12 @@
 import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 
-interface IDictionary { $schema: string; settings: Setting[]; }
 interface SectionRequirements {
     settings?: DefaultSetting[][];
     sections?: string[][];
 }
 
-export class ResourcesProviderBase {
+export abstract class ResourcesProviderBase {
 
     public static widgetRequirementsByType: Map<string, SectionRequirements> = new Map([
         ["console", {
@@ -155,43 +154,6 @@ export class ResourcesProviderBase {
     }
 
     /**
-     * Reads dictionary from "dictionary.json" file
-     * @returns array of settings from the file
-     */
-    protected static readSettings(): Setting[] {
-        const path = require("path");
-        const fs = require("fs");
-        const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
-        const jsonContent: string = fs.readFileSync(dictionaryFilePath, "UTF-8");
-        const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
-
-        return dictionary.settings;
-    }
-
-    /**
-     * Reads descriptions from "descriptions.md" file
-     * @returns map of settings names and descriptions
-     */
-    protected static readDescriptions(): Map<string, string> {
-        const path = require("path");
-        const fs = require("fs");
-        const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
-        const content: string = fs.readFileSync(descriptionsPath, "UTF-8");
-
-        const map: Map<string, string> = new Map();
-        // ## settingname\n\nsetting description[url](hello#html)\n
-        const regExp: RegExp = /\#\# ([a-z]+?)  \n  \n([^\s#][\S\s]+?)  (?=\n  (?:\n(?=\#)|$))/g;
-        let match: RegExpExecArray | null = regExp.exec(content);
-        while (match !== null) {
-            const [, name, description] = match;
-            map.set(name, description);
-            match = regExp.exec(content);
-        }
-
-        return map;
-    }
-
-    /**
      * Tests if the provided setting complete or not
      * @param setting the setting to test
      * @returns true, if setting is complete, false otherwise
@@ -209,11 +171,23 @@ export class ResourcesProviderBase {
     }
 
     /**
+     * Reads descriptions from "descriptions.md" file
+     * @returns map of settings names and descriptions
+     */
+    protected abstract readDescriptions(): Map<string, string>;
+
+    /**
+     * Reads dictionary from "dictionary.json" file
+     * @returns array of settings from the file
+     */
+    protected abstract readSettings(): Setting[];
+
+    /**
      * @returns map of settings, key is the setting name, value is instance of Setting
      */
     protected createSettingsMap(): Map<string, DefaultSetting> {
-        const descriptions: Map<string, string> = ResourcesProviderBase.readDescriptions();
-        const settings: Setting[] = ResourcesProviderBase.readSettings();
+        const descriptions: Map<string, string> = this.readDescriptions();
+        const settings: Setting[] = this.readSettings();
         const map: Map<string, Setting> = new Map();
         for (const setting of settings) {
             if (ResourcesProviderBase.isCompleteSetting(setting)) {
