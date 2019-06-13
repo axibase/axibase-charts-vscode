@@ -1,5 +1,5 @@
 {
-  "name": "charts-language-service",
+  "name": "language-service",
   "version": "0.0.1",
   "main": "dist/main.js",
   "author": "Axibase Developers",
