@@ -1,9 +1,9 @@
-import { ResourcesProvider } from "./resourcesProvider";
+import { ResourcesProviderBase } from "./resourcesProviderBase";
 import { Setting } from "./setting";
 
 interface IDictionary { $schema: string; settings: Setting[]; }
 
-export class ResourcesProviderWeb extends ResourcesProvider {
+export class ResourcesProviderWeb extends ResourcesProviderBase {
     /**
      * Reads dictionary from "dictionary.json" file
      * @returns array of settings from the file
