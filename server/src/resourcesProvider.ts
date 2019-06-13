@@ -1,4 +1,3 @@
-import { isNode } from "browser-or-node";
 import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 
@@ -155,7 +154,7 @@ export class ResourcesProvider {
     /**
      * @returns map of settings, key is the setting name, value is instance of Setting
      */
-    private static createSettingsMap(): Map<string, DefaultSetting> {
+    protected static createSettingsMap(): Map<string, DefaultSetting> {
         const descriptions: Map<string, string> = ResourcesProvider.readDescriptions();
         const settings: Setting[] = ResourcesProvider.readSettings();
         const map: Map<string, Setting> = new Map();
@@ -175,19 +174,12 @@ export class ResourcesProvider {
      * Reads dictionary from "dictionary.json" file
      * @returns array of settings from the file
      */
-    private static readSettings(): Setting[] {
-        let dictionary: IDictionary;
-
-        if (isNode) {
-            const path = require("path");
-            const fs = require("fs");
-            const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
-            const jsonContent: string = fs.readFileSync(dictionaryFilePath, "UTF-8");
-            dictionary = JSON.parse(jsonContent) as IDictionary;
-        } else {
-            const jsonContent: string = require("../dictionary.json");
-            dictionary = (jsonContent as any) as IDictionary;
-        }
+    protected static readSettings(): Setting[] {
+        const path = require("path");
+        const fs = require("fs");
+        const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
+        const jsonContent: string = fs.readFileSync(dictionaryFilePath, "UTF-8");
+        const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
 
         return dictionary.settings;
     }
@@ -196,17 +188,11 @@ export class ResourcesProvider {
      * Reads descriptions from "descriptions.md" file
      * @returns map of settings names and descriptions
      */
-    private static readDescriptions(): Map<string, string> {
-        let content: string = "";
-
-        if (isNode) {
-            const path = require("path");
-            const fs = require("fs");
-            const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
-            content = fs.readFileSync(descriptionsPath, "UTF-8");
-        } else {
-            content = require("../descriptions.md").default;
-        }
+    protected static readDescriptions(): Map<string, string> {
+        const path = require("path");
+        const fs = require("fs");
+        const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
+        const content: string = fs.readFileSync(descriptionsPath, "UTF-8");
 
         const map: Map<string, string> = new Map();
         // ## settingname\n\nsetting description[url](hello#html)\n
@@ -226,7 +212,7 @@ export class ResourcesProvider {
      * @param setting the setting to test
      * @returns true, if setting is complete, false otherwise
      */
-    private static isCompleteSetting(setting?: Partial<Setting>): boolean {
+    protected static isCompleteSetting(setting?: Partial<Setting>): boolean {
         return setting !== undefined &&
             setting.displayName !== undefined &&
             setting.type !== undefined &&

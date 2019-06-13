@@ -4,6 +4,7 @@ import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
+import {ResourcesProvider} from "../resourcesProvider";
 import { SectionStack } from "../sectionStack";
 import { Validator } from "../validator";
 
@@ -111,7 +112,9 @@ export class Test {
      */
     public completionTest(): void {
         test((this.name), () => {
-            const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
+            const cp: CompletionProvider = new CompletionProvider(
+                this.document, this.position, ResourcesProvider.settingsMap
+            );
             const current: string[] = cp.getCompletionItems().map(i => i.insertText);
             assert.deepStrictEqual(current, this.expected);
         });

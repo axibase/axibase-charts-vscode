@@ -3,7 +3,6 @@ import {
 } from "vscode-languageserver-types";
 import { DefaultSetting } from "./defaultSetting";
 import { Field } from "./field";
-import { ResourcesProvider } from "./resourcesProvider";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
@@ -22,13 +21,14 @@ export interface ItemFields {
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;
-    private readonly settingsMap: Map<string, DefaultSetting> = ResourcesProvider.settingsMap;
+    private readonly settingsMap: Map<string, DefaultSetting>;
 
-    public constructor(textDocument: TextDocument, position: Position) {
+    public constructor(textDocument: TextDocument, position: Position, settingsMap: Map<string, DefaultSetting>) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
         this.text = deleteScripts(deleteComments(text));
         let textList = this.text.split("\n");
         this.currentLine = textList[textList.length - 1];
+        this.settingsMap = settingsMap;
     }
 
     /**

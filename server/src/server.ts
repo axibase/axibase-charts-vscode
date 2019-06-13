@@ -8,6 +8,7 @@ import { CompletionProvider } from "./completionProvider";
 import { Formatter } from "./formatter";
 import { HoverProvider } from "./hoverProvider";
 import { JavaScriptValidator } from "./javaScriptValidator";
+import { ResourcesProvider } from "./resourcesProvider";
 import { Validator } from "./validator";
 
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
@@ -129,7 +130,9 @@ connection.onCompletion((params: CompletionParams): CompletionItem[] => {
     if (textDocument === undefined) {
         return [];
     }
-    const completionProvider: CompletionProvider = new CompletionProvider(textDocument, params.position);
+    const completionProvider: CompletionProvider = new CompletionProvider(
+        textDocument, params.position, ResourcesProvider.settingsMap
+    );
 
     return completionProvider.getCompletionItems();
 });
