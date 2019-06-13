@@ -4,7 +4,7 @@ import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
-import {ResourcesProvider} from "../resourcesProvider";
+import { ResourcesProvider } from "../resourcesProvider";
 import { SectionStack } from "../sectionStack";
 import { Validator } from "../validator";
 
@@ -12,16 +12,16 @@ import { Validator } from "../validator";
  * Stub section validator to allow incomplete configs in tests
  */
 // tslint:disable-next-line:no-object-literal-type-assertion
-const sectionStackStub: SectionStack  = {
+const sectionStackStub: SectionStack = {
     stack: [],
     finalize(): null { return null; },
     getCurrentSetting(): null { return null; },
     getLastSection(): null { return null; },
     getSectionRange(): null { return null; },
     getSectionSettings() { return new Map(); },
-    insertCurrentSetting() { /* void */},
-    insertSection(): null {  return null;  },
-    requireSections() { /* void */},
+    insertCurrentSetting() { /* void */ },
+    insertSection(): null { return null; },
+    requireSections() { /* void */ },
     setSectionRequirements() { /* void */ },
 } as any;
 
@@ -113,7 +113,7 @@ export class Test {
     public completionTest(): void {
         test((this.name), () => {
             const cp: CompletionProvider = new CompletionProvider(
-                this.document, this.position, ResourcesProvider.settingsMap
+                this.document, this.position, new ResourcesProvider().settingsMap
             );
             const current: string[] = cp.getCompletionItems().map(i => i.insertText);
             assert.deepStrictEqual(current, this.expected);

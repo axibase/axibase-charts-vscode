@@ -8,56 +8,6 @@ interface SectionRequirements {
 }
 
 export class ResourcesProvider {
-    public static settingsMap: Map<string, DefaultSetting> = ResourcesProvider.createSettingsMap();
-
-    /**
-     * Map of required settings for each section and their "aliases".
-     * For instance, `series` requires `entity`, but `entities` is also allowed.
-     * Additionally, `series` requires `metric`, but `table` with `attribute` is also ok
-     */
-    public static requiredSectionSettingsMap = new Map<string, SectionRequirements>([
-        ["configuration", {
-            sections: [
-                ["group"],
-            ],
-        }],
-        ["series", {
-            settings: [
-                [
-                    ResourcesProvider.settingsMap.get("entity")!, ResourcesProvider.settingsMap.get("value")!,
-                    ResourcesProvider.settingsMap.get("entities")!, ResourcesProvider.settingsMap.get("entitygroup")!,
-                    ResourcesProvider.settingsMap.get("entityexpression")!,
-                ],
-                [
-                    ResourcesProvider.settingsMap.get("metric")!, ResourcesProvider.settingsMap.get("value")!,
-                    ResourcesProvider.settingsMap.get("table")!, ResourcesProvider.settingsMap.get("attribute")!,
-                ],
-            ],
-        }],
-        ["group", {
-            sections: [
-                ["widget"],
-            ],
-        }],
-        ["widget", {
-            sections: [
-                ["series"],
-            ],
-            settings: [
-                [ResourcesProvider.settingsMap.get("type")!],
-            ],
-        }],
-        ["dropdown", {
-            settings: [
-                [ResourcesProvider.settingsMap.get("onchange")!, ResourcesProvider.settingsMap.get("changefield")!],
-            ],
-        }],
-        ["node", {
-            settings: [
-                [ResourcesProvider.settingsMap.get("id")],
-            ],
-        }],
-    ]);
 
     public static widgetRequirementsByType: Map<string, SectionRequirements> = new Map([
         ["console", {
@@ -125,6 +75,59 @@ export class ResourcesProvider {
     ]);
 
     /**
+     * Map of required settings for each section and their "aliases".
+     * For instance, `series` requires `entity`, but `entities` is also allowed.
+     * Additionally, `series` requires `metric`, but `table` with `attribute` is also ok
+     */
+    public static getRequiredSectionSettingsMap(
+        settingsMap: Map<string, DefaultSetting>
+    ): Map<string, SectionRequirements> {
+        return new Map<string, SectionRequirements>([
+            ["configuration", {
+                sections: [
+                    ["group"],
+                ],
+            }],
+            ["series", {
+                settings: [
+                    [
+                        settingsMap.get("entity")!, settingsMap.get("value")!,
+                        settingsMap.get("entities")!, settingsMap.get("entitygroup")!,
+                        settingsMap.get("entityexpression")!,
+                    ],
+                    [
+                        settingsMap.get("metric")!, settingsMap.get("value")!,
+                        settingsMap.get("table")!, settingsMap.get("attribute")!,
+                    ],
+                ],
+            }],
+            ["group", {
+                sections: [
+                    ["widget"],
+                ],
+            }],
+            ["widget", {
+                sections: [
+                    ["series"],
+                ],
+                settings: [
+                    [settingsMap.get("type")!],
+                ],
+            }],
+            ["dropdown", {
+                settings: [
+                    [settingsMap.get("onchange")!, settingsMap.get("changefield")!],
+                ],
+            }],
+            ["node", {
+                settings: [
+                    [settingsMap.get("id")],
+                ],
+            }],
+        ]);
+    }
+
+    /**
      * @returns array of parent sections for the section
      */
     public static getParents(section: string): string[] {
@@ -149,25 +152,6 @@ export class ResourcesProvider {
         }
 
         return ResourcesProvider.getParents(currentName).includes(previousName);
-    }
-
-    /**
-     * @returns map of settings, key is the setting name, value is instance of Setting
-     */
-    protected static createSettingsMap(): Map<string, DefaultSetting> {
-        const descriptions: Map<string, string> = ResourcesProvider.readDescriptions();
-        const settings: Setting[] = ResourcesProvider.readSettings();
-        const map: Map<string, Setting> = new Map();
-        for (const setting of settings) {
-            if (ResourcesProvider.isCompleteSetting(setting)) {
-                const name: string = Setting.clearSetting(setting.displayName);
-                Object.assign(setting, { name, description: descriptions.get(name) });
-                const completeSetting: Setting = new Setting(setting);
-                map.set(completeSetting.name, completeSetting);
-            }
-        }
-
-        return map;
     }
 
     /**
@@ -217,5 +201,29 @@ export class ResourcesProvider {
             setting.displayName !== undefined &&
             setting.type !== undefined &&
             setting.example !== undefined;
+    }
+    public settingsMap: Map<string, DefaultSetting>;
+
+    constructor() {
+        this.settingsMap = this.createSettingsMap();
+    }
+
+    /**
+     * @returns map of settings, key is the setting name, value is instance of Setting
+     */
+    protected createSettingsMap(): Map<string, DefaultSetting> {
+        const descriptions: Map<string, string> = ResourcesProvider.readDescriptions();
+        const settings: Setting[] = ResourcesProvider.readSettings();
+        const map: Map<string, Setting> = new Map();
+        for (const setting of settings) {
+            if (ResourcesProvider.isCompleteSetting(setting)) {
+                const name: string = Setting.clearSetting(setting.displayName);
+                Object.assign(setting, { name, description: descriptions.get(name) });
+                const completeSetting: Setting = new Setting(setting);
+                map.set(completeSetting.name, completeSetting);
+            }
+        }
+
+        return map;
     }
 }

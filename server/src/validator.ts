@@ -452,7 +452,9 @@ export class Validator {
             this.currentSettings = this.previousSettings;
             this.currentSection = this.previousSection;
         }
-        const sectionRequirements = ResourcesProvider.requiredSectionSettingsMap.get(this.currentSection.text);
+        const settingsMap = new ResourcesProvider().settingsMap;
+        const sectionRequirements = ResourcesProvider.getRequiredSectionSettingsMap(settingsMap)
+            .get(this.currentSection.text);
         if (!sectionRequirements) {
             return;
         }

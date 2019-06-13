@@ -130,8 +130,9 @@ connection.onCompletion((params: CompletionParams): CompletionItem[] => {
     if (textDocument === undefined) {
         return [];
     }
+
     const completionProvider: CompletionProvider = new CompletionProvider(
-        textDocument, params.position, ResourcesProvider.settingsMap
+        textDocument, params.position, new ResourcesProvider().settingsMap
     );
 
     return completionProvider.getCompletionItems();

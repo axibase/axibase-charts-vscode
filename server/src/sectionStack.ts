@@ -16,7 +16,8 @@ class SectionStackNode {
     public readonly settings: Setting[] = [];
 
     public constructor(public range: TextRange) {
-        const deps = ResourcesProvider.requiredSectionSettingsMap.get(this.name);
+        const settingsMap = new ResourcesProvider().settingsMap;
+        const deps = ResourcesProvider.getRequiredSectionSettingsMap(settingsMap).get(this.name);
         if (deps && deps.sections) {
             this.setRequiredSections(deps.sections);
         }

@@ -48,7 +48,9 @@ export function isAnyInArray<T>(target: T[], array: T[]): boolean {
 export function getSetting(name: string, range?: Range): Setting | undefined {
     const clearedName: string = Setting.clearSetting(name);
 
-    const defaultSetting = ResourcesProvider.settingsMap.get(clearedName);
+    const resourcesProvider = new ResourcesProvider();
+
+    const defaultSetting = resourcesProvider.settingsMap.get(clearedName);
     if (defaultSetting === undefined) {
         return undefined;
     }
