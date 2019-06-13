@@ -1,6 +1,6 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
-import { isNestedToPrevious, sectionDepthMap } from "./resources";
+import { ResourcesProvider } from "./resourcesProvider";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
 
@@ -150,7 +150,7 @@ export class Formatter {
         }
         Object.assign(this.previousSection, this.currentSection);
         this.currentSection.name = this.match[2];
-        const depth: number = sectionDepthMap[this.currentSection.name];
+        const depth: number = ResourcesProvider.sectionDepthMap[this.currentSection.name];
         switch (depth) {
             case 0: // [configuration]
             case 1: // [group]
@@ -160,7 +160,7 @@ export class Formatter {
                 break;
             }
             case 3: { // [series], [dropdown], [column], ...
-                if (isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
+                if (ResourcesProvider.isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
                     this.currentIndent = this.previousSection.indent;
                     this.increaseIndent();
                 } else {
@@ -185,7 +185,7 @@ export class Formatter {
                 break;
             }
             case 4: { // [option], [properties], [tags]
-                if (isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
+                if (ResourcesProvider.isNestedToPrevious(this.currentSection.name, this.previousSection.name)) {
                     this.currentIndent = this.previousSection.indent;
                 } else {
                     this.currentIndent = this.lastAddedParent.indent;

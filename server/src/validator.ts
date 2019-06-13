@@ -14,7 +14,7 @@ import {
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
-import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
+import { ResourcesProvider } from "./resourcesProvider";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
@@ -452,7 +452,7 @@ export class Validator {
             this.currentSettings = this.previousSettings;
             this.currentSection = this.previousSection;
         }
-        const sectionRequirements = requiredSectionSettingsMap.get(this.currentSection.text);
+        const sectionRequirements = ResourcesProvider.requiredSectionSettingsMap.get(this.currentSection.text);
         if (!sectionRequirements) {
             return;
         }
@@ -931,22 +931,22 @@ export class Validator {
         if (setting.section == null || this.currentSection == null) {
             return true;
         }
-        const currDepth: number = sectionDepthMap[this.currentSection.text];
+        const currDepth: number = ResourcesProvider.sectionDepthMap[this.currentSection.text];
         if (setting.name === "mode") {
             if (this.currentWidget == null) {
                 return true;
             }
             if (this.currentWidget === "chart") {
                 if (setting.value === "column-stack") {
-                    return currDepth <= sectionDepthMap.widget;
+                    return currDepth <= ResourcesProvider.sectionDepthMap.widget;
                 }
-                return currDepth <= sectionDepthMap.series;
+                return currDepth <= ResourcesProvider.sectionDepthMap.series;
             }
         }
         if (Array.isArray(setting.section)) {
-            return setting.section.some(s => currDepth <= sectionDepthMap[s]);
+            return setting.section.some(s => currDepth <= ResourcesProvider.sectionDepthMap[s]);
         } else {
-            const reqDepth: number = sectionDepthMap[setting.section];
+            const reqDepth: number = ResourcesProvider.sectionDepthMap[setting.section];
             return currDepth <= reqDepth;
         }
 
@@ -983,7 +983,7 @@ export class Validator {
 
         if (setting.name === "type") {
             this.currentWidget = this.match[3];
-            let reqs = widgetRequirementsByType.get(this.currentWidget);
+            let reqs = ResourcesProvider.widgetRequirementsByType.get(this.currentWidget);
             if (reqs && reqs.sections) {
                 this.sectionStack.setSectionRequirements("widget", reqs.sections);
             }

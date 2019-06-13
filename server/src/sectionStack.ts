@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
-import { inheritableSections, requiredSectionSettingsMap, sectionDepthMap } from "./resources";
+import { ResourcesProvider } from "./resourcesProvider";
 import { Setting } from "./setting";
 import { TextRange } from "./textRange";
 import { createDiagnostic } from "./util";
@@ -16,7 +16,7 @@ class SectionStackNode {
     public readonly settings: Setting[] = [];
 
     public constructor(public range: TextRange) {
-        const deps = requiredSectionSettingsMap.get(this.name);
+        const deps = ResourcesProvider.requiredSectionSettingsMap.get(this.name);
         if (deps && deps.sections) {
             this.setRequiredSections(deps.sections);
         }
@@ -265,20 +265,20 @@ export class SectionStack {
         const section = sectionRange.text;
         const expectedDepth: number = this.stack.length;
 
-        let actualDepth: number = sectionDepthMap[section];
+        let actualDepth: number = ResourcesProvider.sectionDepthMap[section];
         let error: Diagnostic = null;
 
         if (actualDepth == null) {
             error = this.createErrorDiagnostic(sectionRange, `Unknown section [${section}].`);
         } else if (actualDepth > expectedDepth) {
-            let canBeInherited = inheritableSections.has(section);
+            let canBeInherited = ResourcesProvider.inheritableSections.has(section);
             if (canBeInherited && expectedDepth > 0) {
                 actualDepth = expectedDepth;
             } else {
                 let errorMessage = `Unexpected section [${section}]. `;
-                let expectedSections: string[] = Object.entries(sectionDepthMap)
+                let expectedSections: string[] = Object.entries(ResourcesProvider.sectionDepthMap)
                     .filter(([, depth]) => depth === expectedDepth)
-                    .map(([key, ]) => `[${key}]`);
+                    .map(([key,]) => `[${key}]`);
 
                 if (expectedSections.length > 1) {
                     errorMessage += `Expected one of ${expectedSections.join(", ")}.`;

@@ -1,4 +1,4 @@
-import { isNestedToPrevious, sectionDepthMap } from "../resources";
+import { ResourcesProvider } from "../resourcesProvider";
 import { Setting } from "../setting";
 import { TextRange } from "../textRange";
 import { Section } from "./section";
@@ -24,7 +24,7 @@ export class ConfigTree {
      */
     public addSection(range: TextRange, settings: Setting[]) {
         const section = new Section(range, settings);
-        const depth: number = sectionDepthMap[range.text];
+        const depth: number = ResourcesProvider.sectionDepthMap[range.text];
         if (depth > 0 && !this.root) {
             return;
         }
@@ -66,7 +66,7 @@ export class ConfigTree {
                 break;
             }
             case 4: { // [option], [properties], [tags]
-                if (isNestedToPrevious(range.text, this.previous.name)) {
+                if (ResourcesProvider.isNestedToPrevious(range.text, this.previous.name)) {
                     section.parent = this.previous;
                 } else {
                     section.parent = this.lastAddedParent;

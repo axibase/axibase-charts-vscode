@@ -1,8 +1,9 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";
+import { DefaultSetting } from "./defaultSetting";
 import { Field } from "./field";
-import { settingsMap } from "./resources";
+import { ResourcesProvider } from "./resourcesProvider";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
@@ -21,6 +22,7 @@ export interface ItemFields {
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;
+    private readonly settingsMap: Map<string, DefaultSetting> = ResourcesProvider.settingsMap;
 
     public constructor(textDocument: TextDocument, position: Position) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
@@ -151,7 +153,7 @@ endif
      */
     private completeSettingName(): CompletionItem[] {
         const items: CompletionItem[] = [];
-        for (let [, value] of settingsMap) {
+        for (let [, value] of this.settingsMap) {
             items.push(this.fillCompletionItem({
                 detail: `${value.description ? value.description + "\n" : ""}Example: ${value.example}`,
                 insertText: `${value.displayName} = `,

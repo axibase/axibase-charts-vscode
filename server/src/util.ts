@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
-import { settingsMap } from "./resources";
+import { ResourcesProvider } from "./resourcesProvider";
 import { Setting } from "./setting";
 
 const DIAGNOSTIC_SOURCE: string = "Axibase Charts";
@@ -48,7 +48,7 @@ export function isAnyInArray<T>(target: T[], array: T[]): boolean {
 export function getSetting(name: string, range?: Range): Setting | undefined {
     const clearedName: string = Setting.clearSetting(name);
 
-    const defaultSetting = settingsMap.get(clearedName);
+    const defaultSetting = ResourcesProvider.settingsMap.get(clearedName);
     if (defaultSetting === undefined) {
         return undefined;
     }
