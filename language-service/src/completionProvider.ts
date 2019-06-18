@@ -4,7 +4,7 @@ import {
 import { Field } from "./field";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
 import { Util } from "./util";
-// export const snippets = require("../../snippets/snippets.json");
+export const snippets = require("../snippets/snippets.json");
 
 export interface ItemFields {
     insertTextFormat?: InsertTextFormat;
@@ -208,20 +208,18 @@ endif
      * @returns array containing snippets
      */
     private completeSnippets(): CompletionItem[] {
-        // const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
-        //     const insertText: string =
-        //         (typeof snippets[key].body === "string") ? snippets[key].body : snippets[key].body.join("\n");
+        const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
+            const insertText: string =
+                (typeof snippets[key].body === "string") ? snippets[key].body : snippets[key].body.join("\n");
 
-        //     return this.fillCompletionItem({
-        //         insertText, detail: snippets[key].description,
-        //         name: key, insertTextFormat:
-        //             InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
-        //     });
-        // });
+            return this.fillCompletionItem({
+                insertText, detail: snippets[key].description,
+                name: key, insertTextFormat:
+                    InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
+            });
+        });
 
-        return [];
-
-        // return items;
+        return items;
     }
 
     /**
