@@ -5,4 +5,3 @@ client/out
 *.vsix
 *.swp
 examples/.vscode/settings.json
-language-service/dist
