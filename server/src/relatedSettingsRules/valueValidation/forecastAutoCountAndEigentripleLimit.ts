@@ -1,7 +1,6 @@
-import { Util } from "language-service/dist";
 import { Diagnostic } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
-import { ResourcesProvider } from "../../resourcesProvider";
+import { createDiagnostic, getSetting } from "../../util";
 import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {
@@ -12,10 +11,10 @@ const rule: RelatedSettingsRule = {
             return;
         }
         const forecastLimit = section.getSettingFromTree("forecast-ssa-decompose-eigentriple-limit");
-        const eigentripleLimitValue = forecastLimit ? forecastLimit.value :
-            new ResourcesProvider().getSetting("forecast-ssa-decompose-eigentriple-limit").defaultValue;
+        const eigentripleLimitValue = forecastLimit ?
+            forecastLimit.value : getSetting("forecast-ssa-decompose-eigentriple-limit").defaultValue;
         if (eigentripleLimitValue <= groupAutoCount.value) {
-            return Util.createDiagnostic(groupAutoCount.textRange,
+            return createDiagnostic(groupAutoCount.textRange,
                 `forecast-ssa-group-auto-count ` +
                 `must be less than forecast-ssa-decompose-eigentriple-limit (default 0)`);
         }

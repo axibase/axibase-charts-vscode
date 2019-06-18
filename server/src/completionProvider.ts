@@ -1,10 +1,12 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";
+import { DefaultSetting } from "./defaultSetting";
 import { Field } from "./field";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
-import { Util } from "./util";
-export const snippets = require("../snippets/snippets.json");
+
+import { deleteComments, deleteScripts, getSetting } from "./util";
+export const snippets = require("../../snippets/snippets.json");
 
 export interface ItemFields {
     insertTextFormat?: InsertTextFormat;
@@ -20,14 +22,14 @@ export interface ItemFields {
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;
-    private readonly resourcesProvider: any;
+    private readonly settingsMap: Map<string, DefaultSetting>;
 
-    public constructor(textDocument: TextDocument, position: Position, resourcesProvider: any) {
+    public constructor(textDocument: TextDocument, position: Position, settingsMap: Map<string, DefaultSetting>) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
-        this.text = Util.deleteScripts(Util.deleteComments(text));
+        this.text = deleteScripts(deleteComments(text));
         let textList = this.text.split("\n");
         this.currentLine = textList[textList.length - 1];
-        this.resourcesProvider = resourcesProvider;
+        this.settingsMap = settingsMap;
     }
 
     /**
@@ -152,7 +154,7 @@ endif
      */
     private completeSettingName(): CompletionItem[] {
         const items: CompletionItem[] = [];
-        for (let [, value] of this.resourcesProvider.settingsMap) {
+        for (let [, value] of this.settingsMap) {
             items.push(this.fillCompletionItem({
                 detail: `${value.description ? value.description + "\n" : ""}Example: ${value.example}`,
                 insertText: `${value.displayName} = `,
@@ -168,7 +170,7 @@ endif
      * @returns array containing completions
      */
     private completeSettingValue(settingName: string): CompletionItem[] {
-        const setting = this.resourcesProvider.getSetting(settingName);
+        const setting = getSetting(settingName);
         if (!setting) {
             return [];
         }

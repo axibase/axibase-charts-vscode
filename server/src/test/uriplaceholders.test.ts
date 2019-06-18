@@ -1,7 +1,7 @@
-import assert = require("assert");
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
+import assert = require("assert");
 
 suite("URL placeholders", () => {
     test("Validation is successful if url placeholders are resolved", () => {
@@ -35,7 +35,7 @@ url = https://{server}.example.com
         `);
         let diags = validator.lineByLine();
 
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(4, 1, 4, 1 + "widget".length),
             "Required section [placeholders] is not declared.",
             DiagnosticSeverity.Error
@@ -56,7 +56,7 @@ url = https://{server}.example.com
         `);
         let diags = validator.lineByLine();
 
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(9, 1, 9, 1 + "placeholders".length),
             "Missing placeholders: server.",
             DiagnosticSeverity.Error
@@ -78,7 +78,7 @@ url = https://{server}.example.com
         `);
         let diags = validator.lineByLine();
 
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(10, 1, 10, 1 + "placeholders".length),
             "Missing placeholders: server, test.",
             DiagnosticSeverity.Error
@@ -101,7 +101,7 @@ url-parameters = ?foo={other}
         `);
         let diags = validator.lineByLine();
 
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(11, 1, 11, 1 + "placeholders".length),
             "Missing placeholders: server, test.",
             DiagnosticSeverity.Error
@@ -131,12 +131,12 @@ url-parameters = ?foo={other}
         let diags = validator.lineByLine();
 
         assert.deepStrictEqual(diags, [
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(10, 1, 10, 1 + "placeholders".length),
                 "Missing placeholders: server, other.",
                 DiagnosticSeverity.Error
             ),
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(16, 1, 16, 1 + "placeholders".length),
                 "Missing placeholders: server.",
                 DiagnosticSeverity.Error
@@ -158,7 +158,7 @@ url-parameters = ?foo={other}
         `);
         let diags = validator.lineByLine();
 
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(8, 1, 8, 1 + "placeholders".length),
             "Unnecessary placeholders: server.",
             DiagnosticSeverity.Warning

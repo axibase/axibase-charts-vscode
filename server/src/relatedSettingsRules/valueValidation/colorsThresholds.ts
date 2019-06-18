@@ -1,7 +1,7 @@
-import { Util } from "language-service/dist";
 import { Diagnostic } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
 import { incorrectColors } from "../../messageUtil";
+import { createDiagnostic } from "../../util";
 import { requiredCondition } from "../utils/condition";
 import { RelatedSettingsRule } from "../utils/interfaces";
 
@@ -24,7 +24,7 @@ const rule: RelatedSettingsRule = {
 
         const thresholdsSetting = section.getSettingFromTree("thresholds");
         if (thresholdsSetting === undefined) {
-            return Util.createDiagnostic(section.range.range,
+            return createDiagnostic(section.range.range,
                 `thresholds is required if colors is specified`);
         }
 
@@ -49,7 +49,7 @@ const rule: RelatedSettingsRule = {
 
         const expected = thresholdsValues.length - 1;
         if (colorsValues.length !== expected) {
-            return Util.createDiagnostic(colorsSetting.textRange,
+            return createDiagnostic(colorsSetting.textRange,
                 incorrectColors(`${colorsValues.length}`, `${expected}`));
         }
     }

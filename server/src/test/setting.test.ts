@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 suite("Validator for expand-panels setting", () => {
@@ -53,7 +53,7 @@ Configuration: ${config}`);
         [series]`;
             const validator = new Validator(config);
             const actualDiagnostics = validator.lineByLine();
-            const expectedDiagnostic = Util.createDiagnostic(
+            const expectedDiagnostic = createDiagnostic(
                 Range.create(Position.create(6, 8), Position.create(6, 21)),
                 `expand-panels must be one of:\n * ${possibleValues.join("\n * ")}`,
                 DiagnosticSeverity.Error
@@ -75,7 +75,7 @@ Configuration: ${config}`);
         [series]`;
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
-        const expectedDiagnostic = Util.createDiagnostic(
+        const expectedDiagnostic = createDiagnostic(
             Range.create(Position.create(6, 8), Position.create(6, 21)),
             "expand-panels setting is not allowed here.",
             DiagnosticSeverity.Error

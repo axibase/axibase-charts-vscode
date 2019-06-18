@@ -1,18 +1,15 @@
 {
   "name": "language-service",
   "version": "0.0.1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "webpack --mode=production"
   },
   "devDependencies": {
     "raw-loader": "^3.0.0",
     "ts-loader": "^6.0.2",
-    "typescript": "^3.5.2",
-    "vscode-languageserver-types": "^3.14.0",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.4"
   }

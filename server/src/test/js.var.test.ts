@@ -1,5 +1,5 @@
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("[JS] Var content tests", () => {
@@ -70,7 +70,7 @@ endvar`, []),
     abc
 ]
 endvar`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(2, "var v = [".length)),
                 "abc is not defined", DiagnosticSeverity.Warning,
             )]
@@ -79,21 +79,21 @@ endvar`,
             "Incorrect multiline var array: no closing bracket",
             `var v = [
 "abc"
-endvar`, [Util.createDiagnostic(
+endvar`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(1, "var v = [".length)),
                 "Unexpected token ;", DiagnosticSeverity.Warning,
             )]
         ),
         new Test(
             "Incorrect oneline var: no opening bracket",
-            `var v = ]`, [Util.createDiagnostic(
+            `var v = ]`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var v = ]".length)),
                 "Unexpected token ]", DiagnosticSeverity.Warning,
             )]
         ),
         new Test(
             "Incorrect oneline var: unallowed function",
-            `var v = sum()`, [Util.createDiagnostic(
+            `var v = sum()`, [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var v = sum()".length)),
                 "sum is not defined", DiagnosticSeverity.Warning,
             )]

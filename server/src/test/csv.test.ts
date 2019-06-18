@@ -1,5 +1,5 @@
-import { Util } from "language-service/dist";
 import { Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("CSV tests", () => {
@@ -28,11 +28,11 @@ endcsv`,
    USA, 63, 63
 encsv`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(3, 0), Position.create(3, "encsv".length)),
                     "Expected 3 columns, but found 1",
                 ),
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
                     "csv has no matching endcsv",
                 ),
@@ -46,11 +46,11 @@ encsv`,
    USA, 63, 63
 encsv`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(4, 0), Position.create(4, "encsv".length)),
                     "Expected 3 columns, but found 1",
                 ),
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
                     "csv has no matching endcsv",
                 ),
@@ -62,7 +62,7 @@ encsv`,
    Russia, 65, 63
    USA, 63, 63, 63
 endcsv`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(2, 0), Position.create(2, "   Russia, 65, 63\n".length)),
                 "Expected 3 columns, but found 4",
             )],
@@ -109,9 +109,9 @@ endcsv`,
             "Incorrect csv with missing keyword 'from'",
             `csv rows https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
-                    `The line should contain a '=' or 'from' keyword`
+                   `The line should contain a '=' or 'from' keyword`
                 )
             ]
         ),
@@ -119,7 +119,7 @@ endcsv`,
             "Incorrect csv 'from' with missing entity name",
             `csv from https://raw.githubusercontent.com/axibase/atsd-use-cases/master/USVisaRefusal/Resources/visa-refusal.csv`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(0, 0), Position.create(0, "csv".length)),
                     `<name> in 'csv <name> from <url>' is missing`
                 )

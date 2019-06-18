@@ -1,6 +1,6 @@
 import assert = require("assert");
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 const config = `[configuration]
@@ -17,7 +17,7 @@ suite("Validator: isAllowedInSection() tests", () => {
 mode = column-stack`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "mode".length)),
             "mode setting is not allowed here.", DiagnosticSeverity.Error,

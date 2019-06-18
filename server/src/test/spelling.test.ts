@@ -1,6 +1,6 @@
-import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { settingsWithWhitespaces, unknownToken } from "../messageUtil";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("Spelling checks", () => {
@@ -11,7 +11,7 @@ suite("Spelling checks", () => {
 	start-time = 2018
 	startime = 2018`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(2, "	".length), Position.create(2, "	startime".length)),
                     unknownToken("startime"),
                 ),
@@ -31,7 +31,7 @@ suite("Spelling checks", () => {
 [starttime]
 	startime = 2018`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(3, "	".length), Position.create(3, " ".length + "startime".length)),
                     unknownToken("startime"),
                 )
@@ -46,7 +46,7 @@ suite("Spelling checks", () => {
     startime = 2018
 
   startime = 2018`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(6, "  ".length), Position.create(6, "  ".length + "startime".length)),
                 unknownToken("startime"),
             )],
@@ -86,7 +86,7 @@ type = chart`,
             `[series
 entity = nurswgvml006
 metric = cpu_iowait`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(0, "[".length, 0, "[".length + "series".length),
                 "Section tag is unclosed",
             )],
@@ -109,18 +109,18 @@ metric = cpu_iowait`,
 
 suite("Warn about setting that contains whitespaces", () => {
     const settingsName: string = "vertical grid";
-    const expectedDiagnostic: Diagnostic = Util.createDiagnostic(
+    const expectedDiagnostic: Diagnostic = createDiagnostic(
         Range.create(
             Position.create(2, 0),
             Position.create(2, settingsName.length)),
         settingsWithWhitespaces(settingsName), DiagnosticSeverity.Warning);
     [
         new Test("should warn about setting with whitespaces",
-            `[configuration]
+                 `[configuration]
                  display-ticks = true
 vertical grid = true
 max-range = 100
-            `, [expectedDiagnostic],
+            `,   [expectedDiagnostic],
         ),
     ].forEach((test: Test) => test.validationTest());
 });

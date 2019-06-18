@@ -1,6 +1,6 @@
-import { Util } from "language-service/dist";
 import { Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
+import { createRange } from "./util";
 
 /**
  * Contains the text and the position of the text
@@ -44,7 +44,7 @@ export class TextRange {
         }
         const [, indent, keyword] = match;
 
-        return new TextRange(keyword, Util.createRange(indent.length, keyword.length, i), canBeUnclosed);
+        return new TextRange(keyword, createRange(indent.length, keyword.length, i), canBeUnclosed);
     }
 
     /**

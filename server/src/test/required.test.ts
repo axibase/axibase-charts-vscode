@@ -1,5 +1,5 @@
-import { Util } from "language-service/dist";
 import { Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("Required settings for sections tests", () => {
@@ -15,7 +15,7 @@ suite("Required settings for sections tests", () => {
             "incorrect series without parent categories",
             `[series]
    metric = hello`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
                 "entity is required",
             )],
@@ -74,7 +74,7 @@ suite("Required settings for sections tests", () => {
    [widget]
        [series]
            metric = hello`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(8, "       [".length), Position.create(8, "       [series".length)),
                 "entity is required",
             )],
@@ -86,11 +86,11 @@ suite("Required settings for sections tests", () => {
 [series]
    entity = hello`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(0, "[".length), Position.create(0, "[".length + "series".length)),
                     "entity is required",
                 ),
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(Position.create(2, "[".length), Position.create(2, "[".length + "series".length)),
                     "metric is required",
                 )],
@@ -121,7 +121,7 @@ for server in servers
            entity = vps
        endif
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(2, "   [".length), Position.create(2, "   [".length + "series".length)),
                 "entity is required",
             )],
@@ -163,7 +163,7 @@ endfor`,
   column-value = null
   [series]
     entity = @{lpar}`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(5, "  [".length, 5, "  [".length + "series".length),
                 "metric is required",
             )],
@@ -176,7 +176,7 @@ endfor`,
   column-metric = null
   [series]
     entity = @{lpar}`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(4, "  [".length, 4, "  [".length + "series".length),
                 "metric is required",
             )],
@@ -257,7 +257,7 @@ suite("Required: [series] declared inside if", () => {
     if "a" == "a"
 [series]
           entity = a
-    endif`, [Util.createDiagnostic(
+    endif`, [createDiagnostic(
         Range.create(5, 1, 5, "series]".length),
         "metric is required",
     )]).validationTest();
@@ -272,7 +272,7 @@ suite("Required: [series] declared inside if", () => {
           entity = a
         [tags]
           a = b
-    endif`, [Util.createDiagnostic(
+    endif`, [createDiagnostic(
         Range.create(5, 1, 5, "series]".length),
         "metric is required",
     )]).validationTest();
@@ -288,7 +288,7 @@ suite("Required: [series] declared inside if", () => {
         [tags]
           a = b
     endif
-    `, [Util.createDiagnostic(
+    `, [createDiagnostic(
         Range.create(5, 1, 5, "series]".length),
         "metric is required",
     )]).validationTest();
@@ -311,7 +311,7 @@ suite("Required: No duplicate errors with [tags]", () => {
     `[widget]
     [tags]
       host = *
-      `,  [Util.createDiagnostic(
+      `,  [createDiagnostic(
         Range.create(0, 1, 0, "widget]".length),
         "type is required",
     )]).validationTest();
@@ -319,7 +319,7 @@ suite("Required: No duplicate errors with [tags]", () => {
     new Test("[tags] in [widget] without type",
     `[widget]
     [tags]
-      host = *`,  [Util.createDiagnostic(
+      host = *`,  [createDiagnostic(
         Range.create(0, 1, 0, "widget]".length),
         "type is required",
     )]).validationTest();

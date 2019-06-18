@@ -1,7 +1,7 @@
 import assert = require("assert");
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { incorrectColors } from "../messageUtil";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 const config = `[configuration]
@@ -100,7 +100,7 @@ colors = green, orange, red
 [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "colors".length)),
             incorrectColors("3", "4"), DiagnosticSeverity.Error,
@@ -115,7 +115,7 @@ colors = green, orange, red
         [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(6, 0),
                 Position.create(6, "colors".length)),
             incorrectColors("3", "4"), DiagnosticSeverity.Error,
@@ -130,7 +130,7 @@ colors = darkorange, darkblue, darkred
 [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 1), Position.create(8, "[series".length)),
             `thresholds is required if colors is specified`, DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
@@ -150,22 +150,22 @@ colors = green, orange, red
         [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "colors".length)),
             incorrectColors("3", "4"), DiagnosticSeverity.Error,
         ),
-        Util.createDiagnostic(
+        createDiagnostic(
             Range.create(Position.create(13, 0),
                 Position.create(13, "colors".length)),
-            incorrectColors("3", "4"), DiagnosticSeverity.Error,
+                incorrectColors("3", "4"), DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
     });
 
-    let deprecate = [Util.createDiagnostic(Range.create(Position.create(7, 0),
+    let deprecate = [createDiagnostic(Range.create(Position.create(7, 0),
         Position.create(7, "thresholds".length)), thresholdsMsg, DiagnosticSeverity.Warning,
     ),
-    Util.createDiagnostic(Range.create(Position.create(8, 0),
+    createDiagnostic(Range.create(Position.create(8, 0),
         Position.create(8, "thresholds".length)), thresholdsMsg, DiagnosticSeverity.Warning,
     )];
 
@@ -181,7 +181,7 @@ colors = orange
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, deprecate.concat(
-            Util.createDiagnostic(Range.create(Position.create(10, 0),
+            createDiagnostic(Range.create(Position.create(10, 0),
                 Position.create(10, "colors".length)), colorsMsg, DiagnosticSeverity.Warning,
             )), `Config: \n${conf}`);
     });
@@ -209,10 +209,10 @@ colors = silver
     [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, deprecate.concat(Util.createDiagnostic(
+        assert.deepStrictEqual(diags, deprecate.concat(createDiagnostic(
             Range.create(Position.create(9, 0),
                 Position.create(9, "colors".length)),
-            incorrectColors("1", "2"), DiagnosticSeverity.Error,
+                incorrectColors("1", "2"), DiagnosticSeverity.Error,
         )), `Config: \n${conf}`);
     });
 });
@@ -247,7 +247,7 @@ forecast-style = stroke: magenta;
 [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 1),
                 Position.create(8, "[series".length)),
             "data-type is required if forecast-style is specified",
@@ -275,7 +275,7 @@ alert-style = color: red
 [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 1),
                 Position.create(7, "[series".length)),
             "alert-expression is required if alert-style is specified",
@@ -292,7 +292,7 @@ suite("RelatedSettings: atribute and table tests", () => {
         table = cpu_busy`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(6, 1), Position.create(6, "[series".length)),
             "attribute is required if table is specified"
         )], `Config: \n${conf}`);
@@ -306,7 +306,7 @@ suite("RelatedSettings: atribute and table tests", () => {
         attribute = cpu_busy`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(6, 1), Position.create(6, "[series".length)),
             "table is required if attribute is specified",
         )], `Config: \n${conf}`);
@@ -330,7 +330,7 @@ suite("RelatedSettings: several widgets", () => {
         [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 1), Position.create(7, "[series".length)),
             `thresholds is required if colors is specified`, DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);
@@ -370,11 +370,11 @@ suite("RelatedSettings: several widgets", () => {
 [series]`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 1), Position.create(7, "[series".length)),
             `thresholds is required if colors is specified`, DiagnosticSeverity.Error,
         ),
-        Util.createDiagnostic(
+        createDiagnostic(
             Range.create(Position.create(11, 1), Position.create(11, "[series".length)),
             `thresholds is required if colors is specified`, DiagnosticSeverity.Error,
         )], `Config: \n${conf}`);

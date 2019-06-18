@@ -1,6 +1,6 @@
 import assert = require("assert");
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 const config = `[configuration]
@@ -17,7 +17,7 @@ suite("Forecast settings validation: group-auto-clustering-params", () => {
 forecast-ssa-group-auto-clustering-params = { "v: 0.5}`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-auto-clustering-params".length)),
             "Invalid object specified: Unexpected end of JSON input", DiagnosticSeverity.Error,
@@ -39,7 +39,7 @@ suite("Forecast settings validation: forecast-ssa-decompose-window-length", () =
 forecast-ssa-decompose-window-length = 0`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-decompose-window-length".length)),
             "forecast-ssa-decompose-window-length should be in range (0, 50]. For example, 50",
@@ -51,7 +51,7 @@ forecast-ssa-decompose-window-length = 0`;
 forecast-ssa-decompose-window-length = 51`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-decompose-window-length".length)),
             "forecast-ssa-decompose-window-length should be in range (0, 50]. For example, 50",
@@ -81,7 +81,7 @@ suite("Forecast settings validation: forecast-ssa-group-manual-groups", () => {
 forecast-ssa-group-manual-groups = 1-10,2-d`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-manual-groups".length)),
             "Incorrect group syntax", DiagnosticSeverity.Error)], `Config: \n${conf}`);
@@ -92,7 +92,7 @@ forecast-ssa-group-manual-groups = 1-10,2-d`;
 forecast-ssa-group-manual-groups = 1,d`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-manual-groups".length)),
             "Incorrect group syntax", DiagnosticSeverity.Error)], `Config: \n${conf}`);
@@ -121,7 +121,7 @@ suite("Forecast settings validation: forecast-ssa-group-auto-union", () => {
 forecast-ssa-group-auto-union = A-B,12`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-auto-union".length)),
             "Incorrect group union syntax", DiagnosticSeverity.Error)], `Config: \n${conf}`);
@@ -132,7 +132,7 @@ forecast-ssa-group-auto-union = A-B,12`;
 forecast-ssa-group-auto-union = A-B;12`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-auto-union".length)),
             "Incorrect group union syntax", DiagnosticSeverity.Error)], `Config: \n${conf}`);
@@ -163,12 +163,12 @@ forecast-arima-auto-regression-interval = 1 week
 forecast-arima-d = 5.6`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 0),
                 Position.create(8, "forecast-arima-auto-regression-interval".length)),
             "forecast-arima-auto-regression-interval setting is appplied only if forecast-arima-auto is false.",
             DiagnosticSeverity.Warning),
-        Util.createDiagnostic(
+        createDiagnostic(
             Range.create(Position.create(9, 0),
                 Position.create(9, "forecast-arima-d".length)),
             "forecast-arima-d setting is appplied only if forecast-arima-auto is false.",
@@ -182,7 +182,7 @@ forecast-arima-auto-regression-interval = 1 week
 forecast-arima-p = 1`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 0),
                 Position.create(8, "forecast-arima-p".length)),
             "forecast-arima-p can not be specified simultaneously with forecast-arima-auto-regression-interval",
@@ -210,19 +210,19 @@ forecast-ssa-group-auto-stack = false`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(Position.create(8, 0),
                     Position.create(8, "forecast-ssa-group-auto-clustering-method".length)),
                 "forecast-ssa-group-auto-clustering-method can not be specified simultaneously " +
                 "with forecast-ssa-group-manual-groups",
                 DiagnosticSeverity.Error),
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(Position.create(9, 0),
                     Position.create(9, "forecast-ssa-group-auto-clustering-params".length)),
                 "forecast-ssa-group-auto-clustering-params can not be specified simultaneously " +
                 "with forecast-ssa-group-manual-groups",
                 DiagnosticSeverity.Error),
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(Position.create(10, 0),
                     Position.create(10, "forecast-ssa-group-auto-stack".length)),
                 "forecast-ssa-group-auto-stack can not be specified simultaneously " +
@@ -237,7 +237,7 @@ forecast-ssa-group-auto-union = A,B,C-E`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(Position.create(8, 0),
                     Position.create(8, "forecast-ssa-group-auto-stack".length)),
                 "forecast-ssa-group-auto-union can not be specified simultaneously " +
@@ -250,7 +250,7 @@ forecast-ssa-group-auto-stack = false`;
         validator = new Validator(conf);
         diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            Util.createDiagnostic(
+            createDiagnostic(
                 Range.create(Position.create(8, 0),
                     Position.create(8, "forecast-ssa-group-auto-union".length)),
                 "forecast-ssa-group-auto-stack can not be specified simultaneously " +
@@ -276,7 +276,7 @@ forecast-horizon-end-time = now
 forecast-horizon-interval = 1 week`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 0),
                 Position.create(8, "forecast-horizon-interval".length)),
             "forecast-horizon-interval can not be specified simultaneously with forecast-horizon-end-time",
@@ -290,7 +290,7 @@ suite("Related forecast settings checks: forecast-ssa-decompose-eigentriple-limi
 forecast-ssa-group-auto-count = 0`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-auto-count".length)),
             "forecast-ssa-group-auto-count must be less than forecast-ssa-decompose-eigentriple-limit (default 0)",
@@ -303,7 +303,7 @@ forecast-ssa-group-auto-count = 5
 forecast-ssa-decompose-eigentriple-limit = 4`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(7, 0),
                 Position.create(7, "forecast-ssa-group-auto-count".length)),
             "forecast-ssa-group-auto-count must be less than forecast-ssa-decompose-eigentriple-limit (default 0)",
@@ -326,7 +326,7 @@ suite("Related forecast settings checks: forecast-horizon-*", () => {
 forecast-horizon-start-time = now - 2*day`;
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [Util.createDiagnostic(
+        assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(6, 1),
                 Position.create(6, "series".length + 1)),
             `forecast-horizon-start-time has effect only with one of the following:

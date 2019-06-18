@@ -1,5 +1,5 @@
-import { Setting } from "language-service/dist";
 import { ResourcesProvider } from "../resourcesProvider";
+import { Setting } from "../setting";
 import { TextRange } from "../textRange";
 import { Section } from "./section";
 

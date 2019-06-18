@@ -1,5 +1,5 @@
 import { Section } from "../../configTree/section";
-import { ResourcesProvider } from "../../resourcesProvider";
+import { getSetting } from "../../util";
 
 /**
  * Function to check that `section` matches conditions.
@@ -32,7 +32,7 @@ function getValueOfCheckedSetting(settingName: string, section: Section): string
             /**
              * Setting is not declared, thus loooking for default value.
              */
-            setting = new ResourcesProvider().getSetting(settingName);
+            setting = getSetting(settingName);
             if (setting !== undefined) {
                 value = setting.defaultValue;
             }

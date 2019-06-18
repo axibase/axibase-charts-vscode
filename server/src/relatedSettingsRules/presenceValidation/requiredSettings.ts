@@ -1,7 +1,8 @@
-import { Setting, Util } from "language-service/dist";
 import { Diagnostic } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
 import { noRequiredSetting, noRequiredSettings } from "../../messageUtil";
+import { Setting } from "../../setting";
+import { createDiagnostic } from "../../util";
 import { requiredCondition } from "../utils/condition";
 import { RelatedSettingsRule, Requirement } from "../utils/interfaces";
 
@@ -156,7 +157,7 @@ const rule: RelatedSettingsRule = {
                 msg = noRequiredSetting(dependent, reqNames);
             }
             if (required === undefined) {
-                diagnostics.push(Util.createDiagnostic(section.range.range, msg));
+                diagnostics.push(createDiagnostic(section.range.range, msg));
             }
         });
         return diagnostics;

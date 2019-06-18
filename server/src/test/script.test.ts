@@ -1,6 +1,6 @@
-import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { lineFeedRequired } from "../messageUtil";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 const unknownToken: string = "script has no matching endscript";
@@ -17,7 +17,7 @@ endscript`,
             "Unclosed empty script",
             `script
 endscrpt`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "script".length)),
                 unknownToken,
             )],
@@ -45,7 +45,7 @@ endscript`,
 endscrpt
 script
 endscrpt`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "script".length)),
                 unknownToken,
             )],
@@ -69,12 +69,12 @@ script =		(!config.isDialog)
 script =			c = widget`,
             [
 
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(1, 0, 1, "script".length),
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
                     DiagnosticSeverity.Warning,
                 ),
-                Util.createDiagnostic(
+                createDiagnostic(
                     Range.create(2, 0, 2, "script".length),
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
                     DiagnosticSeverity.Warning,
@@ -84,13 +84,13 @@ script =			c = widget`,
         new Test(
             "Incorrect empty one-line script = ",
             "script = ",
-            [Util.createDiagnostic(Range.create(0, 0, 0, "script".length), `script can not be empty`)],
+            [createDiagnostic(Range.create(0, 0, 0, "script".length), `script can not be empty`)],
         ),
         new Test(
             "Correct one-line script = with endscript ",
             `script = if (!config.isDialog) c = widget
 endscript`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(1, 0, 1, "endscript".length),
                 "endscript has no matching script",
             )],
@@ -99,7 +99,7 @@ endscript`,
             "Incorrect script/endscript declaration",
             `script alert("Hello, world!")
 endscript`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 Range.create(0, 0, 0, "script".length), lineFeedRequired("script")
             )],
         ),

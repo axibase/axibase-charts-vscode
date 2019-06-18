@@ -3,7 +3,7 @@ import { Setting } from "./setting";
 
 interface IDictionary { $schema: string; settings: Setting[]; }
 
-export class ResourcesProvider extends ResourcesProviderBase {
+export class ResourcesProviderWeb extends ResourcesProviderBase {
 
     constructor() {
         super();
@@ -13,11 +13,8 @@ export class ResourcesProvider extends ResourcesProviderBase {
      * @returns array of settings from the file
      */
     protected readSettings(): Setting[] {
-        const path = require("path");
-        const fs = require("fs");
-        const dictionaryFilePath: string = path.join(__dirname, "..", "dictionary.json");
-        const jsonContent: string = fs.readFileSync(dictionaryFilePath, "UTF-8");
-        const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
+        const jsonContent: string = require("../dictionary.json");
+        const dictionary: IDictionary = (jsonContent as any) as IDictionary;
 
         return dictionary.settings;
     }
@@ -27,11 +24,7 @@ export class ResourcesProvider extends ResourcesProviderBase {
      * @returns map of settings names and descriptions
      */
     protected readDescriptions(): Map<string, string> {
-        const path = require("path");
-        const fs = require("fs");
-        const descriptionsPath: string = path.join(__dirname, "..", "descriptions.md");
-        const content: string = fs.readFileSync(descriptionsPath, "UTF-8");
-
+        const content = require("../descriptions.md").default;
         const map: Map<string, string> = new Map();
         // ## settingname\n\nsetting description[url](hello#html)\n
         const regExp: RegExp = /\#\# ([a-z]+?)  \n  \n([^\s#][\S\s]+?)  (?=\n  (?:\n(?=\#)|$))/g;

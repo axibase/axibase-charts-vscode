@@ -1,7 +1,8 @@
-import { Setting, Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
 import { ResourcesProvider } from "./resourcesProvider";
+import { Setting } from "./setting";
 import { TextRange } from "./textRange";
+import { createDiagnostic } from "./util";
 
 interface DependencyResolveInfo {
     resolvedCount: number;
@@ -232,7 +233,7 @@ export class SectionStack {
     }
 
     private createErrorDiagnostic(section: TextRange, message: string): Diagnostic {
-        return Util.createDiagnostic(
+        return createDiagnostic(
             section.range,
             message,
             DiagnosticSeverity.Error,

@@ -1,7 +1,7 @@
-import { Util } from "language-service/dist";
 import { Diagnostic } from "vscode-languageserver-types";
 import { lineFeedRequired } from "./messageUtil";
 import { TextRange } from "./textRange";
+import { createDiagnostic, createRange } from "./util";
 
 /**
  * Regular expressions to match SQL.
@@ -35,8 +35,8 @@ export class KeywordHandler {
         const match = BLOCK_SQL_START_WITHOUT_LF.exec(line);
         if (match !== null) {
             this.diagnostics.push(
-                Util.createDiagnostic(
-                    Util.createRange(match[1].length, "sql".length, foundKeyword.range.start.line),
+                createDiagnostic(
+                    createRange(match[1].length, "sql".length, foundKeyword.range.start.line),
                     lineFeedRequired("sql")
                 ));
         }
@@ -49,8 +49,8 @@ export class KeywordHandler {
         this.keywordsStack.push(foundKeyword);
         const match = BLOCK_SCRIPT_START_WITHOUT_LF.exec(line);
         if (match !== null) {
-            this.diagnostics.push(Util.createDiagnostic(
-                Util.createRange(match[1].length, "script".length, foundKeyword.range.start.line),
+            this.diagnostics.push(createDiagnostic(
+                createRange(match[1].length, "script".length, foundKeyword.range.start.line),
                 lineFeedRequired("script")
             ));
         }

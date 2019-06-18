@@ -1,7 +1,7 @@
-import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver-types";
 import { Section } from "../../../configTree/section";
 import { uselessScope } from "../../../messageUtil";
+import { createDiagnostic } from "../../../util";
 import { Condition } from "../../utils/condition";
 import { Check, RelatedSettingsRule } from "../../utils/interfaces";
 import forSeries from "./forSeries";
@@ -18,7 +18,7 @@ function getRule(checksMap: Map<string, Condition[]>): Check {
             }
             const msg: string[] = conditions.map(condition => condition(section) as string).filter(m => m);
             if (msg.length > 0) {
-                diagnostics.push(Util.createDiagnostic(
+                diagnostics.push(createDiagnostic(
                     dependentSetting.textRange,
                     uselessScope(dependentSetting.displayName, `${msg.join(", ")}`),
                     DiagnosticSeverity.Warning

@@ -1,8 +1,9 @@
-import { ResourcesProviderBase, Util } from "language-service/dist";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
 import { ResourcesProvider } from "./resourcesProvider";
+import { ResourcesProviderBase } from "./resourcesProviderBase";
 import { TextRange } from "./textRange";
+import { createRange, isEmpty } from "./util";
 
 interface Section {
     indent?: string;
@@ -79,7 +80,7 @@ export class Formatter {
         this.currentLine = -1;
         for (const line of this.lines) {
             this.currentLine++;
-            if (Util.isEmpty(line)) {
+            if (isEmpty(line)) {
                 if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
                     Object.assign(this.currentSection, this.previousSection);
                     this.decreaseIndent();
@@ -125,7 +126,7 @@ export class Formatter {
         if (spacesBefore !== " ") {
             this.edits.push(
                 TextEdit.replace(
-                    Util.createRange(declaration.length, spacesBefore.length, this.currentLine),
+                    createRange(declaration.length, spacesBefore.length, this.currentLine),
                     " ",
                 ),
             );
@@ -134,7 +135,7 @@ export class Formatter {
             const start = line.indexOf(sign) + sign.length;
             this.edits.push(
                 TextEdit.replace(
-                    Util.createRange(start, spacesAfter.length, this.currentLine),
+                    createRange(start, spacesAfter.length, this.currentLine),
                     " ",
                 ),
             );

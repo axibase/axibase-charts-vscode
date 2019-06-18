@@ -1,5 +1,5 @@
-import { Util } from "language-service/dist";
 import { Position, Range } from "vscode-languageserver";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 const elseIfError: string = "elseif has no matching if";
@@ -8,10 +8,10 @@ const endIfError: string = "endif has no matching if";
 const ifError: string = "if has no matching endif";
 
 suite("If elseif else endif validation tests", () => {
-  const tests: Test[] = [
-    new Test(
-      "One correct if-elseif-endif",
-      `list servers = 'srv1', 'srv2'
+    const tests: Test[] = [
+        new Test(
+            "One correct if-elseif-endif",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -22,11 +22,11 @@ for server in servers
       color = yellow
     endif
 endfor`,
-      [],
-    ),
-    new Test(
-      "One correct if-else-endif",
-      `list servers = 'srv1', 'srv2'
+            [],
+        ),
+        new Test(
+            "One correct if-else-endif",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -37,11 +37,11 @@ for server in servers
       color = yellow
     endif
 endfor`,
-      [],
-    ),
-    new Test(
-      "One incorrect elseif-endif",
-      `list servers = 'srv1', 'srv2'
+            [],
+        ),
+        new Test(
+            "One incorrect elseif-endif",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -50,19 +50,19 @@ for server in servers
       color = yellow
     endif
 endfor`,
-      [
-        Util.createDiagnostic(
-          Range.create(5, "    ".length, 5, "    ".length + "elseif".length),
-          elseIfError,
+            [
+                createDiagnostic(
+                    Range.create(5, "    ".length, 5, "    ".length + "elseif".length),
+                    elseIfError,
+                ),
+                createDiagnostic(
+                    Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
+                    endIfError,
+                )],
         ),
-        Util.createDiagnostic(
-          Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-          endIfError,
-        )],
-    ),
-    new Test(
-      "One incorrect else-endif",
-      `list servers = 'srv1', 'srv2'
+        new Test(
+            "One incorrect else-endif",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -71,19 +71,19 @@ for server in servers
       color = yellow
     endif
 endfor`,
-      [
-        Util.createDiagnostic(
-          Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "else".length)),
-          elseError,
+            [
+                createDiagnostic(
+                    Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "else".length)),
+                    elseError,
+                ),
+                createDiagnostic(
+                    Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
+                    endIfError,
+                )],
         ),
-        Util.createDiagnostic(
-          Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-          endIfError,
-        )],
-    ),
-    new Test(
-      "One incorrect else-endif with comment",
-      `list servers = 'srv1', 'srv2'
+        new Test(
+            "One incorrect else-endif with comment",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -92,21 +92,21 @@ for server in servers
       color = yellow
     endif /* a comment */ # too
 endfor`,
-      [
-        Util.createDiagnostic(
-          Range.create(
-            5, "    /* this is a comment */ ".length, 5, "    /* this is a comment */ else".length,
-          ),
-          elseError,
+            [
+                createDiagnostic(
+                    Range.create(
+                        5, "    /* this is a comment */ ".length, 5, "    /* this is a comment */ else".length,
+                    ),
+                    elseError,
+                ),
+                createDiagnostic(
+                    Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
+                    endIfError,
+                )],
         ),
-        Util.createDiagnostic(
-          Range.create(Position.create(7, "    ".length), Position.create(7, "    ".length + "endif".length)),
-          endIfError,
-        )],
-    ),
-    new Test(
-      "One incorrect if-else",
-      `list servers = 'srv1', 'srv2'
+        new Test(
+            "One incorrect if-else",
+            `list servers = 'srv1', 'srv2'
 for server in servers
   [series]
     metric = temp
@@ -116,19 +116,19 @@ for server in servers
     else
       color = yellow
 endfor`,
-      [
-        Util.createDiagnostic(
-          Range.create(Position.create(9, 0), Position.create(9, "endfor".length)),
-          "for has finished before if",
+            [
+                createDiagnostic(
+                    Range.create(Position.create(9, 0), Position.create(9, "endfor".length)),
+                    "for has finished before if",
+                ),
+                createDiagnostic(
+                    Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "if".length)),
+                    ifError,
+                )],
         ),
-        Util.createDiagnostic(
-          Range.create(Position.create(5, "    ".length), Position.create(5, "    ".length + "if".length)),
-          ifError,
-        )],
-    ),
 
-  ];
+    ];
 
-  tests.forEach((test: Test) => { test.validationTest(); });
+    tests.forEach((test: Test) => { test.validationTest(); });
 
 });

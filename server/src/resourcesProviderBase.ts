@@ -1,4 +1,3 @@
-import { Range } from "vscode-languageserver-types";
 import { DefaultSetting } from "./defaultSetting";
 import { Setting } from "./setting";
 
@@ -169,26 +168,6 @@ export abstract class ResourcesProviderBase {
 
     constructor() {
         this.settingsMap = this.createSettingsMap();
-    }
-
-    /**
-     * Clears the passed argument and looks for a setting with the same name
-     * @param name name of the wanted setting
-     * @param range TextRange of the setting in text.
-     * @returns the wanted setting or undefined if not found
-     */
-    public getSetting(name: string, range?: Range): Setting | undefined {
-        const clearedName: string = Setting.clearSetting(name);
-
-        const defaultSetting = this.settingsMap.get(clearedName);
-        if (defaultSetting === undefined) {
-            return undefined;
-        }
-        const setting = new Setting(defaultSetting);
-        if (range) {
-            setting.textRange = range;
-        }
-        return setting;
     }
 
     /**

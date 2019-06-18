@@ -1,5 +1,5 @@
-import { Util } from "language-service/dist";
 import { unknownToken } from "../messageUtil";
+import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 const firstVar: string = "serv";
@@ -51,7 +51,7 @@ for ${secondVar} in servers
        metric = placeholder
        entity = @{${firstVar}}
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 {
                     end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
@@ -73,14 +73,14 @@ for ${firstVar} in servers
        entity = @{${secondVar}}
 endfor`,
             [
-                Util.createDiagnostic(
+                createDiagnostic(
                     {
                         end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                         start: { character: "       entity = @{".length, line: 4 },
                     },
                     unknownToken(firstVar),
                 ),
-                Util.createDiagnostic(
+                createDiagnostic(
                     {
                         end: { character: "       entity = @{".length + secondVar.length, line: 9 },
                         start: { character: "       entity = @{".length, line: 9 },
@@ -101,7 +101,7 @@ for ${firstVar} in servers
        metric = placeholder
        entity = @{${firstVar}}
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 {
                     end: { character: "       entity = @{".length + firstVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
@@ -143,7 +143,7 @@ for ${secondVar} in servers
            entity = @{${firstVar}}
    endfor
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 {
                     end: { character: "           entity = @{".length + thirdVar.length, line: 8 },
                     start: { character: "           entity = @{".length, line: 8 },
@@ -169,7 +169,7 @@ for ${firstVar} in servers
        metric = placeholder
        entity = @{${secondVar}  ${firstVar}}
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 {
                     end: { character: "       entity = @{".length + secondVar.length, line: 4 },
                     start: { character: "       entity = @{".length, line: 4 },
@@ -215,7 +215,7 @@ for ${secondVar} in servers
        metric = placeholder
        entity = @{keepAfterLast(${secondVar}, 'v')}, @{${firstVar}}
 endfor`,
-            [Util.createDiagnostic(
+            [createDiagnostic(
                 {
                     end: {
                         character: `       entity = @{keepAfterLast(${secondVar}, 'v')}, @{`.length + firstVar.length,
