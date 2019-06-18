@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
-import { createDiagnostic } from "./util";
+import { Util } from "./util";
 
 export const intervalUnits: string[] = [
     "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
@@ -128,20 +128,20 @@ export class Setting extends DefaultSetting {
         switch (this.type) {
             case "string": {
                 if (!/\S/.test(this.value)) {
-                    result = createDiagnostic(range, `${this.displayName} can not be empty`);
+                    result = Util.createDiagnostic(range, `${this.displayName} can not be empty`);
                     break;
                 }
                 if (this.enum.length > 0) {
                     if (this.value.split(/\s*,\s*/).some(s => this.enum.indexOf(s) < 0)) {
                         const enumList: string = this.enum.sort().join("\n * ");
-                        result = createDiagnostic(range,
+                        result = Util.createDiagnostic(range,
                             `${this.displayName} must contain only the following:\n * ${enumList}`);
                     }
                     break;
                 }
                 const specCheck = specificValueChecksMap.get(this.name);
                 if (specCheck && specCheck.isIncorrect(this.value)) {
-                    result = createDiagnostic(range, specCheck.errMsg);
+                    result = Util.createDiagnostic(range, specCheck.errMsg);
                 }
                 break;
             }
@@ -163,7 +163,7 @@ export class Setting extends DefaultSetting {
             }
             case "boolean": {
                 if (!booleanRegExp.test(this.value)) {
-                    result = createDiagnostic(
+                    result = Util.createDiagnostic(
                         range, `${this.displayName} should be a boolean value. For example, ${this.example}`,
                     );
                 }
@@ -173,7 +173,7 @@ export class Setting extends DefaultSetting {
                 const index: number = this.findIndexInEnum(this.value);
                 // Empty enum means that the setting is not allowed
                 if (this.enum.length === 0) {
-                    result = createDiagnostic(range, illegalSetting(this.displayName));
+                    result = Util.createDiagnostic(range, illegalSetting(this.displayName));
                 } else if (index < 0) {
                     if (/percentile/.test(this.value) && /statistic/.test(this.name)) {
                         result = this.checkPercentile(range);
@@ -181,7 +181,7 @@ export class Setting extends DefaultSetting {
                     }
                     const enumList: string = this.enum.sort().join("\n * ")
                         .replace(/percentile\\.+/, "percentile(n)");
-                    result = createDiagnostic(range, `${this.displayName} must be one of:\n * ${enumList}`);
+                    result = Util.createDiagnostic(range, `${this.displayName} must be one of:\n * ${enumList}`);
                 }
                 break;
             }
@@ -190,7 +190,7 @@ export class Setting extends DefaultSetting {
                     const message =
                         `.\nFor example, ${this.example}. Supported units:\n * ${intervalUnits.join("\n * ")}`;
                     if (this.name === "updateinterval" && /^\d+$/.test(this.value)) {
-                        result = createDiagnostic(
+                        result = Util.createDiagnostic(
                             range,
                             `Specifying the interval in seconds is deprecated.\nUse \`count unit\` format${message}`,
                             DiagnosticSeverity.Warning,
@@ -202,11 +202,11 @@ export class Setting extends DefaultSetting {
                          */
                         if (this.enum.length > 0) {
                             if (this.findIndexInEnum(this.value) < 0) {
-                                result = createDiagnostic(range,
+                                result = Util.createDiagnostic(range,
                                     `Use ${this.enum.sort().join(", ")} or \`count unit\` format${message}`);
                             }
                         } else {
-                            result = createDiagnostic(range,
+                            result = Util.createDiagnostic(range,
                                 `${this.displayName} should be set as \`count unit\`${message}`);
                         }
                     }
@@ -215,7 +215,7 @@ export class Setting extends DefaultSetting {
             }
             case "date": {
                 if (!isDate(this.value)) {
-                    result = createDiagnostic(range,
+                    result = Util.createDiagnostic(range,
                         `${this.displayName} should be a date. For example, ${this.example}`);
                 }
                 break;
@@ -224,7 +224,7 @@ export class Setting extends DefaultSetting {
                 try {
                     JSON.parse(this.value);
                 } catch (err) {
-                    result = createDiagnostic(range, `Invalid object specified: ${err.message}`);
+                    result = Util.createDiagnostic(range, `Invalid object specified: ${err.message}`);
                 }
                 break;
             }
@@ -239,7 +239,7 @@ export class Setting extends DefaultSetting {
     private checkNumber(reg: RegExp, message: string, range: Range): Diagnostic {
         const example = ` For example, ${this.example}`;
         if (!reg.test(this.value)) {
-            return createDiagnostic(range, `${message}${example}`);
+            return Util.createDiagnostic(range, `${message}${example}`);
         }
         const minValue = typeof this.minValue === "object" ? this.minValue.value : this.minValue;
         const minValueExcluded = typeof this.minValue === "object" ? this.minValue.excluded : false;
@@ -249,7 +249,7 @@ export class Setting extends DefaultSetting {
         const right = maxValueExcluded ? `)` : `]`;
         if (minValueExcluded && +this.value <= minValue || +this.value < minValue ||
             maxValueExcluded && +this.value >= maxValue || +this.value > maxValue) {
-            return createDiagnostic(
+            return Util.createDiagnostic(
                 range, `${this.displayName} should be in range ${left}${minValue}, ${maxValue}${right}.${example}`,
             );
         }
@@ -261,14 +261,14 @@ export class Setting extends DefaultSetting {
         const n = this.value.match(/[^percntil_()]+/);
         if (n && +n[0] >= 0 && +n[0] <= 100) {
             if (/_/.test(this.value)) {
-                result = createDiagnostic(range, `Underscore is deprecated, use percentile(${n[0]}) instead`,
+                result = Util.createDiagnostic(range, `Underscore is deprecated, use percentile(${n[0]}) instead`,
                     DiagnosticSeverity.Warning);
             } else if (!new RegExp(`\\(${n[0]}\\)`).test(this.value)) {
-                result = createDiagnostic(range, `Wrong usage. Expected: percentile(${n[0]}).
+                result = Util.createDiagnostic(range, `Wrong usage. Expected: percentile(${n[0]}).
 Current: ${this.value}`);
             }
         } else {
-            result = createDiagnostic(range, `n must be a decimal number between [0, 100]. Current: ${n ? n[0] : n}`);
+            result = Util.createDiagnostic(range, `n must be a decimal number between [0, 100]. Current: ${n ? n[0] : n}`);
         }
         return result;
     }

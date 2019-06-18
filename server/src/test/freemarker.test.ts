@@ -1,5 +1,5 @@
 import { DiagnosticSeverity, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
+import { Util } from "language-service/dist";
 import { Test } from "./test";
 
 const deprecationMessage: string = `Freemarker expressions are deprecated.
@@ -14,12 +14,12 @@ suite("Freemarker templates", () => {
     </#assign>
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(1, 4, 1, 32),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(3, 4, 3, 14),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -34,12 +34,12 @@ suite("Freemarker templates", () => {
     </#list>
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(1, 4, 1, 22),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(3, 4, 3, 12),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -54,12 +54,12 @@ suite("Freemarker templates", () => {
     </#if>
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(1, 4, 1, 19),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(3, 4, 3, 10),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -76,17 +76,17 @@ suite("Freemarker templates", () => {
     </#if>
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(1, 4, 1, 19),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(3, 4, 3, 11),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(5, 4, 5, 10),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -100,7 +100,7 @@ suite("Freemarker templates", () => {
     entity = e
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(1, 4, 1, 22),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -114,7 +114,7 @@ suite("Freemarker templates", () => {
     </#list>
         `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(2, 4, 2, 12),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
@@ -131,7 +131,7 @@ suite("Freemarker templates", () => {
 
     new Test("De-alias doesn't raise an error",
         `value = 0 <#list sid[1]?split(",") as lpar> + value('\$\{lpar\}:PX')</#list>`,
-        [createDiagnostic(
+        [Util.createDiagnostic(
             Range.create(0, 10, 0, 43),
             deprecationMessage,
             DiagnosticSeverity.Information,
@@ -141,12 +141,12 @@ suite("Freemarker templates", () => {
     new Test("Alias doesn't exist, error",
         `value = 0 <#list sid[1]?split(",") as lpar> + value('\${lpr}:PX')</#list>`,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(0, 10, 0, 43),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(0, `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{`.length, 0,
                     `value = 0 <#list sid[1]?split(",") as lpar> + value('$\{lpr`.length),
                 "lpr is unknown.",
@@ -164,12 +164,12 @@ timespan = 7 day
 </#list>
     `,
         [
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(0, 0, 0, 21),
                 deprecationMessage,
                 DiagnosticSeverity.Information,
             ),
-            createDiagnostic(
+            Util.createDiagnostic(
                 Range.create(5, 0, 5, 8),
                 deprecationMessage,
                 DiagnosticSeverity.Information,

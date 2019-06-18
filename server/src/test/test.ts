@@ -1,6 +1,6 @@
 import * as assert from "assert";
+import { CompletionProvider, LanguageService } from "language-service/dist";
 import { Diagnostic, FormattingOptions, Hover, Position, TextDocument, TextEdit } from "vscode-languageserver";
-import { CompletionProvider } from "../completionProvider";
 import { Formatter } from "../formatter";
 import { HoverProvider } from "../hoverProvider";
 import { JavaScriptValidator } from "../javaScriptValidator";
@@ -112,8 +112,8 @@ export class Test {
      */
     public completionTest(): void {
         test((this.name), () => {
-            const cp: CompletionProvider = new CompletionProvider(
-                this.document, this.position, new ResourcesProvider().settingsMap
+            const cp: CompletionProvider = new LanguageService(new ResourcesProvider()).getCompletionProvider(
+                this.document, this.position
             );
             const current: string[] = cp.getCompletionItems().map(i => i.insertText);
             assert.deepStrictEqual(current, this.expected);

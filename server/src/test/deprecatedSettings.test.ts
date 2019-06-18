@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
+import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 suite("Warn about deprecated setting", () => {
@@ -16,7 +16,7 @@ suite("Warn about deprecated setting", () => {
                     entity = b`;
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
-        const expectedDiagnostic = createDiagnostic(
+        const expectedDiagnostic = Util.createDiagnostic(
             Range.create(Position.create(4, 16), Position.create(4, 21)),
             "This setting is deprecated in timechart. Use `mode = stack` instead",
             DiagnosticSeverity.Warning

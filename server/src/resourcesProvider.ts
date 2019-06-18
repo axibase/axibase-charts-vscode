@@ -1,5 +1,4 @@
-import { ResourcesProviderBase } from "./resourcesProviderBase";
-import { Setting } from "./setting";
+import { ResourcesProviderBase, Setting } from "language-service/dist";
 
 interface IDictionary { $schema: string; settings: Setting[]; }
 

@@ -1,6 +1,6 @@
+import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver-types";
 import { Section } from "../../configTree/section";
-import { createDiagnostic } from "../../util";
 import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {
@@ -16,7 +16,7 @@ const rule: RelatedSettingsRule = {
         }
 
         if (end.value >= forecast.value) {
-            return createDiagnostic(
+            return Util.createDiagnostic(
                 end.textRange,
                 `${forecast.displayName} must be greater than ${end.displayName}`,
                 DiagnosticSeverity.Error

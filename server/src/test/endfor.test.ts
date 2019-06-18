@@ -1,5 +1,5 @@
+import { Util } from "language-service/dist";
 import { Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("Unmatched endfor tests", () => {
@@ -28,7 +28,7 @@ endfor`,
             `list servers = 'srv1', 'srv2'
 for server in servers
    do something`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, 0), Position.create(1, "for".length)),
                 "for has no matching endfor",
             )],
@@ -41,11 +41,11 @@ for server in servers
 for srv in servers
    do something`,
             [
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(Position.create(1, 0), Position.create(1, "for".length)),
                     "for has no matching endfor",
                 ),
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(Position.create(3, 0), Position.create(3, "for".length)),
                     "for has no matching endfor",
                 )],
@@ -58,7 +58,7 @@ for server in servers
 for srv in servers
    do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, 0), Position.create(1, "for".length)),
                 "for has no matching endfor",
             )],

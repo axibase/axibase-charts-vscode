@@ -1,5 +1,5 @@
+import { Setting } from "language-service/dist";
 import { Condition } from "../relatedSettingsRules/utils/condition";
-import { Setting } from "../setting";
 import { TextRange } from "../textRange";
 
 /**

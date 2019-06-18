@@ -1,9 +1,9 @@
 import { DOMWindow, JSDOM } from "jsdom";
+import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { CheckPriority } from "./checkPriority";
 import { JavaScriptChecksQueue } from "./javaScriptChecksQueue";
 import { TextRange } from "./textRange";
-import { createDiagnostic, deleteComments } from "./util";
 
 export class JavaScriptValidator {
 
@@ -16,7 +16,7 @@ export class JavaScriptValidator {
     private readonly queue: JavaScriptChecksQueue = new JavaScriptChecksQueue();
 
     public constructor(text: string) {
-        this.lines = deleteComments(text)
+        this.lines = Util.deleteComments(text)
             .split("\n");
     }
 
@@ -46,7 +46,7 @@ export class JavaScriptValidator {
                     }
                 }
                 if (!isImported) {
-                    result.push(createDiagnostic(queueElement.range, err.message, DiagnosticSeverity.Warning));
+                    result.push(Util.createDiagnostic(queueElement.range, err.message, DiagnosticSeverity.Warning));
                     break;
                 }
             }

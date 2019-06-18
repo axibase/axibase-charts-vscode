@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "umd",
+		"moduleResolution": "node",
+		"declaration": true,
+		"outDir": "dist",
+		"rootDir": "src",
+		"lib": [
+			"es2017",
+			"dom"
+		],
+		"downlevelIteration": true
+	},
+	"files": [
+		"./src/index.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

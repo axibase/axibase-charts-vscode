@@ -1,5 +1,5 @@
+import { Util } from "language-service/dist";
 import { Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("Var endvar tests", () => {
@@ -37,7 +37,7 @@ endvar`,
     [9,3], [9,4]
 ]
 edvar`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
                 "var has no matching endvar",
             )],
@@ -49,7 +49,7 @@ edvar`,
    "array": ["val", "value"]
 }
 edvar`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
                 "var has no matching endvar",
             )],
@@ -61,7 +61,7 @@ edvar`,
    { "array": ["val", "value"] }
 ]
 edvar`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, 0), Position.create(0, "var".length)),
                 "var has no matching endvar",
             )],

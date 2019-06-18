@@ -1,10 +1,10 @@
+import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import {
     deprecatedTagSection,
     settingNameInTags,
     tagNameWithWhitespaces,
 } from "../messageUtil";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 const errorMessage: (setting: string) => string = (setting: string): string =>
@@ -19,7 +19,7 @@ suite("Warn about setting interpreted as a tag", () => {
             `[tags]
 	starttime = 20 second
 	startime = 30 minute`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "starttime".length)),
                 errorMessage("starttime"), DiagnosticSeverity.Information,
             )],
@@ -36,7 +36,7 @@ suite("Warn about setting interpreted as a tag", () => {
             `[tags]
 	stArt-time = 20 second
 	startime = 30 minute`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, "	".length), Position.create(1, "	".length + "stArt-time".length)),
                 errorMessage("start-time"), DiagnosticSeverity.Information,
             )],
@@ -63,7 +63,7 @@ suite("Warn about setting interpreted as a tag", () => {
 });
 
 suite("Warn about deprecated [tag] section", () => {
-    const expectedDiagnostic: Diagnostic = createDiagnostic(
+    const expectedDiagnostic: Diagnostic = Util.createDiagnostic(
         Range.create(Position.create(0, 1),
             Position.create(0, 4)),
         deprecatedTagSection, DiagnosticSeverity.Warning,
@@ -79,7 +79,7 @@ suite("Warn about deprecated [tag] section", () => {
 
 suite("Warn about tag keys with whitespaces that not wrapped in double quotes", () => {
     const expectedDiagnostic: Diagnostic =
-        createDiagnostic(Range.create(Position.create(1, 2),
+        Util.createDiagnostic(Range.create(Position.create(1, 2),
             Position.create(1, 11)),
             tagNameWithWhitespaces("two words"),
             DiagnosticSeverity.Warning);
@@ -94,7 +94,7 @@ suite("Warn about tag keys with whitespaces that not wrapped in double quotes", 
 
 suite("Information about settingName in tags", () => {
     const expectedDiagnostic: Diagnostic =
-        createDiagnostic(Range.create(Position.create(1, 0),
+        Util.createDiagnostic(Range.create(Position.create(1, 0),
             Position.create(1, 5)),
             settingNameInTags("value"),
             DiagnosticSeverity.Information);
@@ -106,7 +106,7 @@ value = key`,
         new Test("setting name is correct for tag section",
             `[tag]
 value = correct`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, 1),
                     Position.create(0, 4)),
                 deprecatedTagSection, DiagnosticSeverity.Warning,

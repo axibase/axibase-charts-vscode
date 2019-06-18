@@ -1,5 +1,5 @@
+import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("[JS] options tests", () => {
@@ -12,7 +12,7 @@ suite("[JS] options tests", () => {
         new Test(
             "Incorrect function call",
             `options = javascript: MetricsSeriesOptions()`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, "options = javascript: ".length),
                     Position.create(0, "options = javascript: MetricsSeriesOptions()".length)),
                 "MetricsSeriesOptions is not defined", DiagnosticSeverity.Warning,

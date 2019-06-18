@@ -1,10 +1,10 @@
+import { CompletionProvider, LanguageService } from "language-service/dist";
 import {
     ClientCapabilities, CompletionItem, CompletionParams, createConnection, Diagnostic,
     DidChangeConfigurationNotification, DidChangeConfigurationParams,
     DocumentFormattingParams, Hover, IConnection, InitializeParams,
     ProposedFeatures, TextDocument, TextDocumentChangeEvent, TextDocumentPositionParams, TextDocuments, TextEdit,
 } from "vscode-languageserver";
-import { CompletionProvider } from "./completionProvider";
 import { Formatter } from "./formatter";
 import { HoverProvider } from "./hoverProvider";
 import { JavaScriptValidator } from "./javaScriptValidator";
@@ -14,6 +14,9 @@ import { Validator } from "./validator";
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection: IConnection = createConnection(ProposedFeatures.all);
+
+// Axibase charts language service, containing completion provider
+const languageService = new LanguageService<ResourcesProvider>(new ResourcesProvider());
 
 // Create a simple text document manager.
 const documents: TextDocuments = new TextDocuments();
@@ -131,8 +134,8 @@ connection.onCompletion((params: CompletionParams): CompletionItem[] => {
         return [];
     }
 
-    const completionProvider: CompletionProvider = new CompletionProvider(
-        textDocument, params.position, new ResourcesProvider().settingsMap
+    const completionProvider: CompletionProvider = languageService.getCompletionProvider(
+        textDocument, params.position
     );
 
     return completionProvider.getCompletionItems();

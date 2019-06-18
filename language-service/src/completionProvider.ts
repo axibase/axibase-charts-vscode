@@ -1,11 +1,10 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";
-import { DefaultSetting } from "./defaultSetting";
 import { Field } from "./field";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
-import { deleteComments, deleteScripts, getSetting } from "./util";
-export const snippets = require("../../snippets/snippets.json");
+import { Util } from "./util";
+// export const snippets = require("../../snippets/snippets.json");
 
 export interface ItemFields {
     insertTextFormat?: InsertTextFormat;
@@ -21,14 +20,14 @@ export interface ItemFields {
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;
-    private readonly settingsMap: Map<string, DefaultSetting>;
+    private readonly resourcesProvider: any;
 
-    public constructor(textDocument: TextDocument, position: Position, settingsMap: Map<string, DefaultSetting>) {
+    public constructor(textDocument: TextDocument, position: Position, resourcesProvider: any) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
-        this.text = deleteScripts(deleteComments(text));
+        this.text = Util.deleteScripts(Util.deleteComments(text));
         let textList = this.text.split("\n");
         this.currentLine = textList[textList.length - 1];
-        this.settingsMap = settingsMap;
+        this.resourcesProvider = resourcesProvider;
     }
 
     /**
@@ -153,7 +152,7 @@ endif
      */
     private completeSettingName(): CompletionItem[] {
         const items: CompletionItem[] = [];
-        for (let [, value] of this.settingsMap) {
+        for (let [, value] of this.resourcesProvider.settingsMap) {
             items.push(this.fillCompletionItem({
                 detail: `${value.description ? value.description + "\n" : ""}Example: ${value.example}`,
                 insertText: `${value.displayName} = `,
@@ -169,7 +168,7 @@ endif
      * @returns array containing completions
      */
     private completeSettingValue(settingName: string): CompletionItem[] {
-        const setting = getSetting(settingName);
+        const setting = this.resourcesProvider.getSetting(settingName);
         if (!setting) {
             return [];
         }
@@ -209,18 +208,20 @@ endif
      * @returns array containing snippets
      */
     private completeSnippets(): CompletionItem[] {
-        const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
-            const insertText: string =
-                (typeof snippets[key].body === "string") ? snippets[key].body : snippets[key].body.join("\n");
+        // const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
+        //     const insertText: string =
+        //         (typeof snippets[key].body === "string") ? snippets[key].body : snippets[key].body.join("\n");
 
-            return this.fillCompletionItem({
-                insertText, detail: snippets[key].description,
-                name: key, insertTextFormat:
-                    InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
-            });
-        });
+        //     return this.fillCompletionItem({
+        //         insertText, detail: snippets[key].description,
+        //         name: key, insertTextFormat:
+        //             InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
+        //     });
+        // });
 
-        return items;
+        return [];
+
+        // return items;
     }
 
     /**

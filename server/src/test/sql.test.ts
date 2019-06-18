@@ -1,8 +1,8 @@
 import assert = require("assert");
+import { Util } from "language-service/dist";
 import { FormattingOptions } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 import { lineFeedRequired, noMatching } from "../messageUtil";
-import { createDiagnostic, createRange } from "../util";
 import { Validator } from "../validator";
 
 const base = `[configuration]
@@ -33,8 +33,8 @@ endsq
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            createDiagnostic(createRange(0, "sql".length, 6), noMatching("sql", "endsql")),
-            createDiagnostic(createRange(1, "widget".length, 4),
+            Util.createDiagnostic(Util.createRange(0, "sql".length, 6), noMatching("sql", "endsql")),
+            Util.createDiagnostic(Util.createRange(1, "widget".length, 4),
                 "Required section [series] is not declared."),
         ], `Config: \n${conf}`);
     });
@@ -48,7 +48,7 @@ endsql
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            createDiagnostic(createRange(0, "endsql".length, 8), noMatching("endsql", "sql"))
+            Util.createDiagnostic(Util.createRange(0, "endsql".length, 8), noMatching("endsql", "sql"))
         ], `Config: \n${conf}`);
     });
 
@@ -60,7 +60,7 @@ endsql
         let validator = new Validator(conf);
         let diags = validator.lineByLine();
         assert.deepStrictEqual(diags, [
-            createDiagnostic(createRange(0, "sql".length, 6), lineFeedRequired("sql"))
+            Util.createDiagnostic(Util.createRange(0, "sql".length, 6), lineFeedRequired("sql"))
         ], `Config: \n${conf}`);
     });
 });

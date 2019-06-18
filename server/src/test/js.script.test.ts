@@ -1,5 +1,5 @@
+import { Util } from "language-service/dist";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("[JS] Script content tests", () => {
@@ -66,7 +66,7 @@ endscript`,
         new Test(
             "Incorrect one-line script",
             `script = console.og()`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(0, "script = ".length),
                     Position.create(0, "script = console.og()".length)),
                 "console.og is not a function", DiagnosticSeverity.Warning,
@@ -81,7 +81,7 @@ endvar
 script
 cmdb = @{JSON.stringify(mdb)}
 endscript`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(5, 0), Position.create(5, "cmdb = @{JSON.stringify(mdb)}".length)),
                 "mdb is not defined", DiagnosticSeverity.Warning,
             )],

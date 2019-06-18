@@ -1,8 +1,8 @@
+import { DefaultSetting, Setting, Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver-types";
 import { Config } from "./config";
 import { ConfigTree } from "./configTree/configTree";
 import { ConfigTreeValidator } from "./configTree/configTreeValidator";
-import { DefaultSetting } from "./defaultSetting";
 import { KeywordHandler } from "./keywordHandler";
 import {
     deprecatedTagSection,
@@ -16,17 +16,7 @@ import {
 } from "./messageUtil";
 import { ResourcesProvider } from "./resourcesProvider";
 import { SectionStack } from "./sectionStack";
-import { Setting } from "./setting";
 import { TextRange } from "./textRange";
-import {
-    countCsvColumns,
-    createDiagnostic,
-    createRange,
-    getSetting,
-    isAnyInArray,
-    isInMap,
-    repetitionDiagnostic
-} from "./util";
 
 const placeholderContainingSettings = [
     "url", "urlparameters"
@@ -154,6 +144,8 @@ export class Validator {
 
     private keywordHandler: KeywordHandler;
 
+    private resourcesProvider: ResourcesProvider = new ResourcesProvider();
+
     public constructor(text: string) {
         this.configTree = new ConfigTree();
         this.config = new Config(text);
@@ -269,7 +261,7 @@ export class Validator {
         const declaredAbove = result.find(v => v.name === variable.name);
         if (declaredAbove !== undefined) {
             const range: Range = this.createRange(indent.length, name.length);
-            this.result.push(repetitionDiagnostic(range, declaredAbove, variable));
+            this.result.push(Util.repetitionDiagnostic(range, declaredAbove, variable));
         } else {
             result.push(variable);
         }
@@ -307,7 +299,7 @@ export class Validator {
         }
         const [, indent, variable] = this.match;
         if (array.includes(variable)) {
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.createRange(indent.length, variable.length),
                 `${variable} is already defined`,
             ));
@@ -329,9 +321,9 @@ export class Validator {
             return map;
         }
         const [, indent, variable] = this.match;
-        if (isInMap(variable, map)) {
+        if (Util.isInMap(variable, map)) {
             const startPosition: number = this.match.index + indent.length;
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.createRange(startPosition, variable.length),
                 `${variable} is already defined`,
             ));
@@ -364,7 +356,7 @@ export class Validator {
     private checkAliases(): void {
         this.deAliases.forEach((deAlias: TextRange) => {
             if (!this.aliases.includes(deAlias.text)) {
-                this.result.push(createDiagnostic(deAlias.range, unknownToken(deAlias.text)));
+                this.result.push(Util.createDiagnostic(deAlias.range, unknownToken(deAlias.text)));
             }
         });
     }
@@ -385,14 +377,14 @@ export class Validator {
             return;
         }
         if (!this.areWeIn(expectedEnd)) {
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.foundKeyword.range, noMatching(this.foundKeyword.text, expectedEnd)
             ));
         } else {
             const index: number =
                 this.keywordsStack.findIndex((keyword: TextRange) => keyword.text === expectedEnd);
             this.keywordsStack.splice(index, 1);
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.foundKeyword.range,
                 `${expectedEnd} has finished before ${lastKeyword}`,
             ));
@@ -412,7 +404,7 @@ export class Validator {
         for (const item of this.currentSettings) {
             if (setting.excludes.includes(item.displayName)) {
                 const range: Range = this.createRange(indent.length, name.length);
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     range,
                     `${setting.displayName} can not be specified simultaneously with ${item.displayName}`,
                 ));
@@ -424,7 +416,7 @@ export class Validator {
         const line: string = this.config.getCurrentLine();
         this.match = /<\/?#.*?\/?>/.exec(line);
         if (this.match !== null) {
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.createRange(this.match.index, this.match[0].length),
                 `Freemarker expressions are deprecated.\nUse a native collection: list, csv table, var object.` +
                 `\nMigration examples are available at ` +
@@ -452,7 +444,7 @@ export class Validator {
             this.currentSettings = this.previousSettings;
             this.currentSection = this.previousSection;
         }
-        const settingsMap = new ResourcesProvider().settingsMap;
+        const settingsMap = this.resourcesProvider.settingsMap;
         const sectionRequirements = ResourcesProvider.getRequiredSectionSettingsMap(settingsMap)
             .get(this.currentSection.text);
         if (!sectionRequirements) {
@@ -477,19 +469,19 @@ export class Validator {
                 }
             }
             const optionsNames = options.map(s => s.name);
-            if (isAnyInArray(optionsNames, this.currentSettings.map(s => s.name))) {
+            if (Util.isAnyInArray(optionsNames, this.currentSettings.map(s => s.name))) {
                 continue;
             }
             for (const array of this.parentSettings.values()) {
                 // Trying to find in this section parents
-                if (isAnyInArray(optionsNames, array.map(s => s.name))) {
+                if (Util.isAnyInArray(optionsNames, array.map(s => s.name))) {
                     continue required;
                 }
             }
             if (this.ifSettings.size > 0) {
                 for (const array of this.ifSettings.values()) {
                     // Trying to find in each one of if-elseif-else... statement
-                    if (!isAnyInArray(optionsNames, array.map(s => s.name))) {
+                    if (!Util.isAnyInArray(optionsNames, array.map(s => s.name))) {
                         notFound.push(displayName);
                         continue required;
                     }
@@ -518,7 +510,7 @@ export class Validator {
             notFound.push(displayName);
         }
         for (const option of notFound) {
-            this.result.push(createDiagnostic(this.currentSection.range, `${option} is required`));
+            this.result.push(Util.createDiagnostic(this.currentSection.range, `${option} is required`));
         }
         this.requiredSettings.splice(0, this.requiredSettings.length);
     }
@@ -544,7 +536,7 @@ export class Validator {
             const declaredAbove = this.currentSettings.find(v => v.name === setting.name);
             if (declaredAbove !== undefined) {
                 // The setting was defined before if
-                this.result.push(repetitionDiagnostic(range, declaredAbove, setting));
+                this.result.push(Util.repetitionDiagnostic(range, declaredAbove, setting));
                 return;
             }
         } else {
@@ -562,7 +554,7 @@ export class Validator {
                 continue;
             }
 
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 nestedConstruction.range, noMatching(nestedConstruction.text, `end${nestedConstruction.text}`),
             ));
         }
@@ -598,7 +590,7 @@ export class Validator {
             }
             this.match = /(^\s*\[)(\w+)\s*$/.exec(line);
             if (this.match !== null) {
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     this.createRange(this.match[1].length, this.match[2].length),
                     "Section tag is unclosed",
                 ));
@@ -670,7 +662,7 @@ export class Validator {
                 return setting;
             }
             const message: string = unknownToken(settingName);
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 this.createRange(this.match[1].length, settingName.length),
                 message,
             ));
@@ -706,11 +698,11 @@ export class Validator {
                 this.match = match;
                 header = line.substring(this.match.index + 1);
             } else {
-                this.result.push(createDiagnostic(this.foundKeyword.range, getCsvErrorMessage(line)));
+                this.result.push(Util.createDiagnostic(this.foundKeyword.range, getCsvErrorMessage(line)));
             }
         }
         this.addToStringMap(this.variables, "csvNames");
-        this.csvColumns = (header === null) ? 0 : countCsvColumns(header);
+        this.csvColumns = (header === null) ? 0 : Util.countCsvColumns(header);
     }
 
     /**
@@ -729,7 +721,7 @@ export class Validator {
             message = `${this.foundKeyword.text} has started before ${this.getLastKeyword()} has finished`;
         }
         if (message !== undefined) {
-            this.result.push(createDiagnostic(this.foundKeyword.range, message));
+            this.result.push(Util.createDiagnostic(this.foundKeyword.range, message));
         }
     }
 
@@ -778,18 +770,18 @@ export class Validator {
                         Function(`return ${collection}`);
                     } catch (err) {
                         const start = line.indexOf(collection);
-                        this.result.push(createDiagnostic(
+                        this.result.push(Util.createDiagnostic(
                             this.createRange(start, collection.length),
                             "Incorrect collection declaration."));
                     }
-                } else if (!isInMap(varName, this.variables)) {
+                } else if (!Util.isInMap(varName, this.variables)) {
                     const message: string = unknownToken(varName);
                     const start = line.lastIndexOf(varName);
-                    this.result.push(createDiagnostic(this.createRange(start, varName.length), message));
+                    this.result.push(Util.createDiagnostic(this.createRange(start, varName.length), message));
                 }
             } else {
                 const start = this.match[0].indexOf("in");
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     this.createRange(start, "in".length),
                     "Empty 'in' statement",
                 ));
@@ -905,7 +897,7 @@ export class Validator {
             const [, indent, name] = this.match;
             const setting: Setting | undefined = this.getSetting(name);
             if (this.isAllowedWidget(setting)) {
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     this.createRange(indent.length, name.length),
                     settingNameInTags(name), DiagnosticSeverity.Information,
                 ));
@@ -969,7 +961,7 @@ export class Validator {
          * Show hint if setting is deprecated
          */
         if (setting.deprecated) {
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 setting.textRange,
                 setting.deprecated,
                 DiagnosticSeverity.Warning
@@ -977,7 +969,7 @@ export class Validator {
         }
 
         if (!this.isAllowedInSection(setting)) {
-            this.result.push(createDiagnostic(
+            this.result.push(Util.createDiagnostic(
                 setting.textRange,
                 illegalSetting(setting.displayName), DiagnosticSeverity.Error,
             ));
@@ -1023,12 +1015,12 @@ export class Validator {
                 const range: Range = this.createRange(start, settingName.length);
                 if (this.currentSection.text === "tags") {
                     if (!/^["].+["]$/.test(settingName)) {
-                        this.result.push(createDiagnostic(
+                        this.result.push(Util.createDiagnostic(
                             range, tagNameWithWhitespaces(settingName), DiagnosticSeverity.Warning,
                         ));
                     }
                 } else if (this.currentSection.text !== "properties") {
-                    this.result.push(createDiagnostic(
+                    this.result.push(Util.createDiagnostic(
                         range, settingsWithWhitespaces(settingName), DiagnosticSeverity.Warning,
                     ));
                 }
@@ -1055,7 +1047,7 @@ export class Validator {
         const range: Range = this.createRange(indent, word.length);
 
         if (word === "tag") {
-            this.result.push(createDiagnostic(range, deprecatedTagSection, DiagnosticSeverity.Warning));
+            this.result.push(Util.createDiagnostic(range, deprecatedTagSection, DiagnosticSeverity.Warning));
         }
     }
 
@@ -1116,7 +1108,7 @@ export class Validator {
             case "if": {
                 const regex: RegExp = /!=|==/;
                 if (!regex.test(line)) {
-                    this.result.push(createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
+                    this.result.push(Util.createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
                 }
                 this.setLastCondition();
                 break;
@@ -1156,10 +1148,10 @@ export class Validator {
      */
     private validateCsv(): void {
         const line: string = this.config.getCurrentLine();
-        const columns: number = countCsvColumns(line);
+        const columns: number = Util.countCsvColumns(line);
         if (columns !== this.csvColumns && !/^[ \t]*$/m.test(line)) {
             this.result.push(
-                createDiagnostic(
+                Util.createDiagnostic(
                     this.createRange(0, line.length),
                     `Expected ${this.csvColumns} columns, but found ${columns}`,
                 ));
@@ -1186,10 +1178,10 @@ export class Validator {
                     continue;
                 }
                 const variable: string = this.match[0];
-                if (!isInMap(variable, this.variables)) {
+                if (!Util.isInMap(variable, this.variables)) {
                     const position: number = startPosition + this.match.index;
                     const message: string = unknownToken(variable);
-                    this.result.push(createDiagnostic(
+                    this.result.push(Util.createDiagnostic(
                         this.createRange(position, variable.length),
                         message,
                     ));
@@ -1204,7 +1196,7 @@ export class Validator {
         const line = this.config.getCurrentLine();
         const start: number = line.indexOf(name);
         const range: Range = (start > -1) ? this.createRange(start, name.length) : undefined;
-        return getSetting(name, range);
+        return this.resourcesProvider.getSetting(name, range);
     }
 
     private checkUrlPlaceholders() {
@@ -1222,7 +1214,7 @@ export class Validator {
                 return phSectionSettings.find(s => s.name === cleared) == null;
             });
             if (missingPhs.length > 0) {
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     placeholderRange.range,
                     `Missing placeholders: ${missingPhs.join(", ")}.`,
                     DiagnosticSeverity.Error
@@ -1230,7 +1222,7 @@ export class Validator {
             }
             let unnecessaryPhs = phSectionSettings.filter(s => !phs.includes(s.name)).map(s => s.name);
             if (unnecessaryPhs.length > 0) {
-                this.result.push(createDiagnostic(
+                this.result.push(Util.createDiagnostic(
                     placeholderRange.range,
                     `Unnecessary placeholders: ${unnecessaryPhs.join(", ")}.`,
                     DiagnosticSeverity.Warning
@@ -1268,6 +1260,6 @@ export class Validator {
      * @returns Range object with start equal to `start` and end equal to `start+length`
      */
     private createRange(start: number, length: number) {
-        return createRange(start, length, this.config.currentLineNumber);
+        return Util.createRange(start, length, this.config.currentLineNumber);
     }
 }

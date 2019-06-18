@@ -1,6 +1,6 @@
+import { Util } from "language-service/dist";
 import { Range } from "vscode-languageserver";
 import { unknownToken } from "../messageUtil";
-import { createDiagnostic } from "../util";
 import { Test } from "./test";
 
 suite("for in ... tests", () => {
@@ -19,7 +19,7 @@ endfor`,
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -30,7 +30,7 @@ endfor`,
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -49,7 +49,7 @@ endfor`,
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(1, "for srv in ".length, 1, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -80,7 +80,7 @@ endlist
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(3, "for srv in ".length, 3, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -94,7 +94,7 @@ endvar
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(4, "for srv in ".length, 4, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -119,7 +119,7 @@ endvar
 for srv in server
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(4, "for srv in ".length, 4, "for srv in ".length + "server".length),
                 unknownToken("server"),
             )],
@@ -144,7 +144,7 @@ var servers = {
    'srv1': 'srv2'
 }
 endvar`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(0, "for srv in ".length, 0, "for srv in ".length + "servers".length),
                 unknownToken("servers"),
             )],
@@ -158,7 +158,7 @@ var servers = {
    'srv1': 'srv2'
 }
 endvar`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(0, "for srv in ".length, 0, "for srv in ".length + "servers".length),
                 unknownToken("servers"),
             )],
@@ -168,7 +168,7 @@ endvar`,
             `for srv in
    #do something
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(0, "for srv ".length, 0, "for srv ".length + "in".length),
                 "Empty 'in' statement",
             )],
@@ -201,7 +201,7 @@ for agent in Object.keys(pps)
     entity = @{agent}
     metric = @{agent}
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(
                     6, "for agent in Object.keys(".length, 6, "for agent in Object.keys(".length + "pps".length,
                 ),
@@ -247,7 +247,7 @@ endfor`,
             `for widgetType in ['chart', 'calendar'
             do something
   endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(
                     0, "for widgetType in ".length, 0, "for widgetType in ".length + "['chart', 'calendar'".length,
                 ),
@@ -268,7 +268,7 @@ endfor`,
             "Incorrect: call values() on undeclared csv",
             `for opt in hosts.values('Name')
     do something
-  endfor`, [createDiagnostic(
+  endfor`, [Util.createDiagnostic(
       Range.create(
           0, "for opt in ".length, 0, "for opt in ".length + "hosts".length,
       ),

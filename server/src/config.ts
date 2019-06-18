@@ -1,4 +1,4 @@
-import { deleteComments } from "./util";
+import { Util } from "language-service/dist";
 
 /**
  * Stores config lines as array, removes comments.
@@ -9,7 +9,7 @@ export class Config {
     private lines: string[];
 
     public constructor(text: string) {
-        this.lines = deleteComments(text)
+        this.lines = Util.deleteComments(text)
             .toLowerCase()
             .split("\n");
     }

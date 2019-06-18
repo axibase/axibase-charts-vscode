@@ -1,5 +1,5 @@
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { createDiagnostic } from "../util";
+import { Util } from "language-service/dist";
 import { Test } from "./test";
 
 suite("Repetition of variables or settings tests", () => {
@@ -8,7 +8,7 @@ suite("Repetition of variables or settings tests", () => {
             "Repetition of var name in 'var' and 'list'",
             `list servers = 'srv1', 'srv2'
 var servers = 'srv1', 'srv2'`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, "var ".length), Position.create(1, "var ".length + "servers".length)),
                 "servers is already defined",
             )],
@@ -18,7 +18,7 @@ var servers = 'srv1', 'srv2'`,
             `list servers = 'srv1', 'srv2'
 for servers in servers
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, "for ".length), Position.create(1, "for ".length + "servers".length)),
                 "servers is already defined",
             )],
@@ -29,7 +29,7 @@ endfor`,
 csv servers = vps, vds
   true, false
 endcsv`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(1, "csv ".length), Position.create(1, "csv ".length + "servers".length)),
                 "servers is already defined",
             )],
@@ -40,7 +40,7 @@ endcsv`,
    true, false
 endcsv
 list servers = 'srv1', 'srv2'`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(3, "list ".length), Position.create(3, "list ".length + "servers".length)),
                 "servers is already defined",
             )],
@@ -59,7 +59,7 @@ var srv = ['srv1', 'srv2']`,
    entity = srv
    entity = srv2
    metric = status`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(2, "   ".length), Position.create(2, "   ".length + "entity".length)),
                 "entity is already defined",
             )],
@@ -74,7 +74,7 @@ var srv = ['srv1', 'srv2']`,
    entity = srv
    metric = temp
    alias = server`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(Position.create(7, "   alias = ".length), Position.create(7, "   alias = server".length)),
                 "server is already defined",
             )],
@@ -119,11 +119,11 @@ for server in servers
        endif
 endfor`,
             [
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(7, "           ".length, 7, "           color".length),
                     "color is already defined",
                 ),
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(9, "           ".length, 9, "           color".length),
                     "color is already defined",
                 )],
@@ -142,7 +142,7 @@ for server in servers
            color = 'green'
        endif
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(7, "           ".length, 7, "           color".length),
                 "color is already defined",
             )],
@@ -161,7 +161,7 @@ for server in servers
            color = 'green'
        endif
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(9, "           ".length, 9, "           color".length),
                 "color is already defined",
             )],
@@ -182,7 +182,7 @@ for server in servers
            color = 'green'
        endif
 endfor`,
-            [createDiagnostic(
+            [Util.createDiagnostic(
                 Range.create(11, "           ".length, 11, "           color".length),
                 "color is already defined",
             )],
@@ -239,12 +239,12 @@ endfor`,
 script = stylesheet.innerHTML = ".axi-calendarchart .axi-chart-series rect:not([fill]) {fill:red}";
 script = document.head.appendChild(stylesheet);`,
             [
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(1, 0, 1, "script".length),
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
                     DiagnosticSeverity.Warning,
                 ),
-                createDiagnostic(
+                Util.createDiagnostic(
                     Range.create(2, 0, 2, "script".length),
                     "Multi-line scripts are deprecated.\nGroup multiple scripts into blocks:\nscript\nendscript",
                     DiagnosticSeverity.Warning,

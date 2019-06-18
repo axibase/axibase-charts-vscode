@@ -1,7 +1,7 @@
 import { deepStrictEqual } from "assert";
+import { Util } from "language-service/dist";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { uselessScope } from "../messageUtil";
-import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 interface NegativeStyleTestCase {
@@ -24,11 +24,11 @@ suite("Validator for negative-style setting", () => {
                 },
                 {
                         expected: [
-                                createDiagnostic(Range.create(Position.create(7, 0),
-                                        Position.create(7, "negative-style".length)),
-                                        uselessScope("negative-style",
-                                                "mode is one of column-stack, column"),
-                                        DiagnosticSeverity.Warning)
+                                Util.createDiagnostic(Range.create(Position.create(7, 0),
+                                Position.create(7, "negative-style".length)),
+                                uselessScope("negative-style",
+                                        "mode is one of column-stack, column"),
+                                DiagnosticSeverity.Warning)
                         ],
                         mode: "stack",
                         type: "chart"
@@ -53,7 +53,7 @@ negative-style = fill: magenta
         [series]`;
                         const validator = new Validator(config);
                         deepStrictEqual(validator.lineByLine(), tCase.expected,
-                        `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
+                                `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
                 });
         });
 
@@ -70,7 +70,7 @@ negative-style = fill: magenta
         [series]`;
                         const validator = new Validator(config);
                         deepStrictEqual(validator.lineByLine(), tCase.expected,
-                        `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
+                                `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
                 });
         });
 
@@ -89,7 +89,7 @@ negative-style = fill: magenta
         [series]`;
                         const validator = new Validator(config);
                         deepStrictEqual(validator.lineByLine(), tCase.expected,
-                        `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
+                                `Should not raise warnings for type ${tCase.type}, mode ${tCase.mode}.\n Config: ${config}`);
                 });
         });
 });
