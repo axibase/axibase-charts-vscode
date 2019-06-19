@@ -1,15 +1,25 @@
 {
   "name": "language-service",
   "version": "0.0.1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "preinstall": "npm run build",
+    "build": "npm run build-lib && npm run build-amd",
+    "clean": "rimraf dist lib",
+    "build-lib": "tsc -p tsconfig.json",
+    "build-amd": "rollup -c rollup.config.js && terser -c -o dist/amd/axibase-charts-languageservice.min.js dist/amd/axibase-charts-languageservice.js"
   },
   "devDependencies": {
+    "rimraf": "^2.6.3",
+    "rollup": "^1.15.6",
+    "rollup-plugin-terser": "^5.0.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "terser": "^4.0.0",
     "ts-loader": "^6.0.2",
+    "tslib": "^1.10.0",
     "typescript": "^3.5.2"
   },
   "dependencies": {
