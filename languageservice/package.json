@@ -6,7 +6,7 @@
   "author": "Axibase Developers",
   "license": "Apache-2.0",
   "scripts": {
-    "postinstall": "npm run build",
+    "install": "npm run build",
     "build": "npm run build-lib && npm run build-amd",
     "clean": "rimraf dist lib",
     "build-lib": "tsc -p tsconfig.json",
