@@ -1,7 +1,8 @@
 import { Position, TextDocument } from "vscode-languageserver-types";
 import { CompletionProvider } from "./completionProvider";
-export declare class LanguageService<T> {
-    resourcesProvider: T;
-    constructor(resourcesProvider: T);
+import { ResourcesProviderBase } from "./resourcesProviderBase";
+export declare class LanguageService {
+    resourcesProvider: ResourcesProviderBase;
+    constructor(resourcesProvider: ResourcesProviderBase);
     getCompletionProvider(textDocument: TextDocument, position: Position): CompletionProvider;
 }
