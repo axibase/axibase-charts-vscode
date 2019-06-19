@@ -166,19 +166,9 @@ export abstract class ResourcesProviderBase {
             setting.example !== undefined;
     }
     public settingsMap: Map<string, DefaultSetting>;
-    public snippets: string;
 
     constructor() {
         this.settingsMap = this.createSettingsMap();
-        this.snippets = this.getSnippets();
-    }
-
-    /**
-     * Reads completion snippets from file
-     */
-    public getSnippets(): string {
-        console.log(require("../snippets/snippets.json"));
-        return require("../snippets/snippets.json");
     }
 
     /**

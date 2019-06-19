@@ -2,7 +2,9 @@ import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver-types";
 import { Field } from "./field";
+import { ResourcesProviderBase } from "./resourcesProviderBase";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
+import snippets from "./snippets/snippets.json";
 import { Util } from "./util";
 
 export interface ItemFields {
@@ -19,9 +21,9 @@ export interface ItemFields {
 export class CompletionProvider {
     private readonly text: string;
     private readonly currentLine: string;
-    private readonly resourcesProvider: any;
+    private readonly resourcesProvider: ResourcesProviderBase;
 
-    public constructor(textDocument: TextDocument, position: Position, resourcesProvider: any) {
+    public constructor(textDocument: TextDocument, position: Position, resourcesProvider: ResourcesProviderBase) {
         const text: string = textDocument.getText().substr(0, textDocument.offsetAt(position));
         this.text = Util.deleteScripts(Util.deleteComments(text));
         let textList = this.text.split("\n");
@@ -151,14 +153,15 @@ endif
      */
     private completeSettingName(): CompletionItem[] {
         const items: CompletionItem[] = [];
-        for (let [, value] of this.resourcesProvider.settingsMap) {
+        const map = Array.from(this.resourcesProvider.settingsMap.values());
+        map.forEach(value => {
             items.push(this.fillCompletionItem({
                 detail: `${value.description ? value.description + "\n" : ""}Example: ${value.example}`,
                 insertText: `${value.displayName} = `,
                 kind: CompletionItemKind.Field,
                 name: value.displayName
             }));
-        }
+        });
         return items;
     }
     /**
@@ -207,13 +210,13 @@ endif
      * @returns array containing snippets
      */
     private completeSnippets(): CompletionItem[] {
-        const items: CompletionItem[] = Object.keys(this.resourcesProvider.snippets).map((key: string) => {
+        const items: CompletionItem[] = Object.keys(snippets).map((key: string) => {
             const insertText: string =
-                (typeof this.resourcesProvider.snippets[key].body === "string") ? 
-                    this.resourcesProvider.snippets[key].body : this.resourcesProvider.snippets[key].body.join("\n");
+                (typeof snippets[key].body === "string") ?
+                    snippets[key].body : snippets[key].body.join("\n");
 
             return this.fillCompletionItem({
-                insertText, detail: this.resourcesProvider.snippets[key].description,
+                insertText, detail: snippets[key].description,
                 name: key, insertTextFormat:
                     InsertTextFormat.Snippet, kind: CompletionItemKind.Keyword
             });
