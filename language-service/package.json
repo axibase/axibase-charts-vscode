@@ -11,5 +11,8 @@
   "devDependencies": {
     "ts-loader": "^6.0.2",
     "typescript": "^3.5.2"
+  },
+  "dependencies": {
+    "vscode-languageserver-types": "^3.14.0"
   }
 }
