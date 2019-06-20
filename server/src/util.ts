@@ -1,6 +1,10 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { Section } from "./configTree/section";
+import { dateError } from "./messageUtil";
 import { settingsMap } from "./resources";
 import { Setting } from "./setting";
+import { TimeParseError } from "./time/timeParseError";
+import { TimeParser } from "./time/timeParser";
 
 const DIAGNOSTIC_SOURCE: string = "Axibase Charts";
 
@@ -185,11 +189,75 @@ colors = red, yellow, green`;
  * @param start - The starting position in the string
  * @param length - Length of the word to be highlighted
  * @param lineNumber - Number of line, where is the word to be highlighted
- * @returns Range object with start equal to `start` and end equal to `start+length` and line equal to `lineNumber`
+ * @returns Range object with start equal to `start` and end equal to `start+length` and line equal to `lineNumber`.
  */
 export function createRange(start: number, length: number, lineNumber: number) {
     return Range.create(
         Position.create(lineNumber, start),
         Position.create(lineNumber, start + length),
     );
+}
+
+const timeParseCache: Map<Setting, Date> = new Map<Setting, Date>();
+/**
+ * Parses value of time setting, adds diagnostic to `errors` if any error during parsing was thrown.
+ *
+ * @param timeSetting - Date setting, which value is need to be parsed
+ * @param timeParser - Util class, containig methods for date parsing
+ * @param errors - Array of diagnosics, to which information about error is added
+ * @returns Value of `timeSetting`, parsed to Date.
+ */
+export function parseTimeValue(timeSetting: Setting, section: Section, errors: Diagnostic[]): Date {
+    let parsedValue;
+    if (timeSetting != null) {
+        if (timeParseCache.has(timeSetting)) {
+            const cached = timeParseCache.get(timeSetting);
+            if (cached instanceof Date) {
+                return cached;
+            }
+            return null;
+        }
+        try {
+            const timeZoneValue = getValueOfSetting("time-zone", section);
+            const timeParser = new TimeParser(timeZoneValue as string);
+            parsedValue = timeParser.parseDateTemplate(timeSetting.value);
+            timeParseCache.set(timeSetting, parsedValue);
+        } catch (err) {
+            if (err instanceof TimeParseError) {
+                const diagnostic = createDiagnostic(timeSetting.textRange,
+                    dateError(err.message, timeSetting.displayName));
+                errors.push(diagnostic);
+            } else {
+                throw err;
+            }
+        }
+    }
+    return parsedValue;
+}
+
+/**
+ * Returns value of setting with specified displayName:
+ *  a) searches setting in tree
+ *  c) if there is no setting in tree, returns default value.
+ *
+ * @param settingName - Display name of setting, which value is requested
+ * @param section - Start section, from which setting must be searched
+ * @returns Value of Setting with name `settingName`.
+ */
+export function getValueOfSetting(settingName: string, section: Section): string | number | boolean {
+    let value: string | number | boolean;
+    let setting = section.getSettingFromTree(settingName);
+    if (setting === undefined) {
+        /**
+         * Setting is not declared, thus loooking for default value.
+         */
+        setting = getSetting(settingName);
+        if (setting !== undefined) {
+            value = setting.defaultValue;
+        }
+    } else {
+        value = setting.value;
+    }
+
+    return value;
 }

@@ -1,3 +1,5 @@
+import { intervalUnits } from "./regExpressions";
+
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**
  * Creates a error message for unknown setting or value.
@@ -66,3 +68,11 @@ export const noMatching: MessageFactoryMethod = (dependent: string, required: st
 
 export const lineFeedRequired: MessageFactoryMethod = (dependent: string): string =>
   `A linefeed character after '${dependent}' keyword is required`;
+
+export const supportedUnits: MessageFactoryMethod = (): string =>
+  `Supported units:\n * ${intervalUnits.join("\n * ")}`;
+
+export const dateError: MessageFactoryMethod = (specificMsg: string, name: string): string =>
+  `${specificMsg}. ${name} must be a date or calendar expression, for example:
+ * current_hour + 1 minute
+ * 2019-04-01T10:15:00Z`;

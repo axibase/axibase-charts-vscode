@@ -1,47 +1,10 @@
 import { Section } from "../../configTree/section";
-import { getSetting } from "../../util";
+import { getValueOfSetting } from "../../util";
 
 /**
  * Function to check that `section` matches conditions.
  */
 export type Condition = (section: Section) => boolean | string;
-
-/**
- * Settings, that are frequently used in conditions checks,
- * see requiredSettings.ts and uselessSettings.ts.
- */
-const frequentlyUsed = ["mode", "type"];
-
-/**
- * Returns value of setting with specified displayName:
- *  a) if setting is frequently used, tries to get it from section's scope;
- *  b) otherwise searches setting in tree
- *  c) if there is no setting in tree, returns default value.
- *
- * @param settingName - Name of setting, which value is requisted
- * @param section - Start section, from which setting must be searched
- * @returns Value of Setting with name `settingName`.
- */
-function getValueOfCheckedSetting(settingName: string, section: Section): string | number | boolean | undefined {
-    let value;
-    if (frequentlyUsed.includes(settingName)) {
-        value = section.getScopeValue(settingName);
-    } else {
-        let setting = section.getSettingFromTree(settingName);
-        if (setting === undefined) {
-            /**
-             * Setting is not declared, thus loooking for default value.
-             */
-            setting = getSetting(settingName);
-            if (setting !== undefined) {
-                value = setting.defaultValue;
-            }
-        } else {
-            value = setting.value;
-        }
-    }
-    return value;
-}
 
 /**
  * Returns function, which validates value of specified setting.
@@ -52,7 +15,7 @@ function getValueOfCheckedSetting(settingName: string, section: Section): string
  */
 export function requiredCondition(settingName: string, possibleValues: string[]): Condition {
     return (section: Section) => {
-        const value = getValueOfCheckedSetting(settingName, section);
+        const value = getValueOfSetting(settingName, section);
         return value ? new RegExp(possibleValues.join("|")).test(value.toString()) : true;
     };
 }
@@ -68,7 +31,7 @@ export function requiredCondition(settingName: string, possibleValues: string[])
  */
 export function isNotUselessIf(settingName: string, possibleValues: string[]): Condition {
     return (section: Section) => {
-        const value = getValueOfCheckedSetting(settingName, section);
+        const value = getValueOfSetting(settingName, section);
         const valueIsOk = value ? new RegExp(possibleValues.join("|")).test(value.toString()) : true;
         if (!valueIsOk) {
             if (possibleValues.length > 1) {

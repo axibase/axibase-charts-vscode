@@ -2,8 +2,9 @@ import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
 import { Field } from "./field";
+import { calendarKeywords, intervalUnits } from "./regExpressions";
 import { settingsMap } from "./resources";
-import { calendarKeywords, intervalUnits, Setting } from "./setting";
+import { Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
 

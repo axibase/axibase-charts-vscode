@@ -7745,13 +7745,19 @@
             "section": "widget",
             "type": "interval",
             "defaultValue": "1 hour",
+            "override": {
+                "[widget == 'console']": {
+                    "defaultValue": "all"
+                }
+            },
             "example": "5 minute"
         },
         {
             "displayName": "time-zone",
             "type": "string",
             "section": "widget",
-            "example": "UTC"
+            "example": "UTC",
+            "default": "local"
         },
         {
             "displayName": "title",
