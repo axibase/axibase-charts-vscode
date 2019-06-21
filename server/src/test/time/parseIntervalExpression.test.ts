@@ -5,7 +5,7 @@ import { TimeParser } from "../../time/timeParser";
 suite("TimeParser > parseDateTemplate() > parseIntervalExpression()", () => {
   let realDateNow: () => number;
   let parser: TimeParser;
-  const currentDate = "2019-06-11 10:15:20";
+  const currentDate = "2019-06-11T10:15:20+03:00"; // Europe/Moscow
   setup(() => {
     realDateNow = Date.now;
     Date.now = () => new Date(currentDate).getTime();
@@ -37,14 +37,14 @@ suite("TimeParser > parseDateTemplate() > parseIntervalExpression()", () => {
     test("- count unit", () => {
       const template = "current_hour - 15 min";
       const actual = parser.parseDateTemplate(template);
-      const expected = new Date("2019-06-11 09:45:00");
+      const expected = new Date("2019-06-11T09:45:00+03:00");
       assert.deepStrictEqual(actual, expected);
     });
 
     test("+ fractional_count unit", () => {
       const template = "current_minute + 0.1 sec";
       const actual = parser.parseDateTemplate(template);
-      const expected = new Date("2019-06-11 10:15:00.100");
+      const expected = new Date("2019-06-11T10:15:00.100+03:00");
       assert.deepStrictEqual(actual, expected);
     });
   });

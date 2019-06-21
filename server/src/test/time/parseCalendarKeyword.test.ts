@@ -5,7 +5,7 @@ import { TimeParser } from "../../time/timeParser";
 suite("TimeParser > parseDateTemplate() > parseCalendarKeyword()", () => {
     let realDateNow: () => number;
     let parser: TimeParser;
-    const currentDate = "2019-06-11 10:15:20"; // Tuesday
+    const currentDate = "2019-06-11T10:15:20+03:00"; // Tuesday, Europe/Moscow
     setup(() => {
         realDateNow = Date.now;
         Date.now = () => new Date(currentDate).getTime();
@@ -70,13 +70,13 @@ suite("TimeParser > parseDateTemplate() > parseCalendarKeyword()", () => {
                 test("current_minute", () => {
                     const template = "current_minute";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 10:15:00");
+                    const expected = new Date("2019-06-11T10:15:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("current_hour", () => {
                     const template = "current_hour";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 10:00:00");
+                    const expected = new Date("2019-06-11T10:00:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("current_day", () => {
@@ -115,13 +115,13 @@ suite("TimeParser > parseDateTemplate() > parseCalendarKeyword()", () => {
                 test("previous_minute", () => {
                     const template = "previous_minute";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 10:14:00");
+                    const expected = new Date("2019-06-11T10:14:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("previous_hour", () => {
                     const template = "previous_hour";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 09:00:00");
+                    const expected = new Date("2019-06-11T09:00:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("previous_day", () => {
@@ -172,13 +172,13 @@ suite("TimeParser > parseDateTemplate() > parseCalendarKeyword()", () => {
                 test("next_minute", () => {
                     const template = "next_minute";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 10:16:00");
+                    const expected = new Date("2019-06-11T10:16:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("next_hour", () => {
                     const template = "next_hour";
                     const actual = parser.parseDateTemplate(template);
-                    const expected = new Date("2019-06-11 11:00:00");
+                    const expected = new Date("2019-06-11T11:00:00+03:00");
                     assert.deepStrictEqual(actual, expected);
                 });
                 test("next_day", () => {

@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
 import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { createDiagnostic, createRange } from "../util";
+import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
 const sameSectionStartEnd = (startTime: string, endTime: string) => {
@@ -150,29 +150,11 @@ suite("start/end-time relation with timezone", () => {
   [group]
     [widget]
       type = chart
-      start-time = 2018-07-05T12:00:00+02:00
+      start-time = 2018-07-05T12:00:00+01:00
       timezone = utc
       [series]`;
     const validator = new Validator(config);
     const actualDiagnostics = validator.lineByLine();
     deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
-  });
-
-  test("No UTC", () => {
-    const config = `[configuration]
-    entity = nurswgvml007
-    metric = cpu_busy
-    end-time = 2018-07-05 13:00:00
-  [group]
-    [widget]
-      type = chart
-      start-time = 2018-07-05T12:00:00+02:00
-      #timezone = utc
-      [series]`;
-    const validator = new Validator(config);
-    const actualDiagnostics = validator.lineByLine();
-    deepStrictEqual(actualDiagnostics, [createDiagnostic(
-      createRange("    ".length, "end-time".length, 3),
-      "end-time must be greater than start-time")], `Config: \n${config}`);
   });
 });
