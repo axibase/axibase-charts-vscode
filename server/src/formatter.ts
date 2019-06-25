@@ -315,6 +315,10 @@ export class Formatter {
      */
     private shouldBeClosed(): boolean {
         let line: string | undefined = this.getCurrentLine();
+        // If keyword supports unclosed syntax no need to check further
+        if (TextRange.canBeUnclosed(line)) {
+            return false;
+        }
         this.match = /^[ \t]*((?:var|list|sql)|script[\s\t]*$)/.exec(line);
         if (!this.match) {
             return true;

@@ -14,6 +14,14 @@ export class TextRange {
         /^([ \t]*)(import|endvar|endcsv|endfor|elseif|endif|endscript|endlist|endsql|script|else|if|list|sql|for|csv|var)\b/i;
 
     /**
+     * Regexps for keywords supporting both closed and unclosed syntax
+     */
+    public static readonly CAN_BE_UNCLOSED_REGEXP: RegExp[] = [
+        // 'csv <name> from <url>'
+        /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m
+    ];
+
+    /**
      * Checks is current keyword closeable or not (can be closed like var-endvar)
      * @param line the line containing the keyword
      * @returns true if the keyword closeable
@@ -45,6 +53,20 @@ export class TextRange {
         const [, indent, keyword] = match;
 
         return new TextRange(keyword, createRange(indent.length, keyword.length, i), canBeUnclosed);
+    }
+
+    /**
+     * Determines if line contains a keyword that can be unclosed
+     * @param line the line containing the keyword
+     */
+    public static canBeUnclosed(line: string): boolean {
+        let match: RegExpExecArray | null = null;
+
+        TextRange.CAN_BE_UNCLOSED_REGEXP.forEach(regexp => {
+            match = regexp.exec(line);
+        });
+
+        return (match !== null) ? true : false;
     }
 
     /**
