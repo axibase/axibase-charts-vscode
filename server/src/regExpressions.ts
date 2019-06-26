@@ -21,6 +21,7 @@ export const BLANK_LINE_PATTERN = /^[ \t]*$/m;
 /**
  * RegExp for 'csv' keyword
  */
+export const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
 
 /**
  * RegExp for: 'csv from <url>'
