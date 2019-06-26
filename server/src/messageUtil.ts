@@ -1,3 +1,5 @@
+import { CSV_FROM_URL_MISSING_NAME_PATTERN } from "./regExpressions";
+
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**
  * Creates a error message for unknown setting or value.
@@ -40,10 +42,6 @@ Current: ${found}, expected: ${msg}`;
 export const illegalSetting: MessageFactoryMethod = (found: string): string =>
   `${found} setting is not allowed here.`;
 
-/**
- * RegExp for: 'csv from <url>'
- */
-const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
 /**
  * If SCV pattern didn't match any known RegExp, compose error message
  * @param line line of code instruction

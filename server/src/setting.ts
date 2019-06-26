@@ -1,60 +1,18 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { intervalUnits } from "./constants";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
+import {
+    booleanRegExp,
+    calculatedRegExp,
+    calendarRegExp,
+    integerRegExp,
+    intervalRegExp,
+    localDateRegExp,
+    numberRegExp,
+    zonedDateRegExp
+} from "./regExpressions";
 import { createDiagnostic } from "./util";
-
-export const intervalUnits: string[] = [
-    "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
-];
-
-export const calendarKeywords: string[] = [
-    "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
-    "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
-    "last_working_day", "monday", "next_day", "next_hour", "next_minute", "next_month", "next_quarter",
-    "next_vacation_day", "next_week", "next_working_day", "next_year", "now", "previous_day", "previous_hour",
-    "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
-    "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
-];
-const booleanKeywords: string[] = [
-    "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
-];
-
-const booleanRegExp: RegExp = new RegExp(`^(?:${booleanKeywords.join("|")})$`);
-
-const calendarRegExp: RegExp = new RegExp(
-    // current_day
-    `^(?:${calendarKeywords.join("|")})` +
-    // + 5 * minute
-    `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${intervalUnits.join("|")}))?$`,
-);
-
-const integerRegExp: RegExp = /^[-+]?\d+$/;
-
-const intervalRegExp: RegExp = new RegExp(
-    // -5 month, +3 day, .3 year, 2.3 week, all
-    `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${intervalUnits.join("|")}))|all)$`,
-);
-
-const localDateRegExp: RegExp = new RegExp(
-    // 2018-12-31
-    "^(?:19[7-9]|[2-9]\\d\\d)\\d(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01])" +
-    // 01:13:46.123, 11:26:52
-    "(?: (?:[01]\\d|2[0-4]):(?:[0-5][0-9])(?::(?:[0-5][0-9]))?(?:\\.\\d{1,9})?)?)?)?$",
-);
-
-// 1, 5.2, 0.3, .9, -8, -0.5, +1.4
-const numberRegExp: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
-
-const zonedDateRegExp: RegExp = new RegExp(
-    // 2018-12-31
-    "^(?:19[7-9]|[2-9]\\d\\d)\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])" +
-    // T12:34:46.123, T23:56:18
-    "[tT](?:[01]\\d|2[0-4]):(?:[0-5][0-9]):(?:[0-5][0-9])(?:\\.\\d{1,9})?" +
-    // Z, +0400, -05:00
-    "(?:[zZ]|[+-](?:[01]\\d|2[0-4]):?(?:[0-5][0-9]))$",
-);
-
-const calculatedRegExp: RegExp = /[@$]\{.+\}/;
 
 /**
  * Tests the provided string with regular expressions

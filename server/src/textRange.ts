@@ -1,5 +1,6 @@
 import { Range } from "vscode-languageserver";
 import { CheckPriority } from "./checkPriority";
+import { CSV_FROM_URL_PATTERN, ONE_LINE_SCRIPT, ONE_LINE_SQL } from "./regExpressions";
 import { createRange } from "./util";
 
 /**
@@ -17,8 +18,9 @@ export class TextRange {
      * Regexps for keywords supporting both closed and unclosed syntax
      */
     public static readonly CAN_BE_UNCLOSED_REGEXP: RegExp[] = [
-        // 'csv <name> from <url>'
-        /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m
+        CSV_FROM_URL_PATTERN,
+        ONE_LINE_SQL,
+        ONE_LINE_SCRIPT
     ];
 
     /**
@@ -60,13 +62,9 @@ export class TextRange {
      * @param line the line containing the keyword
      */
     public static canBeUnclosed(line: string): boolean {
-        let match: RegExpExecArray | null = null;
-
-        TextRange.CAN_BE_UNCLOSED_REGEXP.forEach(regexp => {
-            match = regexp.exec(line);
+        return TextRange.CAN_BE_UNCLOSED_REGEXP.some(regexp => {
+            return regexp.test(line);
         });
-
-        return (match !== null) ? true : false;
     }
 
     /**

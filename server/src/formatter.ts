@@ -1,5 +1,5 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
+import { BLOCK_SQL_END, BLOCK_SQL_START } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
