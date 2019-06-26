@@ -818,6 +818,13 @@
             "section": "widget"
         },
         {
+            "displayName": "columns",
+            "multiLine": true,
+            "type": "string",
+            "example": "command",
+            "section": "widget"
+        },
+        {
             "displayName": "column-time",
             "type": "string",
             "example": "Time in seconds",
