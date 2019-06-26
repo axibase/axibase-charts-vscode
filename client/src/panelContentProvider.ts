@@ -31,7 +31,7 @@ export class PanelContentProvider {
             /**
              * Unable to connect to ATSD after changes in settings.
              */
-            return `<h3>Unable to connect to ASTD</h3>
+            return `<h3>Unable to connect to ATSD</h3>
 <p>Check connection <a href="https://github.com/axibase/axibase-charts-vscode#live-preview"> settings</a>.</p>`;
         }
         if (document) {
