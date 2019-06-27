@@ -37,7 +37,7 @@ export class ConfigTreeValidator {
 // tslint:disable-next-line:max-classes-per-file
 class ConfigTreeWalker {
     private tree: ConfigTree;
-    private requestedSections: Section[] = [];
+    private requestedSections: Section[];
 
     constructor(сonfigTree: ConfigTree) {
         this.tree = сonfigTree;
