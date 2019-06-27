@@ -178,7 +178,7 @@ endif
             items.push(this.fillCompletionItem({
                 detail: `Section name: [${item}]`,
                 insertText: `[${item}]`,
-                kind: CompletionItemKind.Field,
+                kind: CompletionItemKind.Struct,
                 name: item
             }));
         }
