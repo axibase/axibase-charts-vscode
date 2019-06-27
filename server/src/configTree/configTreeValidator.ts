@@ -50,6 +50,8 @@ class ConfigTreeWalker {
      * @returns Array of sections with name `sectionName`
      */
     public getSectionsByName(sectionName: string): Section[] {
+        this.requestedSections = [];
+
         if (this.tree.getRoot) {
             this.walk(sectionName, this.tree.getRoot);
         }

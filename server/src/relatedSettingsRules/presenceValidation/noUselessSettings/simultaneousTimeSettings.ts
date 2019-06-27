@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { Section } from "../../../configTree/section";
+import { simultaneousTimeSettingsWarning } from "../../../messageUtil";
 import { createDiagnostic } from "../../../util";
 import { RelatedSettingsRule } from "../../utils/interfaces";
 
@@ -9,15 +10,11 @@ const rule: RelatedSettingsRule = {
         const startTime = section.getSettingFromTree("start-time");
         const endTime = section.getSettingFromTree("end-time");
         const timespan = section.getSettingFromTree("timespan");
-        const allSettingsPresent = [startTime, endTime, timespan].every(setting => {
-            return setting !== undefined;
-        });
 
-        if (allSettingsPresent) {
+        if (startTime && endTime && timespan) {
             return createDiagnostic(
-                startTime.textRange,
-                `${startTime.displayName}, ${endTime.displayName} and ${timespan.displayName}` +
-                ` mustn't be declared simultaneously. ${timespan.displayName} will be ignored.`,
+                section.range.range,
+                simultaneousTimeSettingsWarning(),
                 DiagnosticSeverity.Warning
             );
         }

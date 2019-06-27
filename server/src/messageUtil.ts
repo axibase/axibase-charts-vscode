@@ -54,6 +54,12 @@ export const getCsvErrorMessage: MessageFactoryMethod = (line: string): string =
     `The line should contain a '=' or 'from' keyword`;
 };
 
+/**
+ * If start-time, end-time and timespan are declared simultaneously, show the warning
+ */
+export const simultaneousTimeSettingsWarning: MessageFactoryMethod = (): string =>
+`'start-time', 'end-time' and 'timespan' can not be declared simultaneously. 'timespan' will be ignored.`;
+
 export const noRequiredSetting: MessageFactoryMethod = (dependent: string, required: string): string =>
   `${required} is required if ${dependent} is specified`;
 
