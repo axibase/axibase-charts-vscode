@@ -33,18 +33,17 @@ export class CompletionProvider {
      * Creates completion items
      */
     public getCompletionItems(): CompletionItem[] {
-        let match = /^\s*(\S+)\s*=\s*/.exec(this.currentLine);
-        if (match) {
+        const valueMatch = /^\s*(\S+)\s*=\s*/.exec(this.currentLine);
+        const bracesMatch = /\s*(\[.*?)\s*/.exec(this.currentLine);
+        if (valueMatch) {
             // completion requested at assign stage, i. e. type = <Ctrl + space>
-            return this.completeSettingValue(match[1]);
+            return this.completeSettingValue(valueMatch[1]);
+        } else if (bracesMatch) {
+            // requested completion for section name in []
+            return this.completeSectionName();
         } else {
             // completion requested at start of line (supposed that line is empty)
-            return this.completeSnippets().concat(
-                this.completeIf(),
-                this.completeFor(),
-                this.completeSettingName(),
-                this.completeSectionName()
-            );
+            return this.completeSnippets().concat(this.completeIf(), this.completeFor(), this.completeSettingName());
         }
     }
 
@@ -177,7 +176,7 @@ endif
         for (let item of sectionNames) {
             items.push(this.fillCompletionItem({
                 detail: `Section name: [${item}]`,
-                insertText: `[${item}]`,
+                insertText: `${item}`,
                 kind: CompletionItemKind.Struct,
                 name: item
             }));
@@ -185,6 +184,7 @@ endif
 
         return items;
     }
+
     /**
      * Creates an array of completion items containing possible values for settings.
      * @param settingName name of the setting, for example "colors"
