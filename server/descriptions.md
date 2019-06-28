@@ -194,6 +194,10 @@ Hide `column-entity` with `column-entity = null`.
 Change the name of column `metric` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
 Hide `column-metric` with `column-metric = null`.  
   
+## columns  
+  
+Add columns by key. Short form of `[column]` with key setting.  
+  
 ## columntime  
   
 Change the name of column `time` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
