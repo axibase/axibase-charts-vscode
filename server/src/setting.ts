@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { intervalUnits } from "./constants";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
-import { intervalUnits } from "./regExpressions";
 import { createDiagnostic } from "./util";
 
 const booleanKeywords: string[] = [

@@ -1,8 +1,8 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
+import { calendarKeywords, intervalUnits } from "./constants";
 import { Field } from "./field";
-import { calendarKeywords, intervalUnits } from "./regExpressions";
 import { settingsMap } from "./resources";
 import { Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";

@@ -1,4 +1,4 @@
-import { intervalUnits } from "./regExpressions";
+import { intervalUnits } from "./constants";
 
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**

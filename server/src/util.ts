@@ -249,7 +249,7 @@ export function getValueOfSetting(settingName: string, section: Section): string
     let setting = section.getSettingFromTree(settingName);
     if (setting === undefined) {
         /**
-         * Setting is not declared, thus loooking for default value.
+         * Setting is not declared, thus looking for default value.
          */
         setting = getSetting(settingName);
         if (setting !== undefined) {
