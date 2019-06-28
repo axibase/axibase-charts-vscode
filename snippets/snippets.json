@@ -649,5 +649,25 @@
             "  ${0}"
         ],
         "description": "Detail series section with average aggregation"
+    },
+    "sql": {
+        "prefix": "sql",
+        "body": [
+            "sql",
+            "   SELECT time, entity, value",
+            "       FROM 'metric_name'",
+            "   WHERE datetime >= NOW - 5*MINUTE",
+            "endsql"
+        ]
+    },
+    "script": {
+        "prefix": "script",
+        "body": [
+            "script",
+            "   window.userFunction = function (value) {",
+            "       return Math.round(value / 10) * 10;",
+            "   }",
+            "endscript"
+        ]
     }
 }

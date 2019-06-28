@@ -3,7 +3,7 @@ import {
 } from "vscode-languageserver";
 import { Field } from "./field";
 import { settingsMap } from "./resources";
-import { calendarKeywords, intervalUnits, Setting } from "./setting";
+import { calendarKeywords, controlKeyWords, intervalUnits, Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
 
@@ -39,7 +39,13 @@ export class CompletionProvider {
             return this.completeSettingValue(match[1]);
         } else {
             // completion requested at start of line (supposed that line is empty)
-            return this.completeSnippets().concat(this.completeIf(), this.completeFor(), this.completeSettingName());
+            return this.completeSnippets().concat(
+                this.completeIf(),
+                this.completeFor(),
+                this.completeSettingName(),
+                this.completeControlKeyWord(),
+                this.completeEndKeyword()
+            );
         }
     }
 
@@ -79,6 +85,58 @@ endfor`;
         completion.insertTextFormat = InsertTextFormat.Snippet;
 
         return completion;
+    }
+
+    /**
+     * Creates an array of completion items containing section names.
+     * @returns array containing snippets
+     */
+    private completeControlKeyWord(): CompletionItem[] {
+        const items: CompletionItem[] = [];
+
+        for (let keyword of controlKeyWords) {
+            items.push(this.fillCompletionItem({
+                detail: `Control keyword: ${keyword}`,
+                insertText: `${keyword}`,
+                kind: CompletionItemKind.Keyword,
+                name: keyword
+            }));
+        }
+
+        return items;
+    }
+
+    /**
+     * Completes keywords endings such as `endsql`, `endfor` etc
+     */
+    private completeEndKeyword(): CompletionItem[] {
+        // detected `end`
+        const endWordRegex: RegExp = /^[ \t]*(end)[ \t]*/gm;
+        // detected any control keyword in previous code
+        const keywordsRegex: RegExp = new RegExp(`^[ \t]*(?:${controlKeyWords.join("|")})[ \t]*`, "mg");
+        let completions: CompletionItem[] = [];
+
+        if (endWordRegex.test(this.text)) {
+            let keywordMatch: RegExpExecArray | null = keywordsRegex.exec(this.text);
+            let keywordLastMatch: RegExpExecArray | undefined;
+
+            while (keywordMatch) {
+                keywordLastMatch = keywordMatch;
+                keywordMatch = keywordsRegex.exec(this.text);
+            }
+
+            if (keywordLastMatch) {
+                const keyword = keywordLastMatch[0].trim();
+
+                completions.push(this.fillCompletionItem({
+                    detail: `Control keyword: ${keyword}`,
+                    insertText: `end${keyword}`,
+                    kind: CompletionItemKind.Keyword,
+                }));
+            }
+        }
+
+        return completions;
     }
 
     /**

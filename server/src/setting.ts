@@ -7,6 +7,8 @@ export const intervalUnits: string[] = [
     "nanosecond", "millisecond", "second", "minute", "hour", "day", "week", "month", "quarter", "year",
 ];
 
+export const controlKeyWords = ["sql", "script", "if", "for", "var", "list", "csv"];
+
 export const calendarKeywords: string[] = [
     "current_day", "current_hour", "current_minute", "current_month", "current_quarter", "current_week",
     "current_year", "first_day", "first_vacation_day", "first_working_day", "friday", "last_vacation_day",
