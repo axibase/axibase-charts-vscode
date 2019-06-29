@@ -654,9 +654,9 @@
         "prefix": "sql",
         "body": [
             "sql",
-            "   SELECT time, entity, value",
-            "       FROM 'metric_name'",
-            "   WHERE datetime >= NOW - 5*MINUTE",
+            "  SELECT time, entity, value",
+            "  FROM 'metric_name'",
+            "  WHERE datetime > = NOW - 5*MINUTE",
             "endsql"
         ]
     },
@@ -664,9 +664,9 @@
         "prefix": "script",
         "body": [
             "script",
-            "   window.userFunction = function (value) {",
-            "       return Math.round(value / 10) * 10;",
-            "   }",
+            "  window.userFunction = function (value) {",
+            "  return Math.round(value / 10) * 10;",
+            "  }",
             "endscript"
         ]
     }
