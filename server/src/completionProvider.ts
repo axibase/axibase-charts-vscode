@@ -34,11 +34,11 @@ export class CompletionProvider {
      */
     public getCompletionItems(): CompletionItem[] {
         const valueMatch = /^\s*(\S+)\s*=\s*/.exec(this.currentLine);
-        const bracesMatch = /\s*(\[.*?)\s*/.exec(this.currentLine);
+        const bracketsMatch = /\s*(\[.*?)\s*/.exec(this.currentLine);
         if (valueMatch) {
             // completion requested at assign stage, i. e. type = <Ctrl + space>
             return this.completeSettingValue(valueMatch[1]);
-        } else if (bracesMatch) {
+        } else if (bracketsMatch) {
             // requested completion for section name in []
             return this.completeSectionName();
         } else {
