@@ -128,7 +128,7 @@
     "test:e2e": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.0",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^10.11.2",
     "tslint": "^5.11.0",
     "typescript": "^3.1.1"
