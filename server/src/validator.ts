@@ -685,6 +685,46 @@ export class Validator {
     }
 
     /**
+     * Checks `if` condition syntax
+     */
+    private handleIf(): void {
+        // var condition = true;
+        const varRegex: RegExp = /^[ \t]*(?:var)[ \t]+(\S+)[ \t]*=/;
+        // if condition
+        const ifNameRegex: RegExp = /^[ \t]*(?:if)[ \t]+(\S+)[ \t]*/;
+        // if a == b
+        const inlineIfRegex: RegExp = /!=|==/;
+
+        let line: string = this.config.getCurrentLine();
+        let num: number = this.config.currentLineNumber;
+        let name: string | null = null;
+
+        // if it is correct inline syntax no need to check further
+        const correctInlineIf: boolean = inlineIfRegex.test(line);
+        if (correctInlineIf) {
+            return;
+        }
+
+        // variable name used in if condition
+        const nameInCondition = ifNameRegex.exec(line) ? ifNameRegex.exec(line)[1] : null;
+
+        // search for `var condition = value`
+        while (!name && line !== null) {
+            line = this.config.getLine(--num);
+            name = varRegex.exec(line) ? varRegex.exec(line)[1] : null;
+        }
+
+        // if `var condition = value` not found, it must be inline syntax
+        if (!name && !correctInlineIf) {
+            this.result.push(createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
+        } else if (name !== nameInCondition) {
+            // if `var condition = value` was found but variable name doesn't match
+            this.result.push(createDiagnostic(this.foundKeyword.range,
+                `var '${nameInCondition}' used in 'if' condition not found`));
+        }
+    }
+
+    /**
      * Calculates the number of columns in the found csv header
      */
     private handleCsv(): void {
@@ -1112,10 +1152,7 @@ export class Validator {
                 break;
             }
             case "if": {
-                const regex: RegExp = /!=|==/;
-                if (!regex.test(line)) {
-                    this.result.push(createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
-                }
+                this.handleIf();
                 this.setLastCondition();
                 break;
             }
