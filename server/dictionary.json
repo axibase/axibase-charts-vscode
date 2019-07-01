@@ -8267,9 +8267,11 @@
                 "[section == 'property' || section == 'properties']": {
                     "enum": [
                         ".*"
-                    ]
+                    ],
+                    "section": "property"
                 }
-            }
+            },
+            "section": "widget"
         },
         {
             "displayName": "unscale",
