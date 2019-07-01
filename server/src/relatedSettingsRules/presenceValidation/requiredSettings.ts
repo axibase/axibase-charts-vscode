@@ -30,14 +30,6 @@ const checks: Map<string, Requirement> = new Map<string, Requirement>([
             requiredSetting: "thresholds"
         }],
     [
-        "forecast-style", {
-            conditions: [
-                requiredCondition("type", ["chart"]),
-                requiredCondition("mode", ["column", "column-stack"])
-            ],
-            requiredSetting: "data-type"
-        }],
-    [
         "forecast-horizon-start-time", {
             /**
              * If "forecast-horizon-start-time" is specified:
