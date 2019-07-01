@@ -20,7 +20,7 @@
 		"test": "node node_modules/vscode/bin/test --node-ipc"
 	},
 	"devDependencies": {
-		"@types/jsdom": "^11.12.0",
+		"@types/jsdom": "^12.2.4",
 		"@types/mocha": "^5.2.7",
 		"vscode": "^1.1.35"
 	}
