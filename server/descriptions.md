@@ -194,6 +194,10 @@ Hide `column-entity` with `column-entity = null`.
 Change the name of column `metric` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
 Hide `column-metric` with `column-metric = null`.  
   
+## columns  
+  
+Add columns by key. Short form of `[column]` with key setting.  
+  
 ## columntime  
   
 Change the name of column `time` in the [Table](../streaming-table/README.md), [Property](../property-table/README.md), and [Console](../alert-console/README.md) widgets.
@@ -916,6 +920,10 @@ Font size cannot scale above set size.
   
 ## maximum  
   
+## maxinserttime  
+  
+Include series if the timestamp of the latest sample is less than `max-insert-time`, specified as [ISO date](https://axibase.com/docs/atsd/shared/date-format.html), local date, or [calendar expression](https://axibase.com/docs/atsd/shared/calendar.html).  
+  
 ## maxrange  
   
 Define maximum range displayed on the left axis.  
@@ -953,9 +961,15 @@ Possible values:
 `entity`: All series with the same entity are combined.  
 `{tag-name}`: All series with the same value of tag `{tag-name}` are combined.  
   
-## methodpath  
+## mergeproperties  
   
-Data API method path. Default value is specific for each data type: `/series/query`, `/properties/query`, `/messages/query`, `/alerts/query`.  
+Merge tags collected with different timestamps.  
+  
+## messageexpression  
+  
+Include messages that match a filter [expression](https://axibase.com/docs/atsd/api/meta/expression.html).
+The expression can include fields: `type`, `source`, `tags`, `tags.{name}`, `message`,`severity`.
+Supported wildcards: `*` and `?`.  
   
 ## metric  
   
@@ -973,6 +987,10 @@ Minimum caption font size.
 Font size cannot scale below set size.  
   
 ## minimum  
+  
+## mininserttime  
+  
+Include series if the timestamp of the latest sample is equal or greater than `min-insert-time`, specified as [ISO date](https://axibase.com/docs/atsd/shared/date-format.html), local date, or [calendar expression](https://axibase.com/docs/atsd/shared/calendar.html).  
   
 ## minorticks  
   
@@ -1125,6 +1143,8 @@ Display legend labels.
 ID of parent vertex.  
   
 ## path  
+  
+Data API method path. Default value is specific for each data type: `/series/query`, `/properties/query`, `/messages/query`, `/alerts/query`.  
   
 ## percentilemarkers  
   
