@@ -1,6 +1,7 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { Section } from "../../configTree/section";
-import { createDiagnostic, parseTimeValue } from "../../util";
+import { parseTimeValue } from "../../time";
+import { createDiagnostic } from "../../util";
 import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {

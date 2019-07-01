@@ -1,6 +1,6 @@
 import { Diagnostic } from "vscode-languageserver";
 import { Section } from "../../configTree/section";
-import { parseTimeValue } from "../../util";
+import { parseTimeValue } from "../../time";
 import { RelatedSettingsRule } from "../utils/interfaces";
 
 const rule: RelatedSettingsRule = {
