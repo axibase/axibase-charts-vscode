@@ -1,4 +1,5 @@
 import { noUselessSettingsForSeries, noUselessSettingsForWidget } from "./presenceValidation/noUselessSettings/index";
+import simultaneousTimeSettings from "./presenceValidation/noUselessSettings/simultaneousTimeSettings";
 import requiredSettings from "./presenceValidation/requiredSettings";
 import { RelatedSettingsRule } from "./utils/interfaces";
 import colorsThresholds from "./valueValidation/colorsThresholds";
@@ -19,7 +20,8 @@ const rulesBySection: Map<string, RelatedSettingsRule[]> = new Map<string, Relat
     [
         "widget", [
             startEndTime,
-            noUselessSettingsForWidget
+            noUselessSettingsForWidget,
+            simultaneousTimeSettings
         ]
     ]
 ]);
