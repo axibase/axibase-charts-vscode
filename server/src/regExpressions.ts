@@ -1,4 +1,4 @@
-import { booleanKeywords, calendarKeywords, intervalUnits } from "./constants";
+import { BOOLEAN_KEYWORDS, CALENDAR_KEYWORDS, INTERVAL_UNITS } from "./constants";
 
 /** Regular expressions for CSV syntax checking */
 /**
@@ -28,9 +28,7 @@ export const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
  */
 export const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
 
-/**
- * Regular expressions to match SQL.
- */
+/** Regular expressions to match SQL */
 export const ONE_LINE_SQL = /^\s*sql\s*=.*$/m;
 export const BLOCK_SQL_START_WITHOUT_LF = /(^\s*)sql\s*\S/;
 export const BLOCK_SQL_START = /sql(?!([\s\S]*=))/;
@@ -44,23 +42,23 @@ export const BLOCK_SCRIPT_START_WITHOUT_LF = /(^\s*)script\s*\S/;
 export const BLOCK_SCRIPT_START = /script(?!([\s\S]*=))/;
 export const BLOCK_SCRIPT_END = /^\s*endscript\s*$/;
 
-export const booleanRegExp: RegExp = new RegExp(`^(?:${booleanKeywords.join("|")})$`);
+export const BOOLEAN_REGEXP: RegExp = new RegExp(`^(?:${BOOLEAN_KEYWORDS.join("|")})$`);
 
-export const calendarRegExp: RegExp = new RegExp(
+export const CALENDAR_REGEXP: RegExp = new RegExp(
     // current_day
-    `^(?:${calendarKeywords.join("|")})` +
+    `^(?:${CALENDAR_KEYWORDS.join("|")})` +
     // + 5 * minute
-    `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${intervalUnits.join("|")}))?$`,
+    `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${INTERVAL_UNITS.join("|")}))?$`,
 );
 
-export const integerRegExp: RegExp = /^[-+]?\d+$/;
+export const INTEGER_REGEXP: RegExp = /^[-+]?\d+$/;
 
-export const intervalRegExp: RegExp = new RegExp(
+export const INTERVAL_REGEXP: RegExp = new RegExp(
     // -5 month, +3 day, .3 year, 2.3 week, all
-    `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${intervalUnits.join("|")}))|all)$`,
+    `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${INTERVAL_UNITS.join("|")}))|all)$`,
 );
 
-export const localDateRegExp: RegExp = new RegExp(
+export const LOCAL_DATE_REGEXP: RegExp = new RegExp(
     // 2018-12-31
     "^(?:19[7-9]|[2-9]\\d\\d)\\d(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01])" +
     // 01:13:46.123, 11:26:52
@@ -68,9 +66,9 @@ export const localDateRegExp: RegExp = new RegExp(
 );
 
 // 1, 5.2, 0.3, .9, -8, -0.5, +1.4
-export const numberRegExp: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
+export const NUMBER_REGEXP: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
 
-export const zonedDateRegExp: RegExp = new RegExp(
+export const ZONED_DATE_REGEXP: RegExp = new RegExp(
     // 2018-12-31
     "^(?:19[7-9]|[2-9]\\d\\d)\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])" +
     // T12:34:46.123, T23:56:18
@@ -79,4 +77,4 @@ export const zonedDateRegExp: RegExp = new RegExp(
     "(?:[zZ]|[+-](?:[01]\\d|2[0-4]):?(?:[0-5][0-9]))$",
 );
 
-export const calculatedRegExp: RegExp = /[@$]\{.+\}/;
+export const CALCULATED_REGEXP: RegExp = /[@$]\{.+\}/;
