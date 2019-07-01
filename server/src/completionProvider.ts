@@ -2,7 +2,7 @@ import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
 import { Field } from "./field";
-import { settingsMap } from "./resources";
+import { sectionDepthMap, settingsMap } from "./resources";
 import { calendarKeywords, intervalUnits, Setting } from "./setting";
 import { deleteComments, deleteScripts, getSetting } from "./util";
 export const snippets = require("../../snippets/snippets.json");
@@ -39,7 +39,12 @@ export class CompletionProvider {
             return this.completeSettingValue(match[1]);
         } else {
             // completion requested at start of line (supposed that line is empty)
-            return this.completeSnippets().concat(this.completeIf(), this.completeFor(), this.completeSettingName());
+            return this.completeSnippets().concat(
+                this.completeIf(),
+                this.completeFor(),
+                this.completeSettingName(),
+                this.completeSectionName()
+            );
         }
     }
 
@@ -159,6 +164,25 @@ endif
                 name: value.displayName
             }));
         }
+        return items;
+    }
+
+    /**
+     * Creates an array of completion items containing section names.
+     * @returns array containing snippets
+     */
+    private completeSectionName(): CompletionItem[] {
+        const items: CompletionItem[] = [];
+        const sectionNames = Object.keys(sectionDepthMap);
+        for (let item of sectionNames) {
+            items.push(this.fillCompletionItem({
+                detail: `Section name: [${item}]`,
+                insertText: `[${item}]`,
+                kind: CompletionItemKind.Struct,
+                name: item
+            }));
+        }
+
         return items;
     }
     /**
