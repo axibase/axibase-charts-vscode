@@ -1,4 +1,5 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
+import { relations } from "./constants";
 import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
@@ -91,7 +92,7 @@ export class Formatter {
                 this.increaseIndent();
                 continue;
             } else {
-                this.checkEquals();
+                this.checkSign();
             }
             if (TextRange.isClosing(line)) {
                 const stackHead: number | undefined = this.keywordsLevels.pop();
@@ -112,11 +113,11 @@ export class Formatter {
     }
 
     /**
-     * Checks how many spaces are between equals sign and setting name
+     * Checks how many spaces are between the sign and setting name
      */
-    private checkEquals(): void {
+    private checkSign(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = /(^\s*.+?)(\s*?)(!=|==|=)(\s*)/;
+        const regexp: RegExp = new RegExp(`(^\\s*.+?)(\\s*?)(${relations.join("|")})(\\s*)`);
         const match: RegExpExecArray | null = regexp.exec(line);
         if (match === null) {
             return;

@@ -10,3 +10,13 @@ export const calendarKeywords: string[] = [
     "previous_minute", "previous_month", "previous_quarter", "previous_vacation_day", "previous_week",
     "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
 ];
+
+export const relations: string[] = [
+    "!=",
+    "==",
+    "=",
+    ">=",
+    "<=",
+    ">",
+    "<"
+];

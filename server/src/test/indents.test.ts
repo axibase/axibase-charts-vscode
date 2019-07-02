@@ -456,11 +456,48 @@ suite("Formatting indents tests: !=, ==, = ", () => {
       "Incorrect =",
       `type=bar`, [TextEdit.replace(Range.create(
         Position.create(0, "type".length), Position.create(0, "type".length)), " "),
-        TextEdit.replace(Range.create(
-          Position.create(0, "type=".length), Position.create(0, "type=".length)), " ")
+      TextEdit.replace(Range.create(
+        Position.create(0, "type=".length), Position.create(0, "type=".length)), " ")
       ],
       FormattingOptions.create(2, true),
     )];
-  tests.forEach((test: Test) => { test.formatTest(); }
-  );
+  tests.forEach((test: Test) => { test.formatTest(); });
+});
+
+suite("Formatting indents tests: >=, <=, >, <", () => {
+  const tests: Test[] = [
+    new Test(
+      "Correct >",
+      `if a > b`, [], FormattingOptions.create(2, true),
+    ),
+    new Test(
+      "Correct <",
+      `if a < b`, [], FormattingOptions.create(2, true),
+    ),
+    new Test(
+      "Correct >=",
+      `if a >= b`, [], FormattingOptions.create(2, true),
+    ), new Test(
+      "Correct <=",
+      `if a <= b`, [], FormattingOptions.create(2, true),
+    ), new Test(
+      "Incorrect > (extra spaces before)",
+      `if a   > b`, [
+        TextEdit.replace(Range.create(
+          Position.create(0, "if a".length),
+          Position.create(0, "if a   ".length)), " "
+        )
+      ],
+      FormattingOptions.create(2, true),
+    ), new Test(
+      "Incorrect <= (extra spaces after)",
+      `if a <=   b`, [
+        TextEdit.replace(Range.create(
+          Position.create(0, "if a <=".length),
+          Position.create(0, "if a <=   ".length)), " "
+        )
+      ],
+      FormattingOptions.create(2, true),
+    )];
+  tests.forEach((test: Test) => { test.formatTest(); });
 });
