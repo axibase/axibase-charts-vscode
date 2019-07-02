@@ -3,12 +3,10 @@ import { Setting } from "../setting";
 import { TextRange } from "../textRange";
 
 /**
- * See frequentlyUsed.
+ * Settings, that are frequently used in conditions checks,
+ * see requiredSettings.ts, uselessSettings.ts and date checks.
  */
-export interface SectionScope {
-    widgetType?: string;
-    mode?: string;
-}
+const sectionScopeSettings: string[] = ["type", "mode", "endtime", "timezone"];
 
 /**
  * ConfigTree node.
@@ -19,7 +17,10 @@ export class Section {
     public parent: Section;
     public children: Section[] = [];
     public range: TextRange;
-    public scope: SectionScope = {};
+    /**
+     * Caches frequently used settings to reduce search in tree.
+     */
+    private scope: Map<string, Setting> = new Map<string, Setting>();
 
     /**
      * @param range - The text (name of section) and the position of the text
@@ -34,15 +35,16 @@ export class Section {
     public applyScope() {
         if (this.parent !== undefined) {
             /**
-             * We are not at [configuration].
+             * We are not at [configuration]. Inherit parent scope.
              */
-            this.scope = Object.create(this.parent.scope);
+            this.scope = new Map(this.parent.scope);
         }
         for (const setting of this.settings) {
-            if (setting.name === "type") {
-                this.scope.widgetType = setting.value;
-            } else if (setting.name === "mode") {
-                this.scope.mode = setting.value;
+            /**
+             * Override parent scope.
+             */
+            if (sectionScopeSettings.includes(setting.name)) {
+                this.scope.set(setting.name, setting);
             }
         }
     }
@@ -59,16 +61,21 @@ export class Section {
     }
 
     /**
-     * Searches setting in the tree by it's displayName,
+     * Returns setting with specified display name. If setting is frequently used, tries to get it from section's scope,
+     * otherwise searches setting in the tree by it's displayName,
      * starting from the current section and ending root, returns the closest one.
      *
      * @param settingName - Setting.displayName
      * @returns Setting with displayname equal to `settingName`
      */
     public getSettingFromTree(settingName: string): Setting | undefined {
+        let value = this.getScopeSetting(settingName);
+        if (value != null) {
+            return value;
+        }
         let currentSection: Section = this;
         while (currentSection) {
-            const value = currentSection.getSetting(settingName);
+            value = currentSection.getSetting(settingName);
             if (value !== void 0) {
                 return value;
             }
@@ -77,8 +84,9 @@ export class Section {
         return undefined;
     }
 
-    public getScopeValue(settingName: string): string {
-        return settingName === "type" ? this.scope.widgetType : this.scope.mode;
+    public getScopeSetting(settingName: string): Setting {
+        const cleared = Setting.clearSetting(settingName);
+        return this.scope.get(cleared);
     }
 
     /**
