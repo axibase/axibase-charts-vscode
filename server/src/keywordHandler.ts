@@ -42,6 +42,25 @@ export class KeywordHandler {
         }
     }
 
+    /**
+     * Checks `if` condition syntax
+     */
+    public handleIf(line: string, foundKeyword: TextRange): void {
+        const ifConditionRegex: RegExp = /^[\s].*if\s*(.*)/;
+        const ifCondition = ifConditionRegex.exec(line) ? ifConditionRegex.exec(line)[1] : null;
+
+        try {
+            Function(`return ${ifCondition}`);
+        } catch (err) {
+            const range = ifCondition ? createRange(
+                line.indexOf(ifCondition),
+                ifCondition.length,
+                foundKeyword.range.start.line
+            ) : foundKeyword.range;
+            this.diagnostics.push(createDiagnostic(range, "Wrong if condition"));
+        }
+    }
+
     public handleScript(line: string, foundKeyword: TextRange): void {
         if (ONE_LINE_SCRIPT.test(line)) {
             return;

@@ -3,11 +3,8 @@ import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
-const INLINE_IF_WARNING = `Specify == or !=`;
-const VAR_NAMES_DONT_MATCH = (nameInCondition: string) =>
-    `var '${nameInCondition}' used in 'if' condition not found`;
-
-const testConfig = (condition: string, variable?: string) =>
+const ERROR_MESSAGE = "Wrong if condition";
+const testConfig = (condition: string, variable: string = "") =>
     `[configuration]
 [group]
   [widget]
@@ -27,32 +24,51 @@ suite("If condition syntax tests", () => {
         deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
     });
 
-    test("Incorrect inline if condition, missing `==` or `!=`", () => {
-        const config = testConfig("b");
+    test("Incorrect inline if condition", () => {
+        const config = testConfig("b <> 2");
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
-            Range.create(Position.create(8, 6), Position.create(8, 8)),
-            INLINE_IF_WARNING,
+            Range.create(Position.create(8, 9), Position.create(8, 15)),
+            ERROR_MESSAGE,
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
     });
 
     test("Correct if condition via variable declaration", () => {
-        const config = testConfig("b", "var b = true");
+        const config = testConfig("firstVar", "var firstVar = true");
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
         deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
     });
 
-    test("Incorrect if condition via variable declaration, variable names don't match", () => {
-        const config = testConfig("b", "var test = true");
+    test("Incorrect if condition via variable declaration", () => {
+        const config = testConfig("123incorrectVar", "123incorrectVar = 11");
         const validator = new Validator(config);
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
-            Range.create(Position.create(8, 6), Position.create(8, 8)),
-            VAR_NAMES_DONT_MATCH("b"),
+            Range.create(Position.create(8, 9), Position.create(8, 24)),
+            ERROR_MESSAGE,
+            DiagnosticSeverity.Error
+        );
+        deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
+    });
+
+    test("Correct if condition via javascript expression", () => {
+        const config = testConfig("someList.length > 10");
+        const validator = new Validator(config);
+        const actualDiagnostics = validator.lineByLine();
+        deepStrictEqual(actualDiagnostics, [], `Config: \n${config}`);
+    });
+
+    test("Incorrect if condition via javascript expression", () => {
+        const config = testConfig("someList.length is_true");
+        const validator = new Validator(config);
+        const actualDiagnostics = validator.lineByLine();
+        const expectedDiagnostic = createDiagnostic(
+            Range.create(Position.create(8, 9), Position.create(8, 32)),
+            ERROR_MESSAGE,
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
