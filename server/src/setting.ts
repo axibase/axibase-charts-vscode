@@ -3,25 +3,13 @@ import { INTERVAL_UNITS } from "./constants";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
 import {
-    BOOLEAN_REGEXP,
-    CALCULATED_REGEXP,
-    CALENDAR_REGEXP,
-    INTEGER_REGEXP,
-    INTERVAL_REGEXP,
-    LOCAL_DATE_REGEXP,
-    NUMBER_REGEXP,
-    ZONED_DATE_REGEXP
+  BOOLEAN_REGEXP,
+  CALCULATED_REGEXP,
+  INTEGER_REGEXP,
+  INTERVAL_REGEXP,
+  NUMBER_REGEXP,
 } from "./regExpressions";
 import { createDiagnostic } from "./util";
-
-/**
- * Tests the provided string with regular expressions
- * @param text the target string
- * @returns true if the string is date expression, false otherwise
- */
-function isDate(text: string): boolean {
-    return CALENDAR_REGEXP.test(text) || LOCAL_DATE_REGEXP.test(text) || ZONED_DATE_REGEXP.test(text);
-}
 
 interface SpecificValueCheck {
   errMsg: string;

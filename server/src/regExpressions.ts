@@ -1,4 +1,4 @@
-import { BOOLEAN_KEYWORDS, CALENDAR_KEYWORDS, INTERVAL_UNITS } from "./constants";
+import { BOOLEAN_KEYWORDS, INTERVAL_UNITS } from "./constants";
 
 /** Regular expressions for CSV syntax checking */
 /**
@@ -44,13 +44,6 @@ export const BLOCK_SCRIPT_END = /^\s*endscript\s*$/;
 
 export const BOOLEAN_REGEXP: RegExp = new RegExp(`^(?:${BOOLEAN_KEYWORDS.join("|")})$`);
 
-export const CALENDAR_REGEXP: RegExp = new RegExp(
-    // current_day
-    `^(?:${CALENDAR_KEYWORDS.join("|")})` +
-    // + 5 * minute
-    `(?:[ \\t]*[-+][ \\t]*(?:\\d+|(?:\\d+)?\\.\\d+)[ \\t]*\\*[ \\t]*(?:${INTERVAL_UNITS.join("|")}))?$`,
-);
-
 export const INTEGER_REGEXP: RegExp = /^[-+]?\d+$/;
 
 export const INTERVAL_REGEXP: RegExp = new RegExp(
@@ -58,23 +51,7 @@ export const INTERVAL_REGEXP: RegExp = new RegExp(
     `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@\\{.+\\})[ \\t]*(?:${INTERVAL_UNITS.join("|")}))|all)$`,
 );
 
-export const LOCAL_DATE_REGEXP: RegExp = new RegExp(
-    // 2018-12-31
-    "^(?:19[7-9]|[2-9]\\d\\d)\\d(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01])" +
-    // 01:13:46.123, 11:26:52
-    "(?: (?:[01]\\d|2[0-4]):(?:[0-5][0-9])(?::(?:[0-5][0-9]))?(?:\\.\\d{1,9})?)?)?)?$",
-);
-
 // 1, 5.2, 0.3, .9, -8, -0.5, +1.4
 export const NUMBER_REGEXP: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
-
-export const ZONED_DATE_REGEXP: RegExp = new RegExp(
-    // 2018-12-31
-    "^(?:19[7-9]|[2-9]\\d\\d)\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])" +
-    // T12:34:46.123, T23:56:18
-    "[tT](?:[01]\\d|2[0-4]):(?:[0-5][0-9]):(?:[0-5][0-9])(?:\\.\\d{1,9})?" +
-    // Z, +0400, -05:00
-    "(?:[zZ]|[+-](?:[01]\\d|2[0-4]):?(?:[0-5][0-9]))$",
-);
 
 export const CALCULATED_REGEXP: RegExp = /[@$]\{.+\}/;
