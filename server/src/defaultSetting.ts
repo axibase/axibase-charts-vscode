@@ -163,7 +163,7 @@ export class DefaultSetting {
         if (this.defaultValue != null && this.defaultValue !== "") {
             result += `Default value: ${this.defaultValue}  \n`;
         }
-        if (this.enum == null && this.enum.length === 0) {
+        if (this.enum != null && this.enum.length > 0) {
             result += `Possible values: ${this.enum.join()}  \n`;
         }
         if (this.excludes != null && this.excludes.length !== 0) {

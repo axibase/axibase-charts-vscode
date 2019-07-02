@@ -164,7 +164,7 @@ export class Validator {
             if (this.isNotKeywordEnd("script") || this.isNotKeywordEnd("var") || this.isNotKeywordEnd("sql")) {
                 /**
                  * Lines in multiline script and var sections
-                 * will be cheked in JavaScriptValidator.processScript() and processVar().
+                 * will be checked in JavaScriptValidator.processScript() and processVar().
                  * SQL-block must be skipped without any processing.
                  */
                 continue;

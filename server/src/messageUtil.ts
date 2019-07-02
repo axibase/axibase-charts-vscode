@@ -1,3 +1,4 @@
+import { INTERVAL_UNITS } from "./constants";
 import { CSV_FROM_URL_MISSING_NAME_PATTERN } from "./regExpressions";
 
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
@@ -70,3 +71,11 @@ export const noMatching: MessageFactoryMethod = (dependent: string, required: st
 
 export const lineFeedRequired: MessageFactoryMethod = (dependent: string): string =>
   `A linefeed character after '${dependent}' keyword is required`;
+
+export const supportedUnits: MessageFactoryMethod = (): string =>
+  `Supported units:\n * ${INTERVAL_UNITS.join("\n * ")}`;
+
+export const dateError: MessageFactoryMethod = (specificMsg: string, name: string): string =>
+  `${specificMsg}. ${name} must be a date or calendar expression, for example:
+ * current_hour + 1 minute
+ * 2019-04-01T10:15:00Z`;
