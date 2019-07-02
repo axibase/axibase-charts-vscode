@@ -217,44 +217,6 @@ colors = silver
     });
 });
 
-suite("RelatedSettings: forecast-style and data-type tests", () => {
-    test("Correct: data-type is declared in [series]", () => {
-        const conf = `${config}
-        type = chart
-        title = Column chart
-        timespan = 1 day
-        max-range = 100
-        forecast-style = stroke: magenta;
-
-        [series]
-          statistic = percentile(75)
-          period = 10 minute
-          mode = range
-
-        [series]
-          mode = column
-          data-type = forecast`;
-        let validator = new Validator(conf);
-        let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [], `Config: \n${conf}`);
-    });
-
-    test("Incorrect: data-type is not declared", () => {
-        const conf = `${config}
-        type = chart
-        mode = column
-forecast-style = stroke: magenta;
-[series]`;
-        let validator = new Validator(conf);
-        let diags = validator.lineByLine();
-        assert.deepStrictEqual(diags, [createDiagnostic(
-            Range.create(Position.create(8, 1),
-                Position.create(8, "[series".length)),
-            "data-type is required if forecast-style is specified",
-        )], `Config: \n${conf}`);
-    });
-});
-
 suite("RelatedSettings: alert-style and alert-expression tests", () => {
 
     test("Correct: alert-expression is declared", () => {
