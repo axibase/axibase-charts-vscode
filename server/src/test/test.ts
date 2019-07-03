@@ -31,7 +31,7 @@ export class Test {
     /**
      * The expected result of the target function
      */
-    private readonly expected: Diagnostic[] | TextEdit[] | Hover | string[] | string;
+    private readonly expected: Diagnostic[] | TextEdit[] | Hover | string[];
     /**
      * The name of the test. Displayed in tests list after the execution
      */
@@ -53,7 +53,7 @@ export class Test {
     public constructor(
         name: string,
         text: string,
-        expected: Diagnostic[] | TextEdit[] | Hover | string[] | string,
+        expected: Diagnostic[] | TextEdit[] | Hover | string[],
         options?: FormattingOptions,
         position?: Position,
     ) {
@@ -114,19 +114,6 @@ export class Test {
             const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
             const current: string[] = cp.getCompletionItems().map(i => i.insertText);
             assert.deepStrictEqual(current, this.expected);
-        });
-    }
-
-    /**
-     * Tests CompletionProvider for endkeywords, such as 'endif', 'endsql', etc
-     */
-    public completionEndTest(): void {
-        test((this.name), () => {
-            const cp: CompletionProvider = new CompletionProvider(this.document, this.position);
-            const current: string[] = cp.getCompletionItems().map(i => i.insertText);
-
-            // check that array of completions includes specific endkeyword
-            assert.strictEqual(current.includes(this.expected as string), true);
         });
     }
 }

@@ -1,5 +1,7 @@
-import { Position } from "vscode-languageserver";
+import { Position, TextDocument } from "vscode-languageserver";
 import { Test } from "./test";
+import { CompletionProvider } from "../completionProvider";
+import { strictEqual } from "assert";
 
 suite("CompletionProvider tests", () => {
     [
@@ -7,7 +9,7 @@ suite("CompletionProvider tests", () => {
             "Correct: completion using possibleValues",
             `type = `,
             ["chart", "gauge", "treemap", "bar", "calendar", "histogram", "box",
-             "pie", "graph", "text", "page", "console", "table", "property"],
+                "pie", "graph", "text", "page", "console", "table", "property"],
             undefined,
             Position.create(0, "type = ".length),
         ),
@@ -28,15 +30,40 @@ suite("CompletionProvider tests", () => {
     ].forEach((test: Test): void => test.completionTest());
 });
 
+/**
+ * Tests CompletionProvider for endkeywords, such as 'endif', 'endsql', etc
+ */
 suite("CompletionProvider endkeywords tests", () => {
-    [
-        new Test(
-            "Correct: endscript completion",
-            `script
-            end`,
-            "endscript",
-            undefined,
-            Position.create(2, 1),
-        )
-    ].forEach((test: Test): void => test.completionEndTest());
+    test("Endscript keyword completion", () => {
+        const text = `script
+        end`;
+        const expected = "endscript";
+        const shouldComplete = true;
+        const position = Position.create(2, 1);
+        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+        strictEqual(current.includes(expected), shouldComplete);
+    });
+
+    test("Start keyword misspelled, no completion", () => {
+        const text = `sq
+        end`;
+        const expected = "endsql";
+        const shouldComplete = false;
+        const position = Position.create(2, 1);
+        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+        strictEqual(current.includes(expected), shouldComplete);
+    });
+
+    test("Doesn't offer mismatched keyword completion", () => {
+        const text = `sql
+        end`;
+        const expected = "endscript";
+        const shouldComplete = false;
+        const position = Position.create(2, 1);
+        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const current: string[] = cp.getCompletionItems().map(i => i.insertText);
+        strictEqual(current.includes(expected), shouldComplete);
+    });
 });
