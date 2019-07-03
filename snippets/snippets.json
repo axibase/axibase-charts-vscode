@@ -651,7 +651,7 @@
         "description": "Detail series section with average aggregation"
     },
     "sql": {
-        "prefix": "sql",
+        "prefix": "sql block",
         "body": [
             "sql",
             "  SELECT time, entity, value",
@@ -661,7 +661,7 @@
         ]
     },
     "script": {
-        "prefix": "script",
+        "prefix": "script block",
         "body": [
             "script",
             "  window.${1:userFunction} = function (${2:value}) {",
