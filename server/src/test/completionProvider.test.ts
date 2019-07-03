@@ -38,32 +38,29 @@ suite("CompletionProvider endkeywords tests", () => {
         const text = `script
         end`;
         const expected = "endscript";
-        const isTrue = true;
         const position = Position.create(2, 1);
         const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
-        strictEqual(current.includes(expected), isTrue);
+        strictEqual(current.includes(expected), true);
     });
 
     test("Start keyword misspelled, no completion", () => {
         const text = `sq
         end`;
         const expected = "endsql";
-        const isTrue = false;
         const position = Position.create(2, 1);
         const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
-        strictEqual(current.includes(expected), isTrue);
+        strictEqual(current.includes(expected), false);
     });
 
     test("Doesn't offer mismatched keyword completion", () => {
         const text = `sql
         end`;
         const expected = "endscript";
-        const isTrue = false;
         const position = Position.create(2, 1);
         const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
-        strictEqual(current.includes(expected), isTrue);
+        strictEqual(current.includes(expected), false);
     });
 });
