@@ -39,7 +39,8 @@ suite("CompletionProvider endkeywords tests", () => {
         end`;
         const expected = "endscript";
         const position = Position.create(2, 1);
-        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const document: TextDocument = TextDocument.create("test", "axibasecharts", 1, text);
+        const cp: CompletionProvider = new CompletionProvider(document, position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
         strictEqual(current.includes(expected), true);
     });
@@ -49,7 +50,8 @@ suite("CompletionProvider endkeywords tests", () => {
         end`;
         const expected = "endsql";
         const position = Position.create(2, 1);
-        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const document: TextDocument = TextDocument.create("test", "axibasecharts", 1, text);
+        const cp: CompletionProvider = new CompletionProvider(document, position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
         strictEqual(current.includes(expected), false);
     });
@@ -59,7 +61,8 @@ suite("CompletionProvider endkeywords tests", () => {
         end`;
         const expected = "endscript";
         const position = Position.create(2, 1);
-        const cp: CompletionProvider = new CompletionProvider(TextDocument.create("test", "axibasecharts", 1, text), position);
+        const document: TextDocument = TextDocument.create("test", "axibasecharts", 1, text);
+        const cp: CompletionProvider = new CompletionProvider(document, position);
         const current: string[] = cp.getCompletionItems().map(i => i.insertText);
         strictEqual(current.includes(expected), false);
     });
