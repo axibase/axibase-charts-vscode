@@ -196,7 +196,7 @@ Hide `column-metric` with `column-metric = null`.
   
 ## columns  
   
-Add columns by key. Short form of `[column]` with key setting.  
+Comma separated list of column keys to be displayed.  
   
 ## columntime  
   
