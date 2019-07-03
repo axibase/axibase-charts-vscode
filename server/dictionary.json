@@ -819,9 +819,8 @@
         },
         {
             "displayName": "columns",
-            "multiLine": true,
             "type": "string",
-            "example": "command",
+            "example": "columns = pid, command",
             "section": "widget"
         },
         {
