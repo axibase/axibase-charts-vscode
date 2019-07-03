@@ -27,3 +27,16 @@ suite("CompletionProvider tests", () => {
         )
     ].forEach((test: Test): void => test.completionTest());
 });
+
+suite("CompletionProvider endkeywords tests", () => {
+    [
+        new Test(
+            "Correct: endscript completion",
+            `script
+            end`,
+            "endscript",
+            undefined,
+            Position.create(2, 1),
+        )
+    ].forEach((test: Test): void => test.completionEndTest());
+});
