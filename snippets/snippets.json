@@ -654,9 +654,9 @@
         "prefix": "sql",
         "body": [
             "sql",
-            "  SELECT time, entity, value",
-            "  FROM 'metric_name'",
-            "  WHERE datetime > = NOW - 5*MINUTE",
+            "  SELECT ${1:time}, ${2:entity}, ${3:value}",
+            "  FROM '${4:metric_name}'",
+            "  WHERE ${5:datetime} >= ${6:NOW - 5*MINUTE}",
             "endsql"
         ]
     },
