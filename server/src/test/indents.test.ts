@@ -471,26 +471,38 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
     const text = `if a > b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
     const expected: TextEdit[] = [];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
+  
   test("Correct <", () => {
     const text = `if a < b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
     const expected: TextEdit[] = [];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
+
   test("Correct >=", () => {
     const text = `if a >= b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
     const expected: TextEdit[] = [];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
+
   test("Correct <=", () => {
     const text = `if a <= b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
     const expected: TextEdit[] = [];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
+
   test("Incorrect > (extra spaces before)", () => {
     const text = `if a   > b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
@@ -500,8 +512,11 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
         Position.create(0, "if a   ".length)), " "
       )
     ];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
+
   test("Incorrect <= (extra spaces after)", () => {
     const text = `if a <=   b`;
     const options: FormattingOptions = FormattingOptions.create(2, true);
@@ -511,6 +526,8 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
         Position.create(0, "if a <=   ".length)), " "
       )
     ];
-    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
   });
 });
