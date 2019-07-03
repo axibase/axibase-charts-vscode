@@ -664,8 +664,8 @@
         "prefix": "script block",
         "body": [
             "script",
-            "  window.${1:userFunction} = function (${2:value}) {",
-            "  return Math.round(${2:value} / 10) * 10;",
+            "  window.${1:userFunction} = function () {",
+            "  ${2:return Math.round(value / 10) * 10;}",
             "  }",
             "endscript"
         ]
