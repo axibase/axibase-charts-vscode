@@ -1,5 +1,7 @@
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { Test } from "./test";
+import { deepStrictEqual } from "assert";
+import { Formatter } from "../formatter";
 
 suite("Formatting indents tests: sections and settings", () => {
   const tests: Test[] = [
@@ -465,39 +467,50 @@ suite("Formatting indents tests: !=, ==, = ", () => {
 });
 
 suite("Formatting indents tests: >=, <=, >, <", () => {
-  const tests: Test[] = [
-    new Test(
-      "Correct >",
-      `if a > b`, [], FormattingOptions.create(2, true),
-    ),
-    new Test(
-      "Correct <",
-      `if a < b`, [], FormattingOptions.create(2, true),
-    ),
-    new Test(
-      "Correct >=",
-      `if a >= b`, [], FormattingOptions.create(2, true),
-    ), new Test(
-      "Correct <=",
-      `if a <= b`, [], FormattingOptions.create(2, true),
-    ), new Test(
-      "Incorrect > (extra spaces before)",
-      `if a   > b`, [
-        TextEdit.replace(Range.create(
-          Position.create(0, "if a".length),
-          Position.create(0, "if a   ".length)), " "
-        )
-      ],
-      FormattingOptions.create(2, true),
-    ), new Test(
-      "Incorrect <= (extra spaces after)",
-      `if a <=   b`, [
-        TextEdit.replace(Range.create(
-          Position.create(0, "if a <=".length),
-          Position.create(0, "if a <=   ".length)), " "
-        )
-      ],
-      FormattingOptions.create(2, true),
-    )];
-  tests.forEach((test: Test) => { test.formatTest(); });
+  test("Correct >", () => {
+    const text = `if a > b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
+  test("Correct <", () => {
+    const text = `if a < b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
+  test("Correct >=", () => {
+    const text = `if a >= b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
+  test("Correct <=", () => {
+    const text = `if a <= b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
+  test("Incorrect > (extra spaces before)", () => {
+    const text = `if a   > b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [
+      TextEdit.replace(Range.create(
+        Position.create(0, "if a".length),
+        Position.create(0, "if a   ".length)), " "
+      )
+    ];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
+  test("Incorrect <= (extra spaces after)", () => {
+    const text = `if a <=   b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [
+      TextEdit.replace(Range.create(
+        Position.create(0, "if a <=".length),
+        Position.create(0, "if a <=   ".length)), " "
+      )
+    ];
+    deepStrictEqual(new Formatter(text, options).lineByLine(), expected);
+  });
 });
