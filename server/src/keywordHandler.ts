@@ -47,17 +47,16 @@ export class KeywordHandler {
      */
     public handleIf(line: string, foundKeyword: TextRange): void {
         const ifConditionRegex: RegExp = /^[\s].*if\s*(.*)/;
-        const ifCondition = ifConditionRegex.exec(line) ? ifConditionRegex.exec(line)[1] : null;
+        const ifCondition = ifConditionRegex.exec(line)[1];
 
         try {
             Function(`return ${ifCondition}`);
         } catch (err) {
-            const range = ifCondition ? createRange(
+            this.diagnostics.push(createDiagnostic(createRange(
                 line.indexOf(ifCondition),
                 ifCondition.length,
                 foundKeyword.range.start.line
-            ) : foundKeyword.range;
-            this.diagnostics.push(createDiagnostic(range, "Wrong if condition"));
+            ), err.message));
         }
     }
 

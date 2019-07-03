@@ -3,7 +3,6 @@ import { DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { createDiagnostic } from "../util";
 import { Validator } from "../validator";
 
-const ERROR_MESSAGE = "Wrong if condition";
 const testConfig = (condition: string, variable: string = "") =>
     `[configuration]
 [group]
@@ -30,7 +29,7 @@ suite("If condition syntax tests", () => {
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
             Range.create(Position.create(8, 9), Position.create(8, 15)),
-            ERROR_MESSAGE,
+            "Unexpected token >",
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
@@ -49,7 +48,7 @@ suite("If condition syntax tests", () => {
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
             Range.create(Position.create(8, 9), Position.create(8, 24)),
-            ERROR_MESSAGE,
+            "Invalid or unexpected token",
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
@@ -68,7 +67,7 @@ suite("If condition syntax tests", () => {
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
             Range.create(Position.create(8, 9), Position.create(8, 32)),
-            ERROR_MESSAGE,
+            "Unexpected identifier",
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
