@@ -39,6 +39,13 @@ export class KeywordHandler {
         const ifConditionRegex: RegExp = /^[\s].*if\s*(.*)/;
         const ifCondition = ifConditionRegex.exec(line)[1];
 
+        if (ifCondition.trim() === "") {
+            this.diagnostics.push(
+                createDiagnostic(foundKeyword.range, "If condition mustn't be empty")
+            );
+            return;
+        }
+
         try {
             Function(`return ${ifCondition}`);
         } catch (err) {

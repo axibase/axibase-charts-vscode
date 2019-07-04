@@ -72,4 +72,16 @@ suite("If condition syntax tests", () => {
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
     });
+
+    test("Incorrect empty if condition", () => {
+        const config = testConfig("   ");
+        const validator = new Validator(config);
+        const actualDiagnostics = validator.lineByLine();
+        const expectedDiagnostic = createDiagnostic(
+            Range.create(Position.create(8, 6), Position.create(8, 8)),
+            "If condition mustn't be empty",
+            DiagnosticSeverity.Error
+        );
+        deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
+    });
 });
