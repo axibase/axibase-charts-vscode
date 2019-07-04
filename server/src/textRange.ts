@@ -1,5 +1,6 @@
 import { Range } from "vscode-languageserver";
 import { CheckPriority } from "./checkPriority";
+import { CSV_FROM_URL_PATTERN, ONE_LINE_SCRIPT, ONE_LINE_SQL } from "./regExpressions";
 import { createRange } from "./util";
 
 /**
@@ -12,6 +13,15 @@ export class TextRange {
     public static readonly KEYWORD_REGEXP: RegExp =
         // tslint:disable-next-line: max-line-length
         /^([ \t]*)(import|endvar|endcsv|endfor|elseif|endif|endscript|endlist|endsql|script|else|if|list|sql|for|csv|var)\b/i;
+
+    /**
+     * Regexps for keywords supporting both closed and unclosed syntax
+     */
+    public static readonly CAN_BE_UNCLOSED_REGEXP: RegExp[] = [
+        CSV_FROM_URL_PATTERN,
+        ONE_LINE_SQL,
+        ONE_LINE_SCRIPT
+    ];
 
     /**
      * Checks is current keyword closeable or not (can be closed like var-endvar)
@@ -45,6 +55,16 @@ export class TextRange {
         const [, indent, keyword] = match;
 
         return new TextRange(keyword, createRange(indent.length, keyword.length, i), canBeUnclosed);
+    }
+
+    /**
+     * Determines if line contains a keyword that can be unclosed
+     * @param line the line containing the keyword
+     */
+    public static canBeUnclosed(line: string): boolean {
+        return TextRange.CAN_BE_UNCLOSED_REGEXP.some(regexp => {
+            return regexp.test(line);
+        });
     }
 
     /**

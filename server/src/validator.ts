@@ -14,6 +14,13 @@ import {
     tagNameWithWhitespaces,
     unknownToken
 } from "./messageUtil";
+import {
+    BLANK_LINE_PATTERN,
+    CSV_FROM_URL_PATTERN,
+    CSV_INLINE_HEADER_PATTERN,
+    CSV_KEYWORD_PATTERN,
+    CSV_NEXT_LINE_HEADER_PATTERN
+} from "./regExpressions";
 import { requiredSectionSettingsMap, sectionDepthMap, widgetRequirementsByType } from "./resources";
 import { SectionStack } from "./sectionStack";
 import { Setting } from "./setting";
@@ -31,29 +38,6 @@ import {
 const placeholderContainingSettings = [
     "url", "urlparameters"
 ];
-
-/** Regular expressions for CSV syntax checking */
-/**
- * RegExp for: `csv <name> =
- *              <header1>, <header2>`
- */
-const CSV_NEXT_LINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
-/**
- * RegExp for: 'csv <name> = <header1>, <header2>'
- */
-const CSV_INLINE_HEADER_PATTERN = /=[ \t]*$/m;
-/**
- * RegExp for: 'csv <name> from <url>'
- */
-const CSV_FROM_URL_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;
-/**
- * RegExp for blank line
- */
-const BLANK_LINE_PATTERN = /^[ \t]*$/m;
-/**
- * RegExp for 'csv' keyword
- */
-const CSV_KEYWORD_PATTERN = /\b(csv)\b/i;
 
 /**
  * Performs validation of a whole document line by line.
