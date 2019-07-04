@@ -1,7 +1,7 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
-import { calendarKeywords, intervalUnits } from "./constants";
+import { CALENDAR_KEYWORDS, INTERVAL_UNITS } from "./constants";
 import { Field } from "./field";
 import { sectionDepthMap, settingsMap } from "./resources";
 import { Setting } from "./setting";
@@ -214,10 +214,10 @@ endif
                     el.replace(/percentile\\.+/, "percentile(n)")));
             }
             case "interval": {
-                return this.getItemsArray(intervalUnits, ...setting.enum);
+                return this.getItemsArray(INTERVAL_UNITS, ...setting.enum);
             }
             case "date": {
-                return this.getItemsArray(calendarKeywords, new Date().toISOString());
+                return this.getItemsArray(CALENDAR_KEYWORDS, new Date().toISOString());
             }
             default: {
                 return [];

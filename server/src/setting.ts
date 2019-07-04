@@ -1,27 +1,15 @@
 import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
-import { intervalUnits } from "./constants";
+import { INTERVAL_UNITS } from "./constants";
 import { DefaultSetting } from "./defaultSetting";
 import { illegalSetting } from "./messageUtil";
+import {
+  BOOLEAN_REGEXP,
+  CALCULATED_REGEXP,
+  INTEGER_REGEXP,
+  INTERVAL_REGEXP,
+  NUMBER_REGEXP,
+} from "./regExpressions";
 import { createDiagnostic } from "./util";
-
-const booleanKeywords: string[] = [
-  "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
-];
-
-const booleanRegExp: RegExp = new RegExp(`^(?:${booleanKeywords.join("|")})$`);
-
-const integerRegExp: RegExp = /^[-+]?\d+$/;
-
-const intervalRegExp: RegExp = new RegExp(
-  // -5 month, +3 day, .3 year, 2.3 week, all
-  `^(?:(?:[-+]?(?:(?:\\d+|(?:\\d+)?\\.\\d+)|@{.+})[ \\t]*(?:${intervalUnits.join(
-    "|")}))|all)$`,
-);
-
-// 1, 5.2, 0.3, .9, -8, -0.5, +1.4
-const numberRegExp: RegExp = /^[-+]?(?:\.\d+|\d+(?:\.\d+)?)$/;
-
-const calculatedRegExp: RegExp = /[@$]{.+}/;
 
 interface SpecificValueCheck {
   errMsg: string;
@@ -83,7 +71,7 @@ export class Setting extends DefaultSetting {
   public checkType(range: Range): Diagnostic | undefined {
     let result: Diagnostic | undefined;
     // allows ${} and @{} expressions
-    if (calculatedRegExp.test(this.value)) {
+    if (CALCULATED_REGEXP.test(this.value)) {
       return result;
     }
     switch (this.type) {
@@ -113,20 +101,20 @@ export class Setting extends DefaultSetting {
           this.minValue = typeof this.minValue === "object" ? this.minValue.value * 100 : this.minValue * 100;
           this.value = persent[1];
         }
-        result = this.checkNumber(numberRegExp,
+        result = this.checkNumber(NUMBER_REGEXP,
           `${this.displayName} should be a real (floating-point) number.`,
           range);
 
         break;
       }
       case "integer": {
-        result = this.checkNumber(integerRegExp,
+        result = this.checkNumber(INTEGER_REGEXP,
           `${this.displayName} should be an integer number.`,
           range);
         break;
       }
       case "boolean": {
-        if (!booleanRegExp.test(this.value)) {
+        if (!BOOLEAN_REGEXP.test(this.value)) {
           result = createDiagnostic(
             range,
             `${this.displayName} should be a boolean value. For example, ${this.example}`,
@@ -153,9 +141,9 @@ export class Setting extends DefaultSetting {
         break;
       }
       case "interval": {
-        if (!intervalRegExp.test(this.value)) {
+        if (!INTERVAL_REGEXP.test(this.value)) {
           const message =
-            `.\nFor example, ${this.example}. Supported units:\n * ${intervalUnits.join(
+            `.\nFor example, ${this.example}. Supported units:\n * ${INTERVAL_UNITS.join(
               "\n * ")}`;
           if (this.name === "updateinterval" && /^\d+$/.test(this.value)) {
             result = createDiagnostic(

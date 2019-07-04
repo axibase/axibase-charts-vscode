@@ -1,4 +1,5 @@
-import { intervalUnits } from "./constants";
+import { INTERVAL_UNITS } from "./constants";
+import { CSV_FROM_URL_MISSING_NAME_PATTERN } from "./regExpressions";
 
 type MessageFactoryMethod = (found?: string, msg?: any) => string;
 /**
@@ -43,10 +44,6 @@ export const illegalSetting: MessageFactoryMethod = (found: string): string =>
   `${found} setting is not allowed here.`;
 
 /**
- * RegExp for: 'csv from <url>'
- */
-const CSV_FROM_URL_MISSING_NAME_PATTERN = /(^[ \t]*csv[ \t]+)[ \t]*(from)/;
-/**
  * If SCV pattern didn't match any known RegExp, compose error message
  * @param line line of code instruction
  * @returns csv error message
@@ -76,7 +73,7 @@ export const lineFeedRequired: MessageFactoryMethod = (dependent: string): strin
   `A linefeed character after '${dependent}' keyword is required`;
 
 export const supportedUnits: MessageFactoryMethod = (): string =>
-  `Supported units:\n * ${intervalUnits.join("\n * ")}`;
+  `Supported units:\n * ${INTERVAL_UNITS.join("\n * ")}`;
 
 export const dateError: MessageFactoryMethod = (specificMsg: string, name: string): string =>
   `${specificMsg}. ${name} must be a date or calendar expression, for example:

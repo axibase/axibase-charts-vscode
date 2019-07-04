@@ -1,6 +1,5 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { relations } from "./constants";
-import { BLOCK_SQL_END, BLOCK_SQL_START } from "./keywordHandler";
+import { RELATIONS } from "./constants";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
@@ -117,7 +116,7 @@ export class Formatter {
      */
     private checkSign(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = new RegExp(`(^\\s*.+?)(\\s*?)(${relations.join("|")})(\\s*)`);
+        const regexp: RegExp = new RegExp(`(^\\s*.+?)(\\s*?)(${RELATIONS.join("|")})(\\s*)`);
         const match: RegExpExecArray | null = regexp.exec(line);
         if (match === null) {
             return;
@@ -316,6 +315,10 @@ export class Formatter {
      */
     private shouldBeClosed(): boolean {
         let line: string | undefined = this.getCurrentLine();
+        // If keyword supports unclosed syntax no need to check further
+        if (TextRange.canBeUnclosed(line)) {
+            return false;
+        }
         this.match = /^[ \t]*((?:var|list|sql)|script[\s\t]*$)/.exec(line);
         if (!this.match) {
             return true;
@@ -333,38 +336,7 @@ export class Formatter {
                 }
                 break;
             }
-            default: {
-                // since between 'script' and '=' can be different number of spaces
-                // I can't add handle it as a "case"
-                if (this.match[1].includes("script")) {
-                    let j: number = this.currentLine + 1;
-                    line = this.getLine(j);
-                    while (line !== undefined) {
-                        if (/\bscript\b/.test(line)) {
-                            break;
-                        }
-                        if (/\bendscript\b/.test(line)) {
-                            return true;
-                        }
-                        line = this.getLine(++j);
-                    }
-                    return true;
-                }
-                if (BLOCK_SQL_START.test(line)) {
-                    let j: number = this.currentLine + 1;
-                    line = this.getLine(j);
-                    while (line !== undefined) {
-                        if (BLOCK_SQL_START.test(line)) {
-                            break;
-                        }
-                        if (BLOCK_SQL_END.test(line)) {
-                            return true;
-                        }
-                        line = this.getLine(++j);
-                    }
-                    return true;
-                }
-            }
+            default: return true;
         }
 
         return false;

@@ -531,3 +531,23 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
     deepStrictEqual(actual, expected);
   });
 });
+
+suite("Formatting indents tests for keywords that can be unclosed", () => {
+  const tests: Test[] = [
+    new Test(
+      "Correct: csv <name> from <url>",
+      `csv rows from https://raw.githubusercontent.com/axibase/visa-refusal.csv
+for row in rows
+endfor`, [], FormattingOptions.create(2, true),
+    ),
+    new Test(
+      "Incorrect: csv <name> from <url>",
+      `csv rows from https://raw.githubusercontent.com/axibase/visa-refusal.csv
+  for row in rows
+endfor`,
+[TextEdit.replace(Range.create(Position.create(1, 0), Position.create(1, "  ".length)), "")],
+FormattingOptions.create(2, true),
+    )];
+  tests.forEach((test: Test) => { test.formatTest(); }
+  );
+});
