@@ -41,7 +41,7 @@ export class KeywordHandler {
 
         if (ifCondition.trim() === "") {
             this.diagnostics.push(
-                createDiagnostic(foundKeyword.range, "If condition mustn't be empty")
+                createDiagnostic(foundKeyword.range, "If condition can not be empty")
             );
             return;
         }

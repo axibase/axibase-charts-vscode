@@ -79,7 +79,7 @@ suite("If condition syntax tests", () => {
         const actualDiagnostics = validator.lineByLine();
         const expectedDiagnostic = createDiagnostic(
             Range.create(Position.create(8, 6), Position.create(8, 8)),
-            "If condition mustn't be empty",
+            "If condition can not be empty",
             DiagnosticSeverity.Error
         );
         deepStrictEqual(actualDiagnostics, [expectedDiagnostic], `Config: \n${config}`);
