@@ -2,6 +2,7 @@ import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
+import { RELATIONS_REGEXP } from "./regExpressions";
 
 interface Section {
     indent?: string;
@@ -90,7 +91,7 @@ export class Formatter {
                 this.increaseIndent();
                 continue;
             } else {
-                this.checkEquals();
+                this.checkSign();
             }
             if (TextRange.isClosing(line)) {
                 const stackHead: number | undefined = this.keywordsLevels.pop();
@@ -111,12 +112,11 @@ export class Formatter {
     }
 
     /**
-     * Checks how many spaces are between equals sign and setting name
+     * Checks how many spaces are between the sign and setting name
      */
-    private checkEquals(): void {
+    private checkSign(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = /(^\s*.+?)(\s*?)(!=|==|=)(\s*)/;
-        const match: RegExpExecArray | null = regexp.exec(line);
+        const match: RegExpExecArray | null = RELATIONS_REGEXP.exec(line);
         if (match === null) {
             return;
         }

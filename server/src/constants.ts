@@ -11,6 +11,16 @@ export const CALENDAR_KEYWORDS: string[] = [
     "previous_working_day", "previous_year", "saturday", "sunday", "thursday", "tuesday", "wednesday",
 ];
 
+export const RELATIONS: string[] = [
+    "!=",
+    "==",
+    "=",
+    ">=",
+    "<=",
+    ">",
+    "<"
+];
+
 export const BOOLEAN_KEYWORDS: string[] = [
     "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
 ];

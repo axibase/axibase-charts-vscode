@@ -1,5 +1,7 @@
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { Test } from "./test";
+import { deepStrictEqual } from "assert";
+import { Formatter } from "../formatter";
 
 suite("Formatting indents tests: sections and settings", () => {
   const tests: Test[] = [
@@ -456,13 +458,78 @@ suite("Formatting indents tests: !=, ==, = ", () => {
       "Incorrect =",
       `type=bar`, [TextEdit.replace(Range.create(
         Position.create(0, "type".length), Position.create(0, "type".length)), " "),
-        TextEdit.replace(Range.create(
-          Position.create(0, "type=".length), Position.create(0, "type=".length)), " ")
+      TextEdit.replace(Range.create(
+        Position.create(0, "type=".length), Position.create(0, "type=".length)), " ")
       ],
       FormattingOptions.create(2, true),
     )];
-  tests.forEach((test: Test) => { test.formatTest(); }
-  );
+  tests.forEach((test: Test) => { test.formatTest(); });
+});
+
+suite("Formatting indents tests: >=, <=, >, <", () => {
+  test("Correct >", () => {
+    const text = `if a > b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
+  
+  test("Correct <", () => {
+    const text = `if a < b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
+
+  test("Correct >=", () => {
+    const text = `if a >= b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
+
+  test("Correct <=", () => {
+    const text = `if a <= b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
+
+  test("Incorrect > (extra spaces before)", () => {
+    const text = `if a   > b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [
+      TextEdit.replace(Range.create(
+        Position.create(0, "if a".length),
+        Position.create(0, "if a   ".length)), " "
+      )
+    ];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
+
+  test("Incorrect <= (extra spaces after)", () => {
+    const text = `if a <=   b`;
+    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const expected: TextEdit[] = [
+      TextEdit.replace(Range.create(
+        Position.create(0, "if a <=".length),
+        Position.create(0, "if a <=   ".length)), " "
+      )
+    ];
+    const formatter = new Formatter(text, options);
+    const actual = formatter.lineByLine();
+    deepStrictEqual(actual, expected);
+  });
 });
 
 suite("Formatting indents tests for keywords that can be unclosed", () => {
