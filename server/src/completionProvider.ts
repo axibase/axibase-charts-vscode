@@ -1,7 +1,7 @@
 import {
     CompletionItem, CompletionItemKind, InsertTextFormat, Position, TextDocument
 } from "vscode-languageserver";
-import { calendarKeywords, controlKeyWords, intervalUnits } from "./constants";
+import { CALENDAR_KEYWORDS, CONTROL_KEYWORDS, INTERVAL_UNITS } from "./constants";
 import { Field } from "./field";
 import { sectionDepthMap, settingsMap } from "./resources";
 import { Setting } from "./setting";
@@ -96,7 +96,7 @@ endfor`;
     private completeControlKeyWord(): CompletionItem[] {
         const items: CompletionItem[] = [];
 
-        for (let keyword of controlKeyWords) {
+        for (let keyword of CONTROL_KEYWORDS) {
             items.push(this.fillCompletionItem({
                 detail: `Control keyword: ${keyword}`,
                 insertText: `${keyword}`,
@@ -115,7 +115,7 @@ endfor`;
         // detected `end`
         const endWordRegex: RegExp = /^[ \t]*(end)[ \t]*/gm;
         // detected any control keyword in previous code
-        const keywordsRegex: RegExp = new RegExp(`^[ \t]*(?:${controlKeyWords.join("|")})[ \t]*`, "mg");
+        const keywordsRegex: RegExp = new RegExp(`^[ \t]*(?:${CONTROL_KEYWORDS.join("|")})[ \t]*`, "mg");
         let completions: CompletionItem[] = [];
 
         if (endWordRegex.test(this.text)) {
@@ -268,10 +268,10 @@ endif
                     el.replace(/percentile\\.+/, "percentile(n)")));
             }
             case "interval": {
-                return this.getItemsArray(intervalUnits, ...setting.enum);
+                return this.getItemsArray(INTERVAL_UNITS, ...setting.enum);
             }
             case "date": {
-                return this.getItemsArray(calendarKeywords, new Date().toISOString());
+                return this.getItemsArray(CALENDAR_KEYWORDS, new Date().toISOString());
             }
             default: {
                 return [];
