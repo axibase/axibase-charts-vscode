@@ -1,4 +1,4 @@
-import { BOOLEAN_KEYWORDS, INTERVAL_UNITS } from "./constants";
+import { BOOLEAN_KEYWORDS, INTERVAL_UNITS, RELATIONS } from "./constants";
 
 /** Regular expressions for CSV syntax checking */
 
@@ -67,3 +67,6 @@ export const NUMBER_REGEXP: RegExp = /^(?:\-|\+)?(?:\.\d+|\d+(?:\.\d+)?)$/;
 
 // ${server}, ${example}
 export const CALCULATED_REGEXP: RegExp = /[@$]\{.+\}/;
+
+// =, ==, !=, >=, <=, >, <
+export const RELATIONS_REGEXP: RegExp =  new RegExp(`(^\\s*.+?)(\\s*?)(${RELATIONS.join("|")})(\\s*)`);

@@ -1,8 +1,8 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { RELATIONS } from "./constants";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
+import { RELATIONS_REGEXP } from "./regExpressions";
 
 interface Section {
     indent?: string;
@@ -116,8 +116,7 @@ export class Formatter {
      */
     private checkSign(): void {
         const line: string = this.getCurrentLine();
-        const regexp: RegExp = new RegExp(`(^\\s*.+?)(\\s*?)(${RELATIONS.join("|")})(\\s*)`);
-        const match: RegExpExecArray | null = regexp.exec(line);
+        const match: RegExpExecArray | null = RELATIONS_REGEXP.exec(line);
         if (match === null) {
             return;
         }
