@@ -32,6 +32,31 @@ export class KeywordHandler {
         }
     }
 
+    /**
+     * Checks `if` condition syntax
+     */
+    public handleIf(line: string, foundKeyword: TextRange): void {
+        const ifConditionRegex: RegExp = /^[\s].*if\s*(.*)/;
+        const ifCondition = ifConditionRegex.exec(line)[1];
+
+        if (ifCondition.trim() === "") {
+            this.diagnostics.push(
+                createDiagnostic(foundKeyword.range, "If condition can not be empty")
+            );
+            return;
+        }
+
+        try {
+            Function(`return ${ifCondition}`);
+        } catch (err) {
+            this.diagnostics.push(createDiagnostic(createRange(
+                line.indexOf(ifCondition),
+                ifCondition.length,
+                foundKeyword.range.start.line
+            ), err.message));
+        }
+    }
+
     public handleScript(line: string, foundKeyword: TextRange): void {
         if (ONE_LINE_SCRIPT.test(line)) {
             return;

@@ -12,6 +12,16 @@ export const CALENDAR_KEYWORDS: string[] = [
 ];
 
 export const CONTROL_KEYWORDS = ["sql", "script", "if", "for", "var", "list", "csv"];
+export const RELATIONS: string[] = [
+    "!=",
+    "==",
+    "=",
+    ">=",
+    "<=",
+    ">",
+    "<"
+];
+
 export const BOOLEAN_KEYWORDS: string[] = [
     "false", "no", "null", "none", "0", "off", "true", "yes", "on", "1",
 ];

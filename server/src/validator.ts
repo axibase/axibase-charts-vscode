@@ -1096,10 +1096,7 @@ export class Validator {
                 break;
             }
             case "if": {
-                const regex: RegExp = /!=|==/;
-                if (!regex.test(line)) {
-                    this.result.push(createDiagnostic(this.foundKeyword.range, `Specify == or !=`));
-                }
+                this.keywordHandler.handleIf(line, this.foundKeyword);
                 this.setLastCondition();
                 break;
             }
