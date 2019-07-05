@@ -1,8 +1,10 @@
+import { generate } from "escodegen";
+import { parseScript } from "esprima";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
+import { BLOCK_SCRIPT_END, BLOCK_SCRIPT_START, RELATIONS_REGEXP } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
-import { RELATIONS_REGEXP } from "./regExpressions";
 
 interface Section {
     indent?: string;
@@ -77,8 +79,8 @@ export class Formatter {
      */
     public lineByLine(): TextEdit[] {
         this.currentLine = -1;
-        for (const line of this.lines) {
-            this.currentLine++;
+        while (this.currentLine < this.lines.length - 1) {
+            let line = this.getLine(++this.currentLine);
             if (isEmpty(line)) {
                 if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
                     Object.assign(this.currentSection, this.previousSection);
@@ -89,6 +91,9 @@ export class Formatter {
                 this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
+                continue;
+            } else if (BLOCK_SCRIPT_START.test(line)) {
+                this.formatScript();
                 continue;
             } else {
                 this.checkSign();
@@ -109,6 +114,45 @@ export class Formatter {
         }
 
         return this.edits;
+    }
+
+    /**
+     * Formats JavaScript content inside script tags
+     */
+    private formatScript(): void {
+        let content = ``;
+        let line = this.getLine(++this.currentLine);
+        const startLine = this.currentLine;
+
+        // Get content between script tags
+        while (line !== undefined && !BLOCK_SCRIPT_END.test(line)) {
+            content += `${line}\n`;
+            line = this.getLine(++this.currentLine);
+        }
+
+        // Parse and format JavaScript
+        const parsedCode = parseScript(content);
+        const formattedCode = generate(parsedCode, {
+            format: {
+                indent: {
+                    base: this.currentIndent.length,
+                    style: " ".repeat(this.options.tabSize)
+                }
+            }
+        });
+
+        // If formatted code is the same as original, no need to make edit
+        if (formattedCode === content) {
+            return;
+        }
+
+        const endLine = this.currentLine - 1;
+        const endCharacter = this.getLine(endLine).length;
+
+        this.edits.push(TextEdit.replace(
+            Range.create(startLine, 0, endLine, endCharacter),
+            formattedCode
+        ));
     }
 
     /**
