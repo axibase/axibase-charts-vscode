@@ -93,7 +93,9 @@ export class Formatter {
                 this.increaseIndent();
                 continue;
             } else if (BLOCK_SCRIPT_START.test(line)) {
+                this.checkIndent();
                 this.formatScript();
+                this.checkIndent();
                 continue;
             } else {
                 this.checkSign();
@@ -135,7 +137,7 @@ export class Formatter {
         const formattedCode = generate(parsedCode, {
             format: {
                 indent: {
-                    base: this.currentIndent.length,
+                    base: (this.currentIndent.length / this.options.tabSize) + 1,
                     style: " ".repeat(this.options.tabSize)
                 }
             }

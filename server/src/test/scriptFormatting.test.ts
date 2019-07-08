@@ -7,14 +7,14 @@ suite("JavasScript code formatting", () => {
         const text = `script
         window.userFunction = function () {
         return Math.round(value / 10) * 10;
-        }
-      endscript`;
+        };
+endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
-                Position.create(3, 9)),
-                "window.userfunction = function () {\n  return math.round(value / 10) * 10;\n};"
+                Position.create(3, 10)),
+                "  window.userfunction = function () {\n    return math.round(value / 10) * 10;\n  };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -24,14 +24,14 @@ suite("JavasScript code formatting", () => {
 
     test("Code written in one line", () => {
         const text = `script
-        window.userfunction = function () {return math.round(value / 10) * 10;};
-        endscript`;
+        window.userFunction = function () {return Math.round(value / 10) * 10;};
+endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
                 Position.create(1, 80)),
-                "window.userfunction = function () {\n  return math.round(value / 10) * 10;\n};"
+                "  window.userfunction = function () {\n    return math.round(value / 10) * 10;\n  };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -40,17 +40,18 @@ suite("JavasScript code formatting", () => {
     });
 
     test("Unformatted code inside script tag in [configuration]", () => {
-        const text = `[configuration]
-        script
-          window.userFunction = function () {
-          return Math.round(value / 10) * 10;
-          }
-        endscript`;
+        const text = `
+[configuration]
+  script
+    window.userfunction = function () {
+    return math.round(value / 10) * 10;
+    };
+  endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(2, 0),
-                Position.create(4, 11)),
+                Position.create(3, 0),
+                Position.create(5, 6)),
                 "    window.userfunction = function () {\n      return math.round(value / 10) * 10;\n    };"
             )
         ];
@@ -60,17 +61,18 @@ suite("JavasScript code formatting", () => {
     });
 
     test("Unformatted code inside script tag in [group]", () => {
-        const text = `[group]
-        script
-          window.userFunction = function () {
-          return Math.round(value / 10) * 10;
-          }
-        endscript`;
+        const text = `
+[group]
+  script
+    window.userFunction = function () {
+    return Math.round(value / 10) * 10;
+    };
+  endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(2, 0),
-                Position.create(4, 11)),
+                Position.create(3, 0),
+                Position.create(5, 6)),
                 "    window.userfunction = function () {\n      return math.round(value / 10) * 10;\n    };"
             )
         ];
