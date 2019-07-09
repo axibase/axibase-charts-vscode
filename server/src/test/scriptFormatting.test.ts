@@ -14,7 +14,7 @@ endscript`;
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
                 Position.create(3, 10)),
-                "  window.userfunction = function () {\n    return math.round(value / 10) * 10;\n  };"
+                "  window.userFunction = function () {\n    return Math.round(value / 10) * 10;\n  };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -31,7 +31,7 @@ endscript`;
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
                 Position.create(1, 80)),
-                "  window.userfunction = function () {\n    return math.round(value / 10) * 10;\n  };"
+                "  window.userFunction = function () {\n    return Math.round(value / 10) * 10;\n  };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -43,8 +43,8 @@ endscript`;
         const text = `
 [configuration]
   script
-    window.userfunction = function () {
-    return math.round(value / 10) * 10;
+    window.userFunction = function () {
+    return Math.round(value / 10) * 10;
     };
   endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
@@ -52,7 +52,7 @@ endscript`;
             TextEdit.replace(Range.create(
                 Position.create(3, 0),
                 Position.create(5, 6)),
-                "    window.userfunction = function () {\n      return math.round(value / 10) * 10;\n    };"
+                "    window.userFunction = function () {\n      return Math.round(value / 10) * 10;\n    };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -73,7 +73,7 @@ endscript`;
             TextEdit.replace(Range.create(
                 Position.create(3, 0),
                 Position.create(5, 6)),
-                "    window.userfunction = function () {\n      return math.round(value / 10) * 10;\n    };"
+                "    window.userFunction = function () {\n      return Math.round(value / 10) * 10;\n    };"
             )
         ];
         const formatter = new Formatter(text, options);
@@ -85,8 +85,8 @@ endscript`;
         const text = `[configuration]
   [widget]
     script` +
-    `        window.userfunction = function () {` +
-  + `  return math.round(value / 10) * 10;` +
+    `        window.userFunction = function () {` +
+  + `  return Math.round(value / 10) * 10;` +
     `};`
   + `endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
