@@ -33,7 +33,7 @@ export class JavaScriptValidator {
         let queueElement: TextRange;
         while (this.queue.hasElements()) {
             queueElement = this.queue.dequeue();
-            this.toEvaluate = `${this.toEvaluate}${queueElement.text}`;
+            this.toEvaluate = queueElement.text;
             try {
                 window.eval(this.toEvaluate);
             } catch (err) {
@@ -47,7 +47,6 @@ export class JavaScriptValidator {
                 }
                 if (!isImported) {
                     result.push(createDiagnostic(queueElement.range, err.message, DiagnosticSeverity.Warning));
-                    break;
                 }
             }
         }
