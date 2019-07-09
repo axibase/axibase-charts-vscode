@@ -122,15 +122,16 @@ export class Formatter {
      * Formats JavaScript content inside script tags
      */
     private formatScript(): void {
-        let content = ``;
-        let line = this.getLine(++this.currentLine, false);
+        let line = this.getLine(++this.currentLine);
         const startLine = this.currentLine;
 
         // Get content between script tags
+        const buffer = [];
         while (line !== undefined && !BLOCK_SCRIPT_END.test(line)) {
-            content += `${line}\n`;
-            line = this.getLine(++this.currentLine, false);
+            buffer.push(line);
+            line = this.getLine(++this.currentLine);
         }
+        const content = buffer.join("\n");
 
         // Parse and format JavaScript
         const parsedCode = parseScript(content);
@@ -142,11 +143,6 @@ export class Formatter {
                 }
             }
         });
-
-        // If formatted code is the same as original, no need to make edit
-        if (formattedCode === content) {
-            return;
-        }
 
         const endLine = this.currentLine - 1;
         const endCharacter = this.getLine(endLine).length;
@@ -289,19 +285,15 @@ export class Formatter {
 
     /**
      * Caches last returned line in this.lastLineNumber
-     * To prevent several calls toLowerCase and removeExtraSpaces
+     * To prevent several calls of removeExtraSpaces
      * @param i the required line number
      * @returns the required line
      */
-    private getLine(i: number, makeLowerCase: boolean = true): string | undefined {
+    private getLine(i: number): string | undefined {
         if (!this.lastLine || this.lastLineNumber !== i) {
             let line: string | undefined = this.lines[i];
             if (line === undefined) {
                 return undefined;
-            }
-
-            if (makeLowerCase) {
-                line = line.toLowerCase();
             }
 
             this.removeExtraSpaces(line);
