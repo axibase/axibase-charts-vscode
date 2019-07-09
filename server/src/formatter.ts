@@ -79,8 +79,8 @@ export class Formatter {
      */
     public lineByLine(): TextEdit[] {
         this.currentLine = -1;
-        while (this.currentLine < this.lines.length - 1) {
-            let line = this.getLine(++this.currentLine);
+
+        for (let line = this.nextLine(); line !== void 0; line = this.nextLine()) {
             if (isEmpty(line)) {
                 if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
                     Object.assign(this.currentSection, this.previousSection);
@@ -122,14 +122,14 @@ export class Formatter {
      * Formats JavaScript content inside script tags
      */
     private formatScript(): void {
-        let line = this.getLine(++this.currentLine);
         const startLine = this.currentLine;
+        let line = this.nextLine();
 
         // Get content between script tags
         const buffer = [];
         while (line !== undefined && !BLOCK_SCRIPT_END.test(line)) {
             buffer.push(line);
-            line = this.getLine(++this.currentLine);
+            line = this.nextLine();
         }
         const content = buffer.join("\n");
 
@@ -302,6 +302,13 @@ export class Formatter {
         }
 
         return this.lastLine;
+    }
+
+    /**
+     * Gets next line of text document
+     */
+    private nextLine(): string | undefined {
+        return this.getLine(++this.currentLine);
     }
 
     /**
