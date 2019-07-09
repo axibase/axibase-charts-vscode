@@ -7,7 +7,7 @@
 	"publisher": "Axibase",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kirmanak/Axibase-Charts-Syntax"
+		"url": "https://github.com/axibase/axibase-charts-vscode"
 	},
 	"engines": {
 		"vscode": "^1.25.0"
