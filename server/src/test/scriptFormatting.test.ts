@@ -12,7 +12,7 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(0, 0),
+                Position.create(1, 0),
                 Position.create(3, 10)),
                 "  window.userFunction = function () {\n    return Math.round(value / 10) * 10;\n  };"
             )
@@ -29,7 +29,7 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(0, 0),
+                Position.create(1, 0),
                 Position.create(1, 80)),
                 "  window.userFunction = function () {\n    return Math.round(value / 10) * 10;\n  };"
             )
@@ -50,7 +50,7 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(2, 0),
+                Position.create(3, 0),
                 Position.create(5, 6)),
                 "    window.userFunction = function () {\n      return Math.round(value / 10) * 10;\n    };"
             )
@@ -71,7 +71,7 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(2, 0),
+                Position.create(3, 0),
                 Position.create(5, 6)),
                 "    window.userFunction = function () {\n      return Math.round(value / 10) * 10;\n    };"
             )

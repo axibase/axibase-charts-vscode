@@ -120,8 +120,8 @@ export class Formatter {
      * Formats JavaScript content inside script tags
      */
     private formatScript(): void {
-        const startLine = this.currentLine;
         let line = this.nextLine();
+        const startLine = this.currentLine;
 
         // Get content between script tags
         const buffer = [];
