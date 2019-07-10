@@ -4,10 +4,10 @@ import { BOOLEAN_KEYWORDS, INTERVAL_UNITS, RELATIONS } from "./constants";
 
 //  csv <name> =
 //  <header1>, <header2>
-export const CSV_NEXT_LINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)/m;
+export const CSV_NEXT_LINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)(.*)/m;
 
 // csv <name> = <header1>, <header2>
-export const CSV_INLINE_HEADER_PATTERN = /=[ \t]*$/m;
+export const CSV_INLINE_HEADER_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(=)[ \t]*$/m;
 
 // csv <name> from <url>
 export const CSV_FROM_URL_PATTERN = /(^[ \t]*csv[ \t]+)(\w+)[ \t]*(from)/m;

@@ -170,7 +170,10 @@ export class Validator {
                 continue;
             }
             if (this.isNotKeywordEnd("csv")) {
-                this.validateCsv();
+                this.validateCsvColumnsNumber();
+            }
+            if (this.isNotKeywordEnd("for")) {
+                this.validateForVariables();
             }
             this.eachLine();
             if (this.foundKeyword !== undefined) {
@@ -675,20 +678,39 @@ export class Validator {
         const line: string = this.config.getCurrentLine();
         let header: string | null = null;
 
-        if (CSV_INLINE_HEADER_PATTERN.exec(line)) {
+        if (CSV_INLINE_HEADER_PATTERN.test(line)) {
             let j: number = this.config.currentLineNumber + 1;
             header = this.config.getLine(j);
             while (header !== null && BLANK_LINE_PATTERN.test(header)) {
                 header = this.config.getLine(++j);
             }
-        } else {
-            let match = CSV_NEXT_LINE_HEADER_PATTERN.exec(line) || CSV_FROM_URL_PATTERN.exec(line);
 
-            if (match !== null) {
-                this.match = match;
+            this.match = CSV_INLINE_HEADER_PATTERN.exec(line);
+            let columnNames = this.config.getLine(j);
+
+            while (header !== null && BLANK_LINE_PATTERN.test(header)) {
+                columnNames = this.config.getLine(++j);
+            }
+
+            const names = columnNames.split(",").map(name => name.trim());
+            this.variables.set("csvColumnNames", names);
+        } else {
+
+            let columns: string[] | null = null;
+
+            if (CSV_NEXT_LINE_HEADER_PATTERN.test(line)) {
+                this.match = CSV_NEXT_LINE_HEADER_PATTERN.exec(line);
+                header = line.substring(this.match.index + 1);
+                columns = this.match[this.match.length - 1].split(",").map(item => item.trim());
+            } else if (CSV_FROM_URL_PATTERN.test(line)) {
+                this.match = CSV_FROM_URL_PATTERN.exec(line);
                 header = line.substring(this.match.index + 1);
             } else {
                 this.result.push(createDiagnostic(this.foundKeyword.range, getCsvErrorMessage(line)));
+            }
+
+            if (columns) {
+                this.variables.set("csvColumnNames", columns);
             }
         }
         this.addToStringMap(this.variables, "csvNames");
@@ -1133,7 +1155,7 @@ export class Validator {
     /**
      * Creates diagnostics for a CSV line containing wrong columns number
      */
-    private validateCsv(): void {
+    private validateCsvColumnsNumber(): void {
         const line: string = this.config.getCurrentLine();
         const columns: number = countCsvColumns(line);
         if (columns !== this.csvColumns && !/^[ \t]*$/m.test(line)) {
@@ -1142,6 +1164,31 @@ export class Validator {
                     this.createRange(0, line.length),
                     `Expected ${this.csvColumns} columns, but found ${columns}`,
                 ));
+        }
+    }
+
+    /**
+     * Creates diagnostics for unknown variables used in for
+     */
+    private validateForVariables(): void {
+        const line: string = this.config.getCurrentLine();
+        const regexp: RegExp = /{(.+?)}/g;
+        let match = regexp.exec(line);
+        if (match !== null) {
+            const [object, property] = match[1].split(".");
+
+            if (!property) {
+                return;
+            }
+
+            if (!isInMap(property, this.variables)) {
+                const position: number = line.indexOf(match[1]);
+                const message: string = `Cannot read ${property} of ${object}`;
+                this.result.push(createDiagnostic(
+                    this.createRange(position, property.length),
+                    message,
+                ));
+            }
         }
     }
 
@@ -1222,7 +1269,7 @@ export class Validator {
      * Returns all placeholders declared before the current line.
      */
     private getUrlPlaceholders(): string[] {
-        let result = new Set();
+        let result: Set<string> = new Set();
         for (let setting of placeholderContainingSettings) {
             let currentSetting = this.sectionStack.getCurrentSetting(setting);
             if (currentSetting) {

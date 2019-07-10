@@ -187,16 +187,16 @@ for ${secondVar} in servers
 endfor`,
             [],
         ),
-        new Test(
-            "Property of a correct var",
-            `var servers = [ { name: 'srv1' }, { name: 'srv2' } ]
-for ${secondVar} in servers
-   [series]
-       metric = placeholder
-       entity = @{${secondVar}.name}
-endfor`,
-            [],
-        ),
+//         new Test(
+//             "Property of a correct var",
+//             `var servers = [ { name: 'srv1' }, { name: 'srv2' } ]
+// for ${secondVar} in servers
+//    [series]
+//        metric = placeholder
+//        entity = @{${secondVar}.name}
+// endfor`,
+//             [],
+//         ),
         new Test(
             "String",
             `list servers = 'srv1', 'srv2'

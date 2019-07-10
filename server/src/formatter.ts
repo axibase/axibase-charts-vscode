@@ -1,8 +1,8 @@
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
+import { RELATIONS_REGEXP } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
-import { RELATIONS_REGEXP } from "./regExpressions";
 
 interface Section {
     indent?: string;
