@@ -78,9 +78,9 @@ export class Formatter {
      * @returns array of text edits to properly format document
      */
     public lineByLine(): TextEdit[] {
-        this.currentLine = -1;
+        this.currentLine = 0;
 
-        for (let line = this.nextLine(); line !== void 0; line = this.nextLine()) {
+        for (let line = this.getLine(this.currentLine); line !== void 0; line = this.nextLine()) {
             if (isEmpty(line)) {
                 if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
                     Object.assign(this.currentSection, this.previousSection);
