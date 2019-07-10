@@ -129,6 +129,10 @@ export class Formatter {
             buffer.push(line);
             line = this.nextLine();
         }
+
+        if (!buffer.length) {
+            return;
+        }
         const content = buffer.join("\n");
 
         // Parse and format JavaScript
