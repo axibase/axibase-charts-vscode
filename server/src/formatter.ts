@@ -293,7 +293,6 @@ export class Formatter {
             if (line === undefined) {
                 return undefined;
             }
-
             this.removeExtraSpaces(line);
             this.lastLine = line;
             this.lastLineNumber = i;
