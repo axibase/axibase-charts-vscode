@@ -44,7 +44,7 @@ export const ONE_LINE_SCRIPT = /^\s*script\s*=.*$/m;
 export const BLOCK_SCRIPT_START_WITHOUT_LF = /(^\s*)script\s*\S/;
 
 // script
-export const BLOCK_SCRIPT_START = /script(?!([\s\S]*=))/;
+export const BLOCK_SCRIPT_START = /(?:^\s*)script(?!([\s\S]*=))/;
 
 // endscript
 export const BLOCK_SCRIPT_END = /^\s*endscript\s*$/;

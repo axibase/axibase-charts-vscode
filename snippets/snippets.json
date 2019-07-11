@@ -665,8 +665,8 @@
         "body": [
             "script",
             "  window.${1:userFunction} = function () {",
-            "  ${2:return Math.round(value / 10) * 10;}",
-            "  }",
+            "    ${2}",
+            "  };",
             "endscript"
         ]
     }
