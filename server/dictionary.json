@@ -4271,7 +4271,8 @@
         {
             "displayName": "new-row-color",
             "type": "string",
-            "example": "red"
+            "example": "red",
+            "section": "widget"
         },
         {
             "displayName": "node-alert-expression",
