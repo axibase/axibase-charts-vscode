@@ -1,7 +1,7 @@
 import { generate } from "escodegen";
 import { parseScript } from "esprima";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { BLOCK_SCRIPT_END, BLOCK_SCRIPT_START, RELATIONS_REGEXP } from "./regExpressions";
+import { BLOCK_SCRIPT_END, BLOCK_SCRIPT_START, ONE_LINE_SCRIPT, RELATIONS_REGEXP } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
@@ -90,6 +90,8 @@ export class Formatter {
                 this.checkIndent();
                 this.increaseIndent();
                 continue;
+            } else if (ONE_LINE_SCRIPT.test(line)) {
+                this.formatInlineScript();
             } else if (BLOCK_SCRIPT_START.test(line)) {
                 this.checkIndent();
                 this.formatScript();
@@ -151,6 +153,40 @@ export class Formatter {
 
         this.edits.push(TextEdit.replace(
             Range.create(startLine, 0, endLine, endCharacter),
+            formattedCode
+        ));
+    }
+
+    /**
+     * Formats `script = ` setting contents
+     */
+    private formatInlineScript(): void {
+        const line = this.getCurrentLine();
+        const match = ONE_LINE_SCRIPT.exec(line)[1];
+
+        // Parse and format JavaScript
+        const parsedCode = parseScript(match);
+        let formattedCode = generate(parsedCode, {
+            format: {
+                indent: {
+                    base: (this.currentIndent.length / this.options.tabSize),
+                    style: " ".repeat(this.options.tabSize)
+                },
+                newline: "",
+                semicolons: false
+            }
+        });
+
+        // Ugly hack: escodegen forces new line insertion and corresponding indents
+        // Substiute multiple spaces with single ' ' and remove leading and trailing spaces
+        formattedCode = formattedCode.replace(/\s\s+/g, " ").trim();
+
+        if (formattedCode === match) {
+            return;
+        }
+
+        this.edits.push(TextEdit.replace(
+            createRange(line.indexOf(match), match.length, this.currentLine),
             formattedCode
         ));
     }

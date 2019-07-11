@@ -2,7 +2,7 @@ import { deepStrictEqual } from "assert";
 import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
 import { Formatter } from "../formatter";
 
-suite("JavasScript code formatting", () => {
+suite("JavaScript code formatting", () => {
     test("Unformatted code inside script tag alone", () => {
         const text = `script
         window.userFunction = function () {
@@ -89,6 +89,47 @@ endscript`;
   + `  return Math.round(value / 10) * 10;` +
     `};`
   + `endscript`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Inline `script =` that needs formatting", () => {
+        const text = `[configuration]
+  script = var hello= value()`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [
+            TextEdit.replace(Range.create(
+                Position.create(1, 11),
+                Position.create(1, 29)),
+                "var hello = value()"
+            )
+        ];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Needs formatting. Multiple spaces before and after equals sign", () => {
+        const text = `[configuration]
+  script            =       var hello= value()`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [
+            TextEdit.replace(Range.create(
+                Position.create(1, 28),
+                Position.create(1, 46)),
+                "var hello = value()"
+            )
+        ];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Inline `script =` that doesn't need formatting", () => {
+        const text = `script = console.log('123')`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [];
         const formatter = new Formatter(text, options);

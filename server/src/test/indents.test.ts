@@ -245,12 +245,6 @@ starttime = 2018`,
       FormattingOptions.create(2, true),
     ),
     new Test(
-      "Does not affect equals signs in setting value",
-      `[configuration]
-  script = var hello= value()`,
-      [], FormattingOptions.create(2, true),
-    ),
-    new Test(
       "Incorrect [column] after endfor",
       `
 [configuration]
