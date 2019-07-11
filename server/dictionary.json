@@ -4269,6 +4269,11 @@
             "section": "widget"
         },
         {
+            "displayName": "new-row-color",
+            "type": "string",
+            "example": "red"
+        },
+        {
             "displayName": "node-alert-expression",
             "type": "string",
             "example": "value > 5",
