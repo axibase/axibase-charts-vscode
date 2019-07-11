@@ -1,5 +1,7 @@
+import { generate } from "escodegen";
+import { parseScript } from "esprima";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { RELATIONS_REGEXP } from "./regExpressions";
+import { BLOCK_SCRIPT_END, BLOCK_SCRIPT_START, RELATIONS_REGEXP } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
 import { createRange, isEmpty } from "./util";
@@ -76,9 +78,7 @@ export class Formatter {
      * @returns array of text edits to properly format document
      */
     public lineByLine(): TextEdit[] {
-        this.currentLine = -1;
-        for (const line of this.lines) {
-            this.currentLine++;
+        for (let line = this.getLine(this.currentLine); line !== void 0; line = this.nextLine()) {
             if (isEmpty(line)) {
                 if (this.currentSection.name === "tags" && this.previousSection.name !== "widget") {
                     Object.assign(this.currentSection, this.previousSection);
@@ -89,6 +89,11 @@ export class Formatter {
                 this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
+                continue;
+            } else if (BLOCK_SCRIPT_START.test(line)) {
+                this.checkIndent();
+                this.formatScript();
+                this.checkIndent();
                 continue;
             } else {
                 this.checkSign();
@@ -109,6 +114,45 @@ export class Formatter {
         }
 
         return this.edits;
+    }
+
+    /**
+     * Formats JavaScript content inside script tags
+     */
+    private formatScript(): void {
+        let line = this.nextLine();
+        const startLine = this.currentLine;
+
+        // Get content between script tags
+        const buffer = [];
+        while (line !== undefined && !BLOCK_SCRIPT_END.test(line)) {
+            buffer.push(line);
+            line = this.nextLine();
+        }
+
+        if (!buffer.length) {
+            return;
+        }
+        const content = buffer.join("\n");
+
+        // Parse and format JavaScript
+        const parsedCode = parseScript(content);
+        const formattedCode = generate(parsedCode, {
+            format: {
+                indent: {
+                    base: (this.currentIndent.length / this.options.tabSize) + 1,
+                    style: " ".repeat(this.options.tabSize)
+                }
+            }
+        });
+
+        const endLine = this.currentLine - 1;
+        const endCharacter = this.getLine(endLine).length;
+
+        this.edits.push(TextEdit.replace(
+            Range.create(startLine, 0, endLine, endCharacter),
+            formattedCode
+        ));
     }
 
     /**
@@ -243,7 +287,7 @@ export class Formatter {
 
     /**
      * Caches last returned line in this.lastLineNumber
-     * To prevent several calls toLowerCase and removeExtraSpaces
+     * To prevent several calls of removeExtraSpaces
      * @param i the required line number
      * @returns the required line
      */
@@ -253,13 +297,19 @@ export class Formatter {
             if (line === undefined) {
                 return undefined;
             }
-            line = line.toLowerCase();
             this.removeExtraSpaces(line);
             this.lastLine = line;
             this.lastLineNumber = i;
         }
 
         return this.lastLine;
+    }
+
+    /**
+     * Gets next line of text document
+     */
+    private nextLine(): string | undefined {
+        return this.getLine(++this.currentLine);
     }
 
     /**
