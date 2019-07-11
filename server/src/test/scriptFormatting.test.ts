@@ -118,7 +118,7 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(1, 28),
+                Position.create(1, 22),
                 Position.create(1, 46)),
                 "var hello = value()"
             )
