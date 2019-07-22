@@ -91,6 +91,7 @@ export class Formatter {
                 this.increaseIndent();
                 continue;
             } else if (ONE_LINE_SCRIPT.test(line)) {
+                this.checkSign();
                 this.formatInlineScript();
             } else if (BLOCK_SCRIPT_START.test(line)) {
                 this.checkIndent();

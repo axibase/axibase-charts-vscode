@@ -38,7 +38,7 @@ export const BLOCK_SQL_END = /^\s*endsql\s*$/;
 /** Regular expressions to match script */
 
 // script = console.log()
-export const ONE_LINE_SCRIPT = /^\s*script\s*=\s(.*)$/m;
+export const ONE_LINE_SCRIPT = /^\s*script\s*=s*\s*(.*)/;
 
 // script alert("Hello, world!")
 export const BLOCK_SCRIPT_START_WITHOUT_LF = /(^\s*)script\s*\S/;

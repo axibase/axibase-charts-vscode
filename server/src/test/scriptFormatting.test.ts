@@ -112,14 +112,24 @@ endscript`;
         deepStrictEqual(actual, expected);
     });
 
-    test("Needs formatting. Multiple spaces before and after equals sign", () => {
+    test("Needs formatting. Format script and `=` sign spaces", () => {
         const text = `[configuration]
   script            =       var hello= value()`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(1, 22),
-                Position.create(1, 46)),
+                Position.create(1, "  script".length),
+                Position.create(1, "  script            ".length)),
+                " "
+            ),
+            TextEdit.replace(Range.create(
+                Position.create(1, "  script            =".length),
+                Position.create(1, "  script            =       ".length)),
+                " "
+            ),
+            TextEdit.replace(Range.create(
+                Position.create(1, "  script            =       ".length),
+                Position.create(1, "  script            =       var hello= value()".length)),
                 "var hello = value()"
             )
         ];
