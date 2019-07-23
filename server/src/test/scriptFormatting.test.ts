@@ -102,8 +102,8 @@ endscript`;
         const options: FormattingOptions = FormattingOptions.create(2, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(1, 11),
-                Position.create(1, 29)),
+                Position.create(1, "  script = ".length),
+                Position.create(1, "  script = var hello= value()".length)),
                 "var hello = value()"
             )
         ];
@@ -131,6 +131,71 @@ endscript`;
                 Position.create(1, "  script            =       ".length),
                 Position.create(1, "  script            =       var hello= value()".length)),
                 "var hello = value()"
+            )
+        ];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Format setting indent and script contents", () => {
+        const text = `[configuration]
+        script = alert ("Key: " + key + ' value: ' + menu[key]);`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [
+            TextEdit.replace(Range.create(
+                Position.create(1, "        script = ".length),
+                Position.create(1, "        script = alert ('Key: ' + key + ' value: ' + menu[key]);".length)),
+                "alert('Key: ' + key + ' value: ' + menu[key])"
+            ),
+            TextEdit.replace(Range.create(
+                Position.create(1, 0),
+                Position.create(1, "        ".length)),
+                "  "
+            ),
+        ];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Format two consequent incorrect scripts", () => {
+        const text = `[configuration]
+  script = if (a    > b) console.log('hello')
+          script = console.log(  result)`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [
+            TextEdit.replace(Range.create(
+                Position.create(1, "  script = ".length),
+                Position.create(1, "  script = if (a    > b) console.log('hello')".length)),
+                "if (a > b) console.log('hello')"
+            ),
+            TextEdit.replace(Range.create(
+                Position.create(2, "          script = ".length),
+                Position.create(2, "          script = console.log(  result)".length)),
+                "console.log(result)"
+            ),
+            TextEdit.replace(Range.create(
+                Position.create(2, 0),
+                Position.create(2, "          ".length)),
+                "  "
+            )
+        ];
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Formatted and unformatted consequent scripts", () => {
+        const text = `[configuration]
+  script = if (a    > b) console.log('hello')
+  script = console.log(result)`;
+        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const expected: TextEdit[] = [
+            TextEdit.replace(Range.create(
+                Position.create(1, "  script = ".length),
+                Position.create(1, "  script = if (a    > b) console.log('hello')".length)),
+                "if (a > b) console.log('hello')"
             )
         ];
         const formatter = new Formatter(text, options);
