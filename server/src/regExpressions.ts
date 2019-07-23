@@ -38,6 +38,7 @@ export const BLOCK_SQL_END = /^\s*endsql\s*$/;
 /** Regular expressions to match script */
 
 // script = console.log()
+// Don't add global flag to this regex to avoid exec lastIndex issue
 export const ONE_LINE_SCRIPT = /^\s*script\s*=\s*(.*)/;
 
 // script alert("Hello, world!")

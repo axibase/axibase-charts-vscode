@@ -170,8 +170,7 @@ export class Formatter {
         let formattedCode = generate(parsedCode, {
             format: {
                 indent: {
-                    base: (this.currentIndent.length / this.options.tabSize),
-                    style: " ".repeat(this.options.tabSize)
+                    base: (this.currentIndent.length / this.options.tabSize)
                 },
                 newline: "",
                 semicolons: false
@@ -180,7 +179,7 @@ export class Formatter {
 
         // Ugly hack: escodegen forces new line insertion and corresponding indents
         // Substiute multiple spaces with single ' ' and remove leading and trailing spaces
-        formattedCode = formattedCode.replace(/\s\s+/g, " ").trim();
+        formattedCode = formattedCode.replace(/\s{2,}/g, " ").trim();
 
         if (formattedCode === match) {
             return;
