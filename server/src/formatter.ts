@@ -63,14 +63,20 @@ export class Formatter {
      * Indent of last keyword.
      */
     private lastKeywordIndent: string = "";
+    /**
+     * Inserts one blank line between sections
+     * Deletes consequent blank lines in the document
+     */
+    private formatBlankLines: boolean;
 
     private lastAddedParent: Section = {};
     private previousSection: Section = {};
     private currentSection: Section = {};
 
-    public constructor(text: string, formattingOptions: FormattingOptions) {
+    public constructor(text: string, formattingOptions: FormattingOptions, formatBlankLines: boolean = false) {
         this.options = formattingOptions;
         this.lines = text.split("\n");
+        this.formatBlankLines = formatBlankLines;
     }
 
     /**
@@ -84,11 +90,13 @@ export class Formatter {
                     Object.assign(this.currentSection, this.previousSection);
                     this.decreaseIndent();
                 }
+                this.deleteExtraBlankLines();
                 continue;
             } else if (this.isSectionDeclaration()) {
                 this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
+                this.insertLineBeforeSection();
                 continue;
             } else if (BLOCK_SCRIPT_START.test(line)) {
                 this.checkIndent();
@@ -310,6 +318,39 @@ export class Formatter {
      */
     private nextLine(): string | undefined {
         return this.getLine(++this.currentLine);
+    }
+
+    /**
+     * Inserts blank line before section except for configuration
+     * Works only if `formatBlankLines` option is activated
+     */
+    private insertLineBeforeSection(): void {
+        if (!this.formatBlankLines || this.currentSection.name === "configuration") {
+            return;
+        }
+        this.edits.push(TextEdit.replace(
+            Range.create(this.currentLine, 0, this.currentLine, this.getCurrentLine().length),
+            "\n" + this.getCurrentLine(),
+        ));
+    }
+
+    /**
+     * Deletes extra blank lines in the document
+     * Works only if `formatBlankLines` option is activated
+     */
+    private deleteExtraBlankLines(): void {
+        if (!this.formatBlankLines || this.getLine(this.currentLine + 1) === void 0) {
+            return;
+        }
+
+        this.edits.push(TextEdit.replace(
+            Range.create(
+                this.currentLine,
+                0,
+                this.currentLine + 1, 0
+            ),
+            "",
+        ));
     }
 
     /**
