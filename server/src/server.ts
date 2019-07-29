@@ -115,13 +115,12 @@ documents.onDidChangeContent(async (change: TextDocumentChangeEvent) => {
 
 connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] => {
     const document: TextDocument | undefined = documents.get(params.textDocument.uri);
-    const formatBlankLines = true; // for demo purposes
 
     if (document === undefined) {
         return [];
     }
     const text: string | undefined = document.getText();
-    const formatter: Formatter = new Formatter(text, params.options, formatBlankLines);
+    const formatter: Formatter = new Formatter(text, params.options);
 
     return formatter.lineByLine();
 });

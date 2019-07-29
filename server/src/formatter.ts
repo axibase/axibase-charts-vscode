@@ -67,16 +67,15 @@ export class Formatter {
      * Inserts one blank line between sections
      * Deletes consequent blank lines in the document
      */
-    private formatBlankLines: boolean;
+    private formatBlankLines: boolean = false;
 
     private lastAddedParent: Section = {};
     private previousSection: Section = {};
     private currentSection: Section = {};
 
-    public constructor(text: string, formattingOptions: FormattingOptions, formatBlankLines: boolean = false) {
+    public constructor(text: string, formattingOptions: FormattingOptions) {
         this.options = formattingOptions;
         this.lines = text.split("\n");
-        this.formatBlankLines = formatBlankLines;
     }
 
     /**
