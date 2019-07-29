@@ -115,7 +115,6 @@ documents.onDidChangeContent(async (change: TextDocumentChangeEvent) => {
 
 connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] => {
     const document: TextDocument | undefined = documents.get(params.textDocument.uri);
-
     if (document === undefined) {
         return [];
     }
