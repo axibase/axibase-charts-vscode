@@ -89,13 +89,13 @@ export class Formatter {
                     Object.assign(this.currentSection, this.previousSection);
                     this.decreaseIndent();
                 }
-                this.deleteExtraBlankLines();
+                // this.deleteExtraBlankLines();
                 continue;
             } else if (this.isSectionDeclaration()) {
                 this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
-                this.insertLineBeforeSection();
+                // this.insertLineBeforeSection();
                 continue;
             } else if (BLOCK_SCRIPT_START.test(line)) {
                 this.checkIndent();
