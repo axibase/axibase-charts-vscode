@@ -89,13 +89,13 @@ export class Formatter {
                     Object.assign(this.currentSection, this.previousSection);
                     this.decreaseIndent();
                 }
-                // this.deleteExtraBlankLines();
+                this.deleteExtraBlankLines();
                 continue;
             } else if (this.isSectionDeclaration()) {
                 this.calculateSectionIndent();
                 this.checkIndent();
                 this.increaseIndent();
-                // this.insertLineBeforeSection();
+                this.insertLineBeforeSection();
                 continue;
             } else if (BLOCK_SCRIPT_START.test(line)) {
                 this.checkIndent();
@@ -324,13 +324,13 @@ export class Formatter {
      * Works only if `formatBlankLines` option is activated
      */
     private insertLineBeforeSection(): void {
-        if (!this.formatBlankLines || this.currentSection.name === "configuration") {
-            return;
-        }
-        this.edits.push(TextEdit.replace(
-            Range.create(this.currentLine, 0, this.currentLine, this.getCurrentLine().length),
-            "\n" + this.getCurrentLine(),
-        ));
+        // if (!this.formatBlankLines || this.currentSection.name === "configuration") {
+        //     return;
+        // }
+        // this.edits.push(TextEdit.replace(
+        //     Range.create(this.currentLine, 0, this.currentLine, this.getCurrentLine().length),
+        //     "\n" + this.getCurrentLine(),
+        // ));
     }
 
     /**
@@ -338,18 +338,18 @@ export class Formatter {
      * Works only if `formatBlankLines` option is activated
      */
     private deleteExtraBlankLines(): void {
-        if (!this.formatBlankLines || this.getLine(this.currentLine + 1) === void 0) {
-            return;
-        }
+        // if (!this.formatBlankLines || this.getLine(this.currentLine + 1) === void 0) {
+        //     return;
+        // }
 
-        this.edits.push(TextEdit.replace(
-            Range.create(
-                this.currentLine,
-                0,
-                this.currentLine + 1, 0
-            ),
-            "",
-        ));
+        // this.edits.push(TextEdit.replace(
+        //     Range.create(
+        //         this.currentLine,
+        //         0,
+        //         this.currentLine + 1, 0
+        //     ),
+        //     "",
+        // ));
     }
 
     /**
