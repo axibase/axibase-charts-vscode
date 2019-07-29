@@ -67,7 +67,7 @@ export class Formatter {
      * Inserts one blank line between sections
      * Deletes consequent blank lines in the document
      */
-    private formatBlankLines: boolean = false;
+    // private formatBlankLines: boolean = false;
 
     private lastAddedParent: Section = {};
     private previousSection: Section = {};
