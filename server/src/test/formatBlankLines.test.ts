@@ -28,6 +28,7 @@ suite("Blank lines formatting", () => {
             )
         ];
         const formatter = new Formatter(text, options, true);
+
         const actual = formatter.lineByLine();
         deepStrictEqual(actual, expected);
     });
