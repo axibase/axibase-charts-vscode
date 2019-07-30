@@ -1,11 +1,13 @@
 sudo: false
 
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-    - os: osx
-      osx_image: xcode10.1
+os:
+  - osx
+  - linux
+
+osx_image: xcode10.1
+
+services:
+  - xvfb
 
 before_install:
   - if [ $TRAVIS_OS_NAME == "linux" ]; then
