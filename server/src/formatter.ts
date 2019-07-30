@@ -325,7 +325,7 @@ export class Formatter {
      * Caches last returned line in this.lastLineNumber
      * To prevent several calls of removeExtraSpaces
      * @param i the required line number
-     * @returns required line
+     * @returns the required line
      */
     private getLine(i: number): string | undefined {
         if (!this.lastLine || this.lastLineNumber !== i) {
