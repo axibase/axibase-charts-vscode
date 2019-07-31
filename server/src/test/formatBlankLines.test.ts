@@ -1,5 +1,6 @@
 import { deepStrictEqual } from "assert";
-import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
+import { Position, Range, TextEdit } from "vscode-languageserver";
+import { CustomFormattingOptions } from "../customFormattingOptions";
 import { Formatter } from "../formatter";
 
 suite("Blank lines formatting", () => {
@@ -9,25 +10,15 @@ suite("Blank lines formatting", () => {
 
 
 [group]`;
-        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
                 Position.create(3, 0)),
                 ""
-            ),
-            TextEdit.replace(Range.create(
-                Position.create(3, 0),
-                Position.create(4, 0)),
-                ""
-            ),
-            TextEdit.replace(Range.create(
-                Position.create(4, 0),
-                Position.create(4, "[group]".length)),
-                "\n[group]"
             )
         ];
-        const formatter = new Formatter(text, options, true);
+        const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
         deepStrictEqual(actual, expected);
     });
@@ -36,7 +27,7 @@ suite("Blank lines formatting", () => {
         const text = `[configuration]
   offset-right = 50
 [group]`;
-        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -44,7 +35,19 @@ suite("Blank lines formatting", () => {
                 "\n[group]"
             )
         ];
-        const formatter = new Formatter(text, options, true);
+        const formatter = new Formatter(text, options);
+        const actual = formatter.lineByLine();
+        deepStrictEqual(actual, expected);
+    });
+
+    test("Correct config that doesn't need formatting", () => {
+        const text = `[configuration]
+  offset-right = 50
+
+[group]`;
+        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
+        const expected: TextEdit[] = [];
+        const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
         deepStrictEqual(actual, expected);
     });
@@ -55,7 +58,7 @@ suite("Blank lines formatting", () => {
 
   metric = cpu_busy
 [group]`;
-        const options: FormattingOptions = FormattingOptions.create(2, true);
+        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -68,7 +71,7 @@ suite("Blank lines formatting", () => {
                 "\n[group]"
             )
         ];
-        const formatter = new Formatter(text, options, true);
+        const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
         deepStrictEqual(actual, expected);
     });

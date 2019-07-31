@@ -5,6 +5,7 @@ import {
     ProposedFeatures, TextDocument, TextDocumentChangeEvent, TextDocumentPositionParams, TextDocuments, TextEdit,
 } from "vscode-languageserver";
 import { CompletionProvider } from "./completionProvider";
+import { CustomFormattingOptions } from "./customFormattingOptions";
 import { Formatter } from "./formatter";
 import { HoverProvider } from "./hoverProvider";
 import { JavaScriptValidator } from "./javaScriptValidator";
@@ -119,7 +120,8 @@ connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] =
         return [];
     }
     const text: string | undefined = document.getText();
-    const formatter: Formatter = new Formatter(text, params.options);
+    const formattingOptions = new CustomFormattingOptions(params.options.tabSize, params.options.insertSpaces, true);
+    const formatter: Formatter = new Formatter(text, formattingOptions);
 
     return formatter.lineByLine();
 });
