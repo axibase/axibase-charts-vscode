@@ -1,7 +1,6 @@
 import { generate } from "escodegen";
 import { parseScript } from "esprima";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
-import { CustomFormattingOptions } from "./customFormattingOptions";
 import { BLOCK_SCRIPT_END, BLOCK_SCRIPT_START, RELATIONS_REGEXP } from "./regExpressions";
 import { isNestedToPrevious, sectionDepthMap } from "./resources";
 import { TextRange } from "./textRange";
@@ -11,6 +10,20 @@ interface Section {
     indent?: string;
     name?: string;
 }
+
+/** Extended formatting options, supporting blank lines formatting possibility */
+interface AxibaseFormattingOptions extends FormattingOptions {
+    formatBlankLines?: boolean;
+}
+
+/** Default document formatting options */
+export const DEFAULT_FORMATTING_OPTIONS = (formatBlankLines: boolean = true): AxibaseFormattingOptions => {
+    const TAB_SIZE: number = 2;
+    const INSERT_SPACES: boolean = true;
+
+    return Object.assign(FormattingOptions.create(TAB_SIZE, INSERT_SPACES), { formatBlankLines });
+};
+
 /**
  * Formats the document
  */
@@ -59,7 +72,7 @@ export class Formatter {
     /**
      * Contains options from user's settings which are used to format document
      */
-    private readonly options: CustomFormattingOptions;
+    private readonly options: AxibaseFormattingOptions;
     /**
      * Indent of last keyword.
      */
@@ -69,7 +82,7 @@ export class Formatter {
     private previousSection: Section = {};
     private currentSection: Section = {};
 
-    public constructor(text: string, formattingOptions: FormattingOptions) {
+    public constructor(text: string, formattingOptions: AxibaseFormattingOptions) {
         this.options = formattingOptions;
         this.lines = text.split("\n");
     }

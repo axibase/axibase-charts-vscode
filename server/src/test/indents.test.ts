@@ -1,7 +1,7 @@
-import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
-import { Test } from "./test";
 import { deepStrictEqual } from "assert";
-import { Formatter } from "../formatter";
+import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
+import { DEFAULT_FORMATTING_OPTIONS, Formatter } from "../formatter";
+import { Test } from "./test";
 
 suite("Formatting indents tests: sections and settings", () => {
   const tests: Test[] = [
@@ -10,7 +10,7 @@ suite("Formatting indents tests: sections and settings", () => {
       `[configuration]
   width-units = 200
   height-units = 200`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "incorrect cfg section",
@@ -18,7 +18,7 @@ suite("Formatting indents tests: sections and settings", () => {
 width-units = 200
   height-units = 200`,
       [TextEdit.replace(Range.create(Position.create(1, 0), Position.create(1, 0)), "  ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "correct nested wgt section",
@@ -27,7 +27,7 @@ width-units = 200
   height-units = 200
   [widget]
     type = chart`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "incorrect nested wgt section",
@@ -37,7 +37,7 @@ width-units = 200
   [widget]
   type = chart`,
       [TextEdit.replace(Range.create(Position.create(4, 0), Position.create(4, 2)), "    ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "correct nested series section",
@@ -48,7 +48,7 @@ width-units = 200
     type = chart
     [series]
       entity = server`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "incorrect nested series section",
@@ -60,7 +60,7 @@ width-units = 200
   [series]
       entity = server`,
       [TextEdit.replace(Range.create(Position.create(5, 0), Position.create(5, 2)), "    ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Correct for loop",
@@ -73,7 +73,7 @@ width-units = 200
       [series]
         entity = @{server}
     endfor`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Incorrect for loop",
@@ -87,7 +87,7 @@ width-units = 200
       entity = @{server}
     endfor`,
       [TextEdit.replace(Range.create(Position.create(7, 0), Position.create(7, "      ".length)), "        ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Incorrect nested if in for",
@@ -114,7 +114,7 @@ metric = cpu_system
         TextEdit.replace(Range.create(Position.create(13, 0), Position.create(13, 0)), "          "),
         TextEdit.replace(Range.create(Position.create(15, 0), Position.create(15, 0)), "          "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Incorrect formatting in the first for, correct in second",
@@ -150,7 +150,7 @@ metric = cpu_system
         TextEdit.replace(Range.create(Position.create(13, 0), Position.create(13, 0)), "      "),
         TextEdit.replace(Range.create(Position.create(14, 0), Position.create(14, "    ".length)), "        "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "A couple of correct groups",
@@ -176,7 +176,7 @@ metric = cpu_system
     [series]
       entity = vds
       metric = cpu_busy`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Correct for after var declaration",
@@ -191,7 +191,7 @@ metric = cpu_system
         entity = @{item}
         metric = cpu_busy
     endfor`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Adds a space between setting name and equals sign",
@@ -200,7 +200,7 @@ metric = cpu_system
       [
         TextEdit.insert(Position.create(1, "  entity".length), " "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Align series setting declared after [tags] and empty line",
@@ -215,7 +215,7 @@ starttime = 2018`,
       [
         TextEdit.insert(Position.create(7, 0), "      "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Removes an extra space between setting name and equals sign",
@@ -224,7 +224,7 @@ starttime = 2018`,
       [
         TextEdit.replace(Range.create(1, "  entity".length, 1, "  entity  ".length), " "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Adds a space between list name and equals sign",
@@ -233,7 +233,7 @@ starttime = 2018`,
       [
         TextEdit.insert(Position.create(1, "  list entities".length), " "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Removes an extra space between list name and equals sign",
@@ -242,13 +242,13 @@ starttime = 2018`,
       [
         TextEdit.replace(Range.create(1, "  list entities".length, 1, "  list entities  ".length), " "),
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Does not affect equals signs in setting value",
       `[configuration]
   script = var hello= value()`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Incorrect [column] after endfor",
@@ -271,14 +271,14 @@ starttime = 2018`,
       key = value
       label = Value`,
       [TextEdit.replace(Range.create(Position.create(15, 0), Position.create(15, "       ".length)), "    ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "No ident increase after one-line script",
       `
 script = if (dialog) widget.hideEmptySeries(false)
 column-time = null`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[series] at the same indent as [tags] in [widget]",
@@ -290,7 +290,7 @@ column-time = null`,
 
 [series]`,
       [TextEdit.replace(Range.create(Position.create(6, 0), Position.create(6, 0)), "    ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[column] at the same indent as [tags] in [widget]",
@@ -304,7 +304,7 @@ column-time = null`,
 [column]
       key = level`,
       [TextEdit.replace(Range.create(Position.create(7, 0), Position.create(7, 0)), "    ")],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[dropdown] nested to [widget]",
@@ -318,7 +318,7 @@ column-time = null`,
       change-field = metric
       options = javascript: requestEntitiesMetricsOptions('name', 'label')
     [series]`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[series] at the same indent as [column] and [tags]",
@@ -335,7 +335,7 @@ column-time = null`,
     [series]
       metric = collectd.df.df_complex.reserved
       color = brown`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[series] at the same indent as [column] and [tags] (empty line after tags)",
@@ -353,7 +353,7 @@ column-time = null`,
     [series]
       metric = collectd.df.df_complex.reserved
       color = brown`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[widget] after [column] and [series]",
@@ -370,7 +370,7 @@ column-time = null`,
       metric-label = wait
   [widget]
     type = chart`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "[column] > [series] > [tags] inside if and for",
@@ -397,7 +397,7 @@ column-time = null`,
 
       endif
     endfor`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Two [option] at the same indent",
@@ -410,7 +410,7 @@ column-time = null`,
       [option]
         text = CPU Idle
         value = cpu_idle`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Child inside keywords, parent - outside",
@@ -429,7 +429,7 @@ column-time = null`,
               value = @{id}
         endif
       endfor`,
-      [], FormattingOptions.create(2, true),
+      [], DEFAULT_FORMATTING_OPTIONS(false),
     )
   ];
   tests.forEach((test: Test) => { test.formatTest(); }
@@ -440,20 +440,20 @@ suite("Formatting indents tests: !=, ==, = ", () => {
   const tests: Test[] = [
     new Test(
       "Correct !=",
-      `if id != 'a'`, [], FormattingOptions.create(2, true),
+      `if id != 'a'`, [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Correct ==",
-      `if id == 'a'`, [], FormattingOptions.create(2, true),
+      `if id == 'a'`, [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Correct =",
-      `type = bar`, [], FormattingOptions.create(2, true),
+      `type = bar`, [], DEFAULT_FORMATTING_OPTIONS(false),
     ), new Test(
       "Incorrect ==",
       `if id =='a'`, [TextEdit.replace(Range.create(
         Position.create(0, "if id ==".length), Position.create(0, "if id ==".length)), " ")],
-      FormattingOptions.create(2, true),
+        DEFAULT_FORMATTING_OPTIONS(false),
     ), new Test(
       "Incorrect =",
       `type=bar`, [TextEdit.replace(Range.create(
@@ -461,7 +461,7 @@ suite("Formatting indents tests: !=, ==, = ", () => {
       TextEdit.replace(Range.create(
         Position.create(0, "type=".length), Position.create(0, "type=".length)), " ")
       ],
-      FormattingOptions.create(2, true),
+      DEFAULT_FORMATTING_OPTIONS(false),
     )];
   tests.forEach((test: Test) => { test.formatTest(); });
 });
@@ -469,16 +469,16 @@ suite("Formatting indents tests: !=, ==, = ", () => {
 suite("Formatting indents tests: >=, <=, >, <", () => {
   test("Correct >", () => {
     const text = `if a > b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [];
     const formatter = new Formatter(text, options);
     const actual = formatter.lineByLine();
     deepStrictEqual(actual, expected);
   });
-  
+
   test("Correct <", () => {
     const text = `if a < b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [];
     const formatter = new Formatter(text, options);
     const actual = formatter.lineByLine();
@@ -487,7 +487,7 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
 
   test("Correct >=", () => {
     const text = `if a >= b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [];
     const formatter = new Formatter(text, options);
     const actual = formatter.lineByLine();
@@ -496,7 +496,7 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
 
   test("Correct <=", () => {
     const text = `if a <= b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [];
     const formatter = new Formatter(text, options);
     const actual = formatter.lineByLine();
@@ -505,7 +505,7 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
 
   test("Incorrect > (extra spaces before)", () => {
     const text = `if a   > b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [
       TextEdit.replace(Range.create(
         Position.create(0, "if a".length),
@@ -519,7 +519,7 @@ suite("Formatting indents tests: >=, <=, >, <", () => {
 
   test("Incorrect <= (extra spaces after)", () => {
     const text = `if a <=   b`;
-    const options: FormattingOptions = FormattingOptions.create(2, true);
+    const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
     const expected: TextEdit[] = [
       TextEdit.replace(Range.create(
         Position.create(0, "if a <=".length),
@@ -538,7 +538,7 @@ suite("Formatting indents tests for keywords that can be unclosed", () => {
       "Correct: csv <name> from <url>",
       `csv rows from https://raw.githubusercontent.com/axibase/visa-refusal.csv
 for row in rows
-endfor`, [], FormattingOptions.create(2, true),
+endfor`, [], DEFAULT_FORMATTING_OPTIONS(false),
     ),
     new Test(
       "Incorrect: csv <name> from <url>",
@@ -546,7 +546,7 @@ endfor`, [], FormattingOptions.create(2, true),
   for row in rows
 endfor`,
 [TextEdit.replace(Range.create(Position.create(1, 0), Position.create(1, "  ".length)), "")],
-FormattingOptions.create(2, true),
+DEFAULT_FORMATTING_OPTIONS(false),
     )];
   tests.forEach((test: Test) => { test.formatTest(); }
   );

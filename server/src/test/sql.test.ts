@@ -1,6 +1,5 @@
 import assert = require("assert");
-import { FormattingOptions } from "vscode-languageserver";
-import { Formatter } from "../formatter";
+import { DEFAULT_FORMATTING_OPTIONS, Formatter } from "../formatter";
 import { lineFeedRequired, noMatching } from "../messageUtil";
 import { createDiagnostic, createRange } from "../util";
 import { Validator } from "../validator";
@@ -81,6 +80,6 @@ suite("Formatter: SQL indents tests", () => {
         "    endsql\n" +
         "    [series]\n"
         ;
-    const formatter = new Formatter(config, FormattingOptions.create(2, true));
+    const formatter = new Formatter(config, DEFAULT_FORMATTING_OPTIONS(false));
     assert.deepStrictEqual(formatter.lineByLine(), []);
 });

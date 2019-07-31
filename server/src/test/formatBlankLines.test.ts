@@ -1,7 +1,6 @@
 import { deepStrictEqual } from "assert";
-import { Position, Range, TextEdit } from "vscode-languageserver";
-import { CustomFormattingOptions } from "../customFormattingOptions";
-import { Formatter } from "../formatter";
+import { FormattingOptions, Position, Range, TextEdit } from "vscode-languageserver";
+import { DEFAULT_FORMATTING_OPTIONS, Formatter } from "../formatter";
 
 suite("Blank lines formatting", () => {
     test("Delete extra blank lines between sections", () => {
@@ -10,7 +9,7 @@ suite("Blank lines formatting", () => {
 
 
 [group]`;
-        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -27,7 +26,7 @@ suite("Blank lines formatting", () => {
         const text = `[configuration]
   offset-right = 50
 [group]`;
-        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -45,7 +44,7 @@ suite("Blank lines formatting", () => {
   offset-right = 50
 
 [group]`;
-        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [];
         const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
@@ -58,7 +57,7 @@ suite("Blank lines formatting", () => {
 
   metric = cpu_busy
 [group]`;
-        const options: CustomFormattingOptions = new CustomFormattingOptions(2, true, true);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
