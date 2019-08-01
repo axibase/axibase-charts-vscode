@@ -1045,6 +1045,10 @@ This applies to derived series which are placed in the same column alongside the
   
 Apply CSS styles to negative values of a series in `column` or `column-stack` mode.  
   
+## newrowcolor  
+  
+Highlight left border of recently received rows with the specified color.  
+  
 ## nodealertexpression  
   
 ## nodealertstyle  
