@@ -820,7 +820,7 @@
         {
             "displayName": "columns",
             "type": "string",
-            "example": "columns = pid, command",
+            "example": "pid, command",
             "section": "widget"
         },
         {
