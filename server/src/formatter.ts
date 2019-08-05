@@ -349,11 +349,11 @@ export class Formatter {
 
     /**
      * Sets current indent to the provided
-     * @param newIndentLenth the new indent
+     * @param newIndentLength the new indent
      */
-    private setIndent(newIndentLenth: number = 0): void {
+    private setIndent(newIndentLength: number = 0): void {
         let newIndent = "";
-        for (; newIndentLenth > 0; newIndentLenth--) {
+        for (; newIndentLength > 0; newIndentLength--) {
             newIndent += "  ";
         }
         this.currentIndent = newIndent;

@@ -34,7 +34,7 @@ export const settingNameInTags: MessageFactoryMethod = (found: string): string =
   "enclose in double-quotes to send it to the server without\na warning.";
 
 export const uselessScope: MessageFactoryMethod = (found: string, msg: string): string =>
-  `${found} setting is appplied only if ${msg}.`;
+  `${found} setting is applied only if ${msg}.`;
 
 export const incorrectColors: MessageFactoryMethod = (found: string, msg: string): string =>
   `Number of colors (if specified) must be equal to\nnumber of thresholds minus 1.
