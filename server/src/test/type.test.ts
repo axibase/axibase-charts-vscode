@@ -1,4 +1,5 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { deepStrictEqual } from "assert";
+import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
 import { dateError, supportedUnits } from "../messageUtil";
 import { createDiagnostic, createRange } from "../util";
 import { Validator } from "../validator";
@@ -671,5 +672,107 @@ start-time = ${template}
       "Incorrect interval syntax: + .5 * week");
     const actual = validator.lineByLine();
     assert.deepStrictEqual(actual, expected, `Config:\n${config}`);
+  });
+});
+
+suite("string[] type tests", () => {
+  test("Commas are missing", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c d e`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    const expectedDiagnostic = createDiagnostic(
+      Range.create(Position.create(8, 18), Position.create(8, 25)),
+      "metrics should be a comma separated list. For example, disk_used, memused",
+      DiagnosticSeverity.Error
+    );
+    deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+  });
+
+  test("Some commas are missing", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c, d e`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    const expectedDiagnostic = createDiagnostic(
+      Range.create(Position.create(8, 18), Position.create(8, 25)),
+      "metrics should be a comma separated list. For example, disk_used, memused",
+      DiagnosticSeverity.Error
+    );
+    deepStrictEqual(actualDiagnostics, [expectedDiagnostic]);
+  });
+
+  test("Correct setting of string[] type, no spaces", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c,d,e`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    deepStrictEqual(actualDiagnostics, []);
+  });
+
+  test("Correct setting of string[] type with spaces", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c, d, e`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    deepStrictEqual(actualDiagnostics, []);
+  });
+
+  test("Correct setting of string[], single value", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    deepStrictEqual(actualDiagnostics, []);
+  });
+
+  test("Correct setting of string[] type, some spaces are missing", () => {
+    const config = `[configuration]
+          [group]
+          [widget]
+              type = chart
+              metric = a
+              [column]
+                  [series]
+                  entity = b
+                  metrics = c,d, e`;
+    const validator = new Validator(config);
+    const actualDiagnostics = validator.lineByLine();
+    deepStrictEqual(actualDiagnostics, []);
   });
 });

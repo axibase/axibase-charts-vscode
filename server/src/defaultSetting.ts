@@ -89,7 +89,7 @@ export class DefaultSetting {
     public readonly section?: string | string[];
     /**
      * The type of the setting.
-     * Possible values: string, number, integer, boolean, enum, interval, date
+     * Possible values: string, number, integer, boolean, enum, interval, date, string[]
      */
     public readonly type: string = "";
     /**

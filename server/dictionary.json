@@ -2106,6 +2106,51 @@
             "section": "series"
         },
         {
+            "displayName": "evaluate-expression",
+            "type": "string",
+            "example": "name LIKE 'cpu*'",
+            "section": "series",
+            "excludes": [
+                "evaluate-script"
+            ]
+        },
+        {
+            "displayName": "evaluate-libs",
+            "type": "string[]",
+            "example": "helpers.mvl,my-lib.mvel",
+            "section": "series"
+        },
+        {
+            "displayName": "evaluate-mode",
+            "type": "string",
+            "example": "NOT_STRICT",
+            "section": "series",
+            "defaultValue": "NOT_STRICT",
+            "possibleValues": [
+                {
+                    "value": "STRICT"
+                },
+                {
+                    "value": "NOT_STRICT"
+                }
+            ]
+        },
+        {
+            "displayName": "evaluate-script",
+            "type": "string",
+            "example": "script-file.mvel",
+            "section": "series",
+            "excludes": [
+                "evaluate-expression"
+            ]
+        },
+        {
+            "displayName": "evaluate-timezone",
+            "type": "string",
+            "section": "series",
+            "example": "Europe/Moscow"
+        },
+        {
             "displayName": "exact-match",
             "type": "boolean",
             "example": true,
@@ -4086,6 +4131,12 @@
                 "attribute",
                 "table"
             ]
+        },
+        {
+            "displayName": "metrics",
+            "type": "string[]",
+            "example": "disk_used, memused",
+            "section": "series"
         },
         {
             "displayName": "metric-label",

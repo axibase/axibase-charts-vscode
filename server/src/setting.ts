@@ -113,6 +113,15 @@ export class Setting extends DefaultSetting {
           range);
         break;
       }
+      case "string[]": {
+        if (!this.isValidStringArray(this.value)) {
+          result = createDiagnostic(
+            range,
+            `${this.displayName} should be a comma separated list. For example, ${this.example}`,
+          );
+        }
+        break;
+      }
       case "boolean": {
         if (!BOOLEAN_REGEXP.test(this.value)) {
           result = createDiagnostic(
@@ -241,6 +250,20 @@ Current: ${this.value}`);
           n}`);
     }
     return result;
+  }
+
+  /**
+   * Check that string array has right format
+   * @param value string to test
+   */
+  private isValidStringArray(value: string) {
+    const validSingle = value.split(" ").length === 1;
+    /**
+     * Workaround in case some commas are missing
+     * For example: disk_used, cpu_used mem_used
+     */
+    const validMultiple = value.split(",").length >= value.split(" ").length;
+    return validSingle || validMultiple;
   }
 
   private findIndexInEnum(value: string) {

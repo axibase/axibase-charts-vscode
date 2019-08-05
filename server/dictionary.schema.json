@@ -76,6 +76,7 @@
             "enum": [
               "boolean",
               "string",
+              "string[]",
               "enum",
               "number",
               "interval",

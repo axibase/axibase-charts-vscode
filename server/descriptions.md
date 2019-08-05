@@ -418,6 +418,26 @@ Override grouped series legend when `group=entity`.
   
 Define the wait period after ATSD handles a server processing error before refreshing data.  
   
+## evaluateexpression  
+  
+Expression evaluated for each timestamp.  
+  
+## evaluatelibs  
+  
+Libraries used for expression evaluation.  
+  
+## evaluatemode  
+  
+Evaluation mode: can be strict or not strict.  
+  
+## evaluatescript  
+  
+Script used for expression evaluation for each timestamp.  
+  
+## evaluatetimezone  
+  
+Regularizes series into DAY (and larger periods) due to calendar alignment.  
+  
 ## exactmatch  
   
 Ignore series with tags, other than those specified in the series configuration.  
@@ -974,6 +994,10 @@ Supported wildcards: `*` and `?`.
 ## metric  
   
 Define the Metric.  
+  
+## metrics  
+  
+Retrieves a list of metrics collected by the entity.  
   
 ## metriclabel  
   
