@@ -2123,7 +2123,6 @@
         {
             "displayName": "evaluate-mode",
             "type": "enum",
-            "example": "NOT_STRICT",
             "section": "series",
             "defaultValue": "NOT_STRICT",
             "enum": [
