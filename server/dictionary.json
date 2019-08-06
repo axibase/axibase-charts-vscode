@@ -7149,7 +7149,7 @@
         },
         {
             "displayName": "sql",
-            "section": "widget",
+            "section": "series",
             "example": "SELECT time, entity, value FROM cpu_busy WHERE time > now - 5 * minute",
             "multiLine": true,
             "type": "string"
