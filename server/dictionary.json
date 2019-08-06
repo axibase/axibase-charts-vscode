@@ -2117,22 +2117,18 @@
         {
             "displayName": "evaluate-libs",
             "type": "string[]",
-            "example": "helpers.mvl,my-lib.mvel",
+            "example": "helpers.mvl, my-lib.mvel",
             "section": "series"
         },
         {
             "displayName": "evaluate-mode",
-            "type": "string",
+            "type": "enum",
             "example": "NOT_STRICT",
             "section": "series",
             "defaultValue": "NOT_STRICT",
-            "possibleValues": [
-                {
-                    "value": "STRICT"
-                },
-                {
-                    "value": "NOT_STRICT"
-                }
+            "enum": [
+                "STRICT",
+                "NOT_STRICT"
             ]
         },
         {

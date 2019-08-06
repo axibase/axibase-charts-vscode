@@ -256,7 +256,8 @@ endif
             return [];
         }
         switch (setting.type) {
-            case "string": {
+            case "string":
+            case "string[]": {
                 return this.completeStringSettingValue(setting);
             }
             case "number":
