@@ -135,24 +135,28 @@ export class Formatter {
         }
         const content = buffer.join("\n");
 
-        // Parse and format JavaScript
-        const parsedCode = parseScript(content);
-        const formattedCode = generate(parsedCode, {
-            format: {
-                indent: {
-                    base: (this.currentIndent.length / this.options.tabSize) + 1,
-                    style: " ".repeat(this.options.tabSize)
+        try {
+            /** Parse and format JavaScript */
+            const parsedCode = parseScript(content);
+            const formattedCode = generate(parsedCode, {
+                format: {
+                    indent: {
+                        base: (this.currentIndent.length / this.options.tabSize) + 1,
+                        style: " ".repeat(this.options.tabSize)
+                    }
                 }
-            }
-        });
+            });
 
-        const endLine = this.currentLine - 1;
-        const endCharacter = this.getLine(endLine).length;
+            const endLine = this.currentLine - 1;
+            const endCharacter = this.getLine(endLine).length;
 
-        this.edits.push(TextEdit.replace(
-            Range.create(startLine, 0, endLine, endCharacter),
-            formattedCode
-        ));
+            this.edits.push(TextEdit.replace(
+                Range.create(startLine, 0, endLine, endCharacter),
+                formattedCode
+            ));
+        } catch (error) {
+            /** If we didn't manage to format script just continue */
+        }
     }
 
     /**
