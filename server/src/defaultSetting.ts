@@ -17,8 +17,6 @@ interface ValueRange {
     excluded: boolean;
 }
 
-type SettingValueType =
-    "string" | "number" | "integer" | "boolean" | "enum" | "interval" | "date" | "object" | "string[]";
 /**
  * Holds the description of a setting and corresponding methods.
  */
@@ -91,9 +89,14 @@ export class DefaultSetting {
     public readonly section?: string | string[];
     /**
      * The type of the setting.
-     * Possible values: string, number, integer, boolean, enum, interval, date, string[]
+     * Possible values: string, number, integer, boolean, enum, interval, date
      */
-    public readonly type: SettingValueType = "string";
+    public readonly type: string = "";
+    /**
+     * Indicates that value is a list of given type
+     * For example, string[] is comma separated strings list
+     */
+    public readonly multiple: boolean = false;
     /**
      * Type of the widget were setting is applicable, for example,
      * gradient-count is applicable for gauge, treemap and calendar.
@@ -159,7 +162,7 @@ export class DefaultSetting {
         if (this.example != null && this.example !== "") {
             result += `Example: ${this.displayName} = ${this.example}  \n`;
         }
-        if (this.type != null) {
+        if (this.type != null && this.type !== "") {
             result += `Type: ${this.type}  \n`;
         }
         if (this.defaultValue != null && this.defaultValue !== "") {

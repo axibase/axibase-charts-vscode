@@ -973,6 +973,10 @@ export class Validator {
             }
         }
 
+        if (setting.multiple) {
+            this.checkMultipleSetting(setting);
+        }
+
         if (!setting.multiLine) {
             this.checkRepetition(setting);
         } else {
@@ -1215,6 +1219,30 @@ export class Validator {
                     DiagnosticSeverity.Warning
                 ));
             }
+        }
+    }
+
+    /**
+     * Check that multiple type setting has right value format
+     * @param setting - config setting to test
+     */
+    private checkMultipleSetting(setting: Setting) {
+        const { displayName, example, textRange, value } = setting;
+        const validSingle = value.split(" ").length === 1;
+        /**
+         * Workaround in case some commas are missing
+         * For example: disk_used, cpu_used mem_used
+         */
+        const validMultiple = value.split(",").length >= value.split(" ").length;
+        /**
+         * If multiple setting is not correct, create diagnostic
+         */
+        if (!validSingle && !validMultiple) {
+            this.result.push(createDiagnostic(
+                textRange,
+                `${displayName} should be a comma separated list. For example, ${example}`,
+                DiagnosticSeverity.Error,
+            ));
         }
     }
 

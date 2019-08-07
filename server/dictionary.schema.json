@@ -145,6 +145,10 @@
             "description": "[Optional] Can this setting be repeated or not. Default is false",
             "type": "boolean"
           },
+          "multiple": {
+            "description": "[Optional] value is a list of given type",
+            "type": "boolean"
+          },
           "enum": {
             "description": "[Optional] Possible values constraint. Default is 'no constraint'. RegExp is supported",
             "type": "array",

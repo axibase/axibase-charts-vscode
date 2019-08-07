@@ -2116,7 +2116,8 @@
         },
         {
             "displayName": "evaluate-libs",
-            "type": "string[]",
+            "type": "string",
+            "multiple": true,
             "example": "helpers.mvl, my-lib.mvel",
             "section": "series"
         },
@@ -4130,7 +4131,8 @@
         },
         {
             "displayName": "metrics",
-            "type": "string[]",
+            "type": "string",
+            "multiple": true,
             "example": "disk_used, memused",
             "section": "series"
         },
