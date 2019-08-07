@@ -2124,6 +2124,7 @@
             "displayName": "evaluate-mode",
             "type": "enum",
             "section": "series",
+            "example": "STRICT",
             "defaultValue": "NOT_STRICT",
             "enum": [
                 "STRICT",
