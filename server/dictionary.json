@@ -876,7 +876,7 @@
             "type": "string",
             "example": "/hbs",
             "defaultValue": "/api/v1",
-            "section": "configuration"
+            "section": "widget"
         },
         {
             "displayName": "counter",
