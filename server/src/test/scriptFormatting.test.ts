@@ -9,7 +9,7 @@ suite("JavasScript code formatting", () => {
         return Math.round(value / 10) * 10;
         };
 endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
@@ -26,7 +26,7 @@ endscript`;
         const text = `script
         window.userFunction = function () {return Math.round(value / 10) * 10;};
 endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
@@ -40,18 +40,17 @@ endscript`;
     });
 
     test("Unformatted code inside script tag in [configuration]", () => {
-        const text = `
-[configuration]
+        const text = `[configuration]
   script
     window.userFunction = function () {
     return Math.round(value / 10) * 10;
     };
   endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
-                Position.create(3, 0),
-                Position.create(5, 6)),
+                Position.create(2, 0),
+                Position.create(4, 6)),
                 "    window.userFunction = function () {\n      return Math.round(value / 10) * 10;\n    };"
             )
         ];
@@ -68,7 +67,7 @@ endscript`;
     return Math.round(value / 10) * 10;
     };
   endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(3, 0),
@@ -83,13 +82,14 @@ endscript`;
 
     test("Correct code that doesn't need formatting", () => {
         const text = `[configuration]
+
   [widget]
     script` +
     `        window.userFunction = function () {` +
   + `  return Math.round(value / 10) * 10;` +
     `};`
   + `endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS(false);
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
         const expected: TextEdit[] = [];
         const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
