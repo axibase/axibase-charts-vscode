@@ -5,6 +5,8 @@ import { RelatedSettingsRule } from "./utils/interfaces";
 import colorsThresholds from "./valueValidation/colorsThresholds";
 import forecastAutoCountAndEigentripleLimit from "./valueValidation/forecastAutoCountAndEigentripleLimit";
 import forecastEndTime from "./valueValidation/forecastEndTime";
+import forecastSsaGroupAutoUnion from "./valueValidation/forecastSsaGroupAutoUnion";
+import forecastSsaGroupManualGroups from "./valueValidation/forecastSsaGroupManualGroups";
 import forecastStartTime from "./valueValidation/forecastStartTime";
 import startEndTime from "./valueValidation/startEndTime";
 
@@ -16,7 +18,9 @@ const rulesBySection: Map<string, RelatedSettingsRule[]> = new Map<string, Relat
             forecastStartTime,
             forecastAutoCountAndEigentripleLimit,
             requiredSettings,
-            noUselessSettingsForSeries
+            noUselessSettingsForSeries,
+            forecastSsaGroupAutoUnion,
+            forecastSsaGroupManualGroups
         ]
     ],
     [

@@ -11,28 +11,6 @@ import {
 } from "./regExpressions";
 import { createDiagnostic } from "./util";
 
-interface SpecificValueCheck {
-  errMsg: string;
-  isIncorrect: (value: string) => boolean;
-}
-
-const specificValueChecksMap: Map<string, SpecificValueCheck> = new Map([
-  ["forecastssagroupmanualgroups", {
-    errMsg: "Incorrect group syntax",
-    isIncorrect: (value: string) => {
-      const regex = /^[\d\s,;-]+$/;
-      return !regex.test(value);
-    }
-  }],
-  ["forecastssagroupautounion", {
-    errMsg: "Incorrect group union syntax",
-    isIncorrect: (value: string) => {
-      const regex = /^[a-z\s,;-]+$/;
-      return !regex.test(value);
-    }
-  }]
-]);
-
 /**
  * In addition to DefaultSetting contains specific fields.
  */
@@ -86,11 +64,6 @@ export class Setting extends DefaultSetting {
             result = createDiagnostic(range,
               `${this.displayName} must contain only the following:\n * ${enumList}`);
           }
-          break;
-        }
-        const specCheck = specificValueChecksMap.get(this.name);
-        if (specCheck && specCheck.isIncorrect(this.value)) {
-          result = createDiagnostic(range, specCheck.errMsg);
         }
         break;
       }
