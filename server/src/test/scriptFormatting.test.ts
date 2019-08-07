@@ -9,7 +9,7 @@ suite("JavasScript code formatting", () => {
         return Math.round(value / 10) * 10;
         };
 endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
@@ -26,7 +26,7 @@ endscript`;
         const text = `script
         window.userFunction = function () {return Math.round(value / 10) * 10;};
 endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(1, 0),
@@ -46,7 +46,7 @@ endscript`;
     return Math.round(value / 10) * 10;
     };
   endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -67,7 +67,7 @@ endscript`;
     return Math.round(value / 10) * 10;
     };
   endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(3, 0),
@@ -89,7 +89,7 @@ endscript`;
   + `  return Math.round(value / 10) * 10;` +
     `};`
   + `endscript`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [];
         const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();

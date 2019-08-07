@@ -11,17 +11,10 @@ interface Section {
     name?: string;
 }
 
-/** Extended formatting options, supporting blank lines formatting possibility */
-interface AxibaseFormattingOptions extends FormattingOptions {
-    formatBlankLines?: boolean;
-}
-
 /** Default document formatting options */
-export const DEFAULT_FORMATTING_OPTIONS = (formatBlankLines: boolean = true): AxibaseFormattingOptions => {
-    const TAB_SIZE: number = 2;
-    const INSERT_SPACES: boolean = true;
-
-    return Object.assign(FormattingOptions.create(TAB_SIZE, INSERT_SPACES), { formatBlankLines });
+export const DEFAULT_FORMATTING_OPTIONS: FormattingOptions = {
+    insertSpaces: true,
+    tabSize: 2
 };
 
 /**
@@ -72,7 +65,7 @@ export class Formatter {
     /**
      * Contains options from user's settings which are used to format document
      */
-    private readonly options: AxibaseFormattingOptions;
+    private readonly options: FormattingOptions;
     /**
      * Indent of last keyword.
      */
@@ -82,7 +75,7 @@ export class Formatter {
     private previousSection: Section = {};
     private currentSection: Section = {};
 
-    public constructor(text: string, formattingOptions: AxibaseFormattingOptions) {
+    public constructor(text: string, formattingOptions: FormattingOptions) {
         this.options = formattingOptions;
         this.lines = text.split("\n");
     }
@@ -336,10 +329,6 @@ export class Formatter {
      * Inserts blank line before section except for configuration
      */
     private insertLineBeforeSection(): void {
-        if (!this.options.formatBlankLines) {
-            return;
-        }
-
         const currentLine = this.getCurrentLine();
         const previousLineNumber = this.currentLine - 1;
         const previousLine = this.getLine(previousLineNumber);
@@ -357,10 +346,6 @@ export class Formatter {
      * Deletes extra blank lines in the document
      */
     private deleteExtraBlankLines(): void {
-        if (!this.options.formatBlankLines) {
-            return;
-        }
-
         const nextLineNumber = this.currentLine + 1;
         const nextLine = this.getLine(nextLineNumber);
 

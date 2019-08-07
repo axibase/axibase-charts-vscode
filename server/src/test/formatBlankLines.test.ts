@@ -9,7 +9,7 @@ suite("Blank lines formatting", () => {
 
 
 [group]`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -26,7 +26,7 @@ suite("Blank lines formatting", () => {
         const text = `[configuration]
   offset-right = 50
 [group]`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),
@@ -44,7 +44,7 @@ suite("Blank lines formatting", () => {
   offset-right = 50
 
 [group]`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [];
         const formatter = new Formatter(text, options);
         const actual = formatter.lineByLine();
@@ -57,7 +57,7 @@ suite("Blank lines formatting", () => {
 
   metric = cpu_busy
 [group]`;
-        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS();
+        const options: FormattingOptions = DEFAULT_FORMATTING_OPTIONS;
         const expected: TextEdit[] = [
             TextEdit.replace(Range.create(
                 Position.create(2, 0),

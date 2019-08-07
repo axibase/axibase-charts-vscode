@@ -119,7 +119,7 @@ connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] =
         return [];
     }
     const text: string | undefined = document.getText();
-    const formatter: Formatter = new Formatter(text, DEFAULT_FORMATTING_OPTIONS());
+    const formatter: Formatter = new Formatter(text, DEFAULT_FORMATTING_OPTIONS);
 
     return formatter.lineByLine();
 });
