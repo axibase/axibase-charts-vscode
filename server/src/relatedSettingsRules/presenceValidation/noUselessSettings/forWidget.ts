@@ -25,9 +25,8 @@ const checks: Map<string, Condition[]> = new Map<string, Condition[]>([
             isNotUselessIf("server-aggregate", ["false"])]
     ],
     [
-        "ticks", [
-            isNotUselessIf("type", ["calendar", "treemap", "gauge"]),
-            isNotUselessIf("mode", ["half", "default"])
+        "palette-ticks", [
+            isNotUselessIf("type", ["calendar", "treemap"])
         ]
     ],
     [

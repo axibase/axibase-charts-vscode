@@ -820,7 +820,7 @@
         {
             "displayName": "columns",
             "type": "string",
-            "example": "columns = pid, command",
+            "example": "pid, command",
             "section": "widget"
         },
         {
@@ -876,7 +876,7 @@
             "type": "string",
             "example": "/hbs",
             "defaultValue": "/api/v1",
-            "section": "configuration"
+            "section": "widget"
         },
         {
             "displayName": "counter",
@@ -7149,7 +7149,7 @@
         },
         {
             "displayName": "sql",
-            "section": "widget",
+            "section": "series",
             "example": "SELECT time, entity, value FROM cpu_busy WHERE time > now - 5 * minute",
             "multiLine": true,
             "type": "string"

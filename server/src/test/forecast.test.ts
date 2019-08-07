@@ -166,12 +166,12 @@ forecast-arima-d = 5.6`;
         assert.deepStrictEqual(diags, [createDiagnostic(
             Range.create(Position.create(8, 0),
                 Position.create(8, "forecast-arima-auto-regression-interval".length)),
-            "forecast-arima-auto-regression-interval setting is appplied only if forecast-arima-auto is false.",
+            "forecast-arima-auto-regression-interval setting is applied only if forecast-arima-auto is false.",
             DiagnosticSeverity.Warning),
         createDiagnostic(
             Range.create(Position.create(9, 0),
                 Position.create(9, "forecast-arima-d".length)),
-            "forecast-arima-d setting is appplied only if forecast-arima-auto is false.",
+            "forecast-arima-d setting is applied only if forecast-arima-auto is false.",
             DiagnosticSeverity.Warning)
         ], `Config: \n${conf}`);
     });

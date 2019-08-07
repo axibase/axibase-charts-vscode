@@ -209,7 +209,7 @@
             }
           },
           "deprecated": {
-            "description": "[Optinal] Warning message to show if setting is deprecated",
+            "description": "[Optimal] Warning message to show if setting is deprecated",
             "type": "string"
           },
           "override": {
