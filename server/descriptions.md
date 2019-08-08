@@ -418,25 +418,25 @@ Override grouped series legend when `group=entity`.
   
 Define the wait period after ATSD handles a server processing error before refreshing data.  
   
-## evaluateexpression  
+## evaluateexpression
   
-Expression evaluated for each timestamp.  
+MVEL expression text applied to the series collections retrieved at the previous transformation step.  
   
 ## evaluatelibs  
   
-Libraries used for expression evaluation.  
+List of MVEL script files imported in the expression context. The scripts can be uploaded on the Data > MVEL Script Viewer page.
   
 ## evaluatemode  
   
-Evaluation mode: can be strict or not strict.  
+Data consistency mode: STRICT or NOT_STRICT (default). Strict mode generates error when some of the joined data is missing.
   
 ## evaluatescript  
   
-Script used for expression evaluation for each timestamp.  
+MVEL script file imported in the expression context. The script can be uploaded on the Data > MVEL Script Viewer page.
   
 ## evaluatetimezone  
   
-Regularizes series into DAY (and larger periods) due to calendar alignment.  
+Timezone used in calendar alignment. The default is the server timezone. List of supported timezone identifiers: https://axibase.com/docs/atsd/shared/timezone-list.html
   
 ## exactmatch  
   
