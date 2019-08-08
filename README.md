@@ -4,16 +4,14 @@
 
 [![](https://vsmarketplacebadge.apphb.com/version-short/Axibase.axibasecharts-syntax.svg)](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax)
 
-**Axibase Charts** extension for Microsoft [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax) is a design tool that simplifies portal development and data exploration using the [Axibase Charts](https://axibase.com/docs/charts/) library of declarative graphics.
+**Axibase Charts** extension for Microsoft [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Axibase.axibasecharts-syntax) makes it easy to work with **declarative** graphics, or graphics built from settings. The extension simplifies portal development and data exploration using the [Axibase Charts](https://axibase.com/docs/charts/) library through the following functionality:
 
-The extension implements the following functionality:
-
+* [Syntax Validation](#validation)
+* [Auto-completion](#snippets)
 * [Settings Reference](#introduction)
 * [Live Preview](#live-preview)
 * [Syntax Highlighting](#syntax-highlighting)
 * [Code Formatting](#code-formatting)
-* [Auto-completion](#snippets)
-* [Syntax Validation](#validation)
 
 ## Installation
 
