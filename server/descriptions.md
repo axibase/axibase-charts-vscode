@@ -997,7 +997,7 @@ Define the Metric.
   
 ## metrics  
   
-Retrieves a list of metrics collected by the entity.  
+Supported only with the evaluate-expression setting. List of metrics for which series collections are loaded with the same entity and tags as in the main query.
   
 ## metriclabel  
   
