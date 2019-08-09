@@ -13,6 +13,7 @@
 		"url": "https://github.com/axibase/axibase-charts-vscode"
 	},
 	"dependencies": {
+		"@axibase/charts-language-service": "github:axibase/charts-language-service#develop",
 		"@types/escodegen": "0.0.6",
 		"@types/esprima": "^4.0.2",
 		"escodegen": "^1.11.1",
@@ -21,7 +22,8 @@
 		"vscode-languageserver": "^5.1.0"
 	},
 	"scripts": {
-		"test": "node node_modules/vscode/bin/test --node-ipc"
+		"test": "node node_modules/vscode/bin/test --node-ipc",
+		"update-resources": "cp node_modules/@axibase/charts-language-service/src/resources/**.json . && cp node_modules/@axibase/charts-language-service/src/resources/descriptions.md . && cp node_modules/@axibase/charts-language-service/src/resources/snippets/snippets.json ../snippets"
 	},
 	"devDependencies": {
 		"@types/jsdom": "^11.12.0",

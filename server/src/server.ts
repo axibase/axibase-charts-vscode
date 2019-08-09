@@ -1,14 +1,12 @@
+import { CompletionProvider, Formatter, LanguageService, Validator } from "@axibase/charts-language-service";
 import {
     ClientCapabilities, CompletionItem, CompletionParams, createConnection, Diagnostic,
     DidChangeConfigurationNotification, DidChangeConfigurationParams,
     DocumentFormattingParams, Hover, IConnection, InitializeParams,
     ProposedFeatures, TextDocument, TextDocumentChangeEvent, TextDocumentPositionParams, TextDocuments, TextEdit,
 } from "vscode-languageserver";
-import { CompletionProvider } from "./completionProvider";
-import { Formatter } from "./formatter";
-import { HoverProvider } from "./hoverProvider";
 import { JavaScriptValidator } from "./javaScriptValidator";
-import { Validator } from "./validator";
+import { ResourcesProvider } from "./resourcesProvider";
 
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -20,6 +18,7 @@ const documents: TextDocuments = new TextDocuments();
 let hasConfigurationCapability: boolean | undefined = false;
 
 connection.onInitialize((params: InitializeParams) => {
+    LanguageService.initialize(new ResourcesProvider());
     const capabilities: ClientCapabilities = params.capabilities;
 
     // Does the client support the `workspace/configuration` request?
@@ -46,7 +45,7 @@ connection.onInitialized(() => {
 connection.onHover((params: TextDocumentPositionParams): Hover => {
     const document: TextDocument = documents.get(params.textDocument.uri);
 
-    return new HoverProvider(document).provideHover(params.position);
+    return LanguageService.getHoverProvider(document).provideHover(params.position);
 });
 
 interface IServerSettings {
@@ -87,7 +86,7 @@ const validateTextDocument: (textDocument: TextDocument) => Promise<void> =
     async (textDocument: TextDocument): Promise<void> => {
         const settings: IServerSettings = await getDocumentSettings(textDocument.uri);
         const text: string = textDocument.getText();
-        const validator: Validator = new Validator(text);
+        const validator: Validator = LanguageService.getValidator(text);
         const jsValidator: JavaScriptValidator = new JavaScriptValidator(text);
         const diagnostics: Diagnostic[] = validator.lineByLine();
         const jsDiagnostics: Diagnostic[] = jsValidator.validate(settings.validateFunctions);
@@ -119,7 +118,7 @@ connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] =
         return [];
     }
     const text: string | undefined = document.getText();
-    const formatter: Formatter = new Formatter(text, params.options);
+    const formatter: Formatter = LanguageService.getFormatter(text, params.options);
 
     return formatter.lineByLine();
 });
