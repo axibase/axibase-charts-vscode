@@ -1,5 +1,6 @@
 import { ResourcesProviderBase, Setting } from "@axibase/charts-language-service";
 import { readFileSync } from "fs";
+import { join } from "path";
 
 interface IDictionary { $schema: string; settings: Setting[]; }
 
@@ -13,16 +14,15 @@ export class ResourcesProvider extends ResourcesProviderBase {
      * @returns snippets JSON contents
      */
     public readSnippets(): string {
-        return require("@axibase/charts-language-service/src/resources/snippets/snippets.json");
+        return require("../../snippets/snippets.json");
     }
     /**
      * Reads dictionary from "dictionary.json" file
      * @returns array of settings from the file
      */
     protected readSettings(): Setting[] {
-        const jsonContent: string = readFileSync(
-            "@axibase/charts-language-service/src/resources/dictionary.json", "UTF-8"
-        );
+        const dictionaryFilePath: string = join(__dirname, "..", "dictionary.json");
+        const jsonContent: string = readFileSync(dictionaryFilePath, "UTF-8");
         const dictionary: IDictionary = JSON.parse(jsonContent) as IDictionary;
 
         return dictionary.settings;
@@ -33,9 +33,8 @@ export class ResourcesProvider extends ResourcesProviderBase {
      * @returns map of settings names and descriptions
      */
     protected readDescriptions(): Map<string, string> {
-        const content: string = readFileSync(
-            "@axibase/charts-language-service/src/resources/descriptions.md", "UTF-8"
-        );
+        const descriptionsPath: string = join(__dirname, "..", "descriptions.md");
+        const content: string = readFileSync(descriptionsPath, "UTF-8");
         const map: Map<string, string> = new Map();
         // ## settingname\n\nsetting description[url](hello#html)\n
         const regExp: RegExp = /\#\# ([a-z]+?)  \n  \n([^\s#][\S\s]+?)  (?=\n  (?:\n(?=\#)|$))/g;
