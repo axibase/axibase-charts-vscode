@@ -13,6 +13,7 @@
 		"url": "https://github.com/axibase/axibase-charts-vscode"
 	},
 	"dependencies": {
+		"@axibase/charts-language-service": "github:axibase/charts-language-service#develop",
 		"@types/escodegen": "0.0.6",
 		"@types/esprima": "^4.0.2",
 		"escodegen": "^1.11.1",
