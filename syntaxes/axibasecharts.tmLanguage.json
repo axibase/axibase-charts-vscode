@@ -57,7 +57,7 @@
 				},
 				{
 					"name": "keyword.control.axibase.charts",
-					"match": "^[ \t]*(script|endscript|import|csv|endcsv|sql|endsql|var|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
+					"match": "^[ \t]*(script|endscript|import|csv|endcsv|sql|endsql|expr|endexpr|var|endvar|for|endfor|list|endlist|if|elseif|else|endif)\\b"
 				},
 				{
 					"name": "entity.name.tag.axibase.charts",
