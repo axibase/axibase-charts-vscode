@@ -740,9 +740,10 @@
         {
             "displayName": "collapsible",
             "type": "boolean",
-            "example": false,
-            "defaultValue": true,
-            "section": "widget"
+            "example": true,
+            "defaultValue": false,
+            "section": "column",
+            "widget": "console"
         },
         {
             "displayName": "color",
@@ -2104,6 +2105,49 @@
             "type": "interval",
             "example": "30 minute",
             "section": "series"
+        },
+        {
+            "displayName": "evaluate-expression",
+            "type": "string",
+            "example": "name LIKE 'cpu*'",
+            "section": "series",
+            "multiLine": true,
+            "excludes": [
+                "evaluate-script"
+            ]
+        },
+        {
+            "displayName": "evaluate-libs",
+            "type": "string",
+            "multiple": true,
+            "example": "helpers.mvl, my-lib.mvel",
+            "section": "series"
+        },
+        {
+            "displayName": "evaluate-mode",
+            "type": "enum",
+            "section": "series",
+            "example": "STRICT",
+            "defaultValue": "NOT_STRICT",
+            "enum": [
+                "STRICT",
+                "NOT_STRICT"
+            ]
+        },
+        {
+            "displayName": "evaluate-script",
+            "type": "string",
+            "example": "script-file.mvel",
+            "section": "series",
+            "excludes": [
+                "evaluate-expression"
+            ]
+        },
+        {
+            "displayName": "evaluate-timezone",
+            "type": "string",
+            "section": "series",
+            "example": "Europe/Moscow"
         },
         {
             "displayName": "exact-match",
@@ -4086,6 +4130,13 @@
                 "attribute",
                 "table"
             ]
+        },
+        {
+            "displayName": "metrics",
+            "type": "string",
+            "multiple": true,
+            "example": "disk_used, memused",
+            "section": "series"
         },
         {
             "displayName": "metric-label",
@@ -7137,15 +7188,28 @@
         },
         {
             "displayName": "source",
-            "widget": "console",
             "section": "widget",
             "type": "enum",
-            "defaultValue": "alert",
             "example": "message",
             "enum": [
                 "message",
-                "alert"
-            ]
+                "alert",
+                "message-stat"
+            ],
+            "override": {
+                "[widget == 'console']": {
+                    "enum": [
+                        "message",
+                        "alert"
+                    ],
+                    "defaultValue": "alert"
+                },
+                "[widget != 'console' && widget != 'property' && widget != '']": {
+                    "enum": [
+                        "message-stat"
+                    ]
+                }
+            }
         },
         {
             "displayName": "sql",
@@ -7272,6 +7336,13 @@
                 "percentile\\((\\d{1,2}(\\.\\d)?|100)\\)",
                 "median"
             ]
+        },
+        {
+            "displayName": "summary-text",
+            "type": "string",
+            "example": "row.date",
+            "widget": "console",
+            "section": "column"
         },
         {
             "displayName": "table",

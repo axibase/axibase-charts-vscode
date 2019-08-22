@@ -7,6 +7,7 @@ import {
 } from "vscode-languageserver";
 import { JavaScriptValidator } from "./javaScriptValidator";
 import { ResourcesProvider } from "./resourcesProvider";
+import { substituteDocumentRange } from "./util";
 
 // Create a connection for the server. The connection uses Node"s IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -118,9 +119,9 @@ connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] =
         return [];
     }
     const text: string | undefined = document.getText();
-    const formatter: Formatter = LanguageService.getFormatter(text, params.options);
+    const formatter: Formatter = LanguageService.getFormatter(params.options);
 
-    return formatter.lineByLine();
+    return substituteDocumentRange(document, formatter.format(text));
 });
 
 connection.onCompletion((params: CompletionParams): CompletionItem[] => {

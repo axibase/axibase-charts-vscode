@@ -669,5 +669,13 @@
             "  };",
             "endscript"
         ]
+    },
+    "expr": {
+        "prefix": "evaluate-expression block",
+        "body": [
+            "expr",
+            "  ${1}",
+            "endexpr"
+        ]
     }
 }
