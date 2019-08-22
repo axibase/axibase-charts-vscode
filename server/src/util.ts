@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Range, TextDocument, TextEdit, Position } from "vscode-languageserver";
 
 const DIAGNOSTIC_SOURCE: string = "Axibase Charts";
 
@@ -46,4 +46,23 @@ export function deleteComments(text: string): string {
     }
 
     return content;
+}
+
+/**
+ * Compose text edit to substitute whole document range with given content 
+ * @param document 
+ * @param formattedText 
+ */
+export function substituteDocumentRange(document: TextDocument, content: string): TextEdit[] {
+    return [
+        TextEdit.replace(
+            Range.create(
+                Position.create(0, 0),
+                Position.create(
+                    document.lineCount - 1,
+                    document.getText().length
+                )
+            ), content
+        )
+    ]
 }

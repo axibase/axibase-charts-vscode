@@ -169,7 +169,9 @@ Displays background circle.
 Apply Unix style with black background.  
   
 ## collapsible  
-
+  
+If `true`, add controller to collapse or expand column cell and **Collapse All** button to widget header.  
+  
 ## columnalertexpression  
   
 Boolean expression to apply conditional style to bars. The CSS style must be specified in the `column-alert-style` setting.
@@ -418,6 +420,26 @@ Override grouped series legend when `group=entity`.
   
 Define the wait period after ATSD handles a server processing error before refreshing data.  
   
+## evaluateexpression
+  
+MVEL expression text applied to the series collections retrieved at the previous transformation step.  
+  
+## evaluatelibs  
+  
+List of MVEL script files imported in the expression context. The scripts can be uploaded on the Data > MVEL Script Viewer page.  
+  
+## evaluatemode  
+  
+Data consistency mode: STRICT or NOT_STRICT (default). Strict mode generates error when some of the joined data is missing.  
+  
+## evaluatescript  
+  
+MVEL script file imported in the expression context. The script can be uploaded on the Data > MVEL Script Viewer page.  
+  
+## evaluatetimezone  
+  
+Timezone used in calendar alignment. The default is the server timezone. List of supported timezone identifiers: https://axibase.com/docs/atsd/shared/timezone-list.html  
+
 ## exactmatch  
   
 Ignore series with tags, other than those specified in the series configuration.  
@@ -975,6 +997,10 @@ Supported wildcards: `*` and `?`.
   
 Define the Metric.  
   
+## metrics  
+  
+Supported only with the `evaluate-expression` setting. List of metrics for which series collections are loaded with the same entity and tags as in the main query.  
+  
 ## metriclabel  
   
 Override grouped series legend when `group=metric`.  
@@ -1412,6 +1438,10 @@ Period by which loaded time series data is split.
 ## summarizestatistic  
   
 Statistical function applied to values within each period.  
+  
+## summarytext  
+  
+JavaScript expression returning caption used for cell if `collapsible = true`.  
   
 ## table  
   
