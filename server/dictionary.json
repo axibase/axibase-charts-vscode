@@ -551,7 +551,8 @@
             "section": "widget",
             "widget": "chart",
             "defaultValue": false,
-            "example": true
+            "example": true,
+            "excludes": ["min-range-force", "max-range-force"]
         },
         {
             "displayName": "axis",
@@ -822,7 +823,8 @@
             "displayName": "columns",
             "type": "string",
             "example": "pid, command",
-            "section": "widget"
+            "section": "widget",
+            "multiLine": true
         },
         {
             "displayName": "column-time",
@@ -1048,7 +1050,7 @@
             "displayName": "disconnect-count",
             "type": "integer",
             "example": 50,
-            "section": "widget",
+            "section": "series",
             "widget": "chart"
         },
         {
@@ -1063,7 +1065,7 @@
             "displayName": "disconnect-interval",
             "type": "interval",
             "example": "1 minute",
-            "section": "widget",
+            "section": "series",
             "widget": "chart"
         },
         {
@@ -4059,7 +4061,8 @@
             "displayName": "max-range-force",
             "type": "number",
             "example": 100,
-            "section": "widget"
+            "section": "widget",
+            "excludes": ["auto-scale"]
         },
         {
             "displayName": "max-range-right",
@@ -4187,7 +4190,8 @@
             "displayName": "min-range-force",
             "section": "widget",
             "type": "number",
-            "example": 0
+            "example": 0,
+            "excludes": ["auto-scale"]
         },
         {
             "displayName": "min-range-right",
@@ -5453,7 +5457,7 @@
         },
         {
             "displayName": "path",
-            "section": "configuration",
+            "section": "widget",
             "type": "string",
             "example": "/messages/query"
         },
